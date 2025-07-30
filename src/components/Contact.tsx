@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ContactForm } from '@/components/ContactForm';
 import { Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react';
 
 export const Contact = () => {
   const { t } = useLanguage();
+  const [isContactFormOpen, setIsContactFormOpen] = useState(false);
 
   const contactMethods = [
     {
@@ -78,13 +81,24 @@ export const Contact = () => {
                 <Phone className="w-5 h-5 mr-2" />
                 Zəng et
               </Button>
-              <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white hover:text-primary">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="bg-white/10 border-white/20 text-white hover:bg-white hover:text-primary"
+                onClick={() => setIsContactFormOpen(true)}
+              >
                 <Mail className="w-5 h-5 mr-2" />
                 Email göndər
               </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* Contact Form Popup */}
+        <ContactForm 
+          isOpen={isContactFormOpen} 
+          onClose={() => setIsContactFormOpen(false)} 
+        />
       </div>
     </section>
   );

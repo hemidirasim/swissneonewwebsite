@@ -1,6 +1,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Shield, Award, Heart } from 'lucide-react';
+import motherChildImage from '@/assets/mother-child-hero.jpg';
 
 export const Hero = () => {
   const { t } = useLanguage();
@@ -81,28 +82,30 @@ export const Hero = () => {
             </div>
           </div>
 
-          {/* Visual */}
+          {/* Visual - Mother & Child */}
           <div className="relative">
-            <div className="relative mx-auto max-w-md">
-              {/* Main product showcase */}
-              <div className="relative bg-card rounded-3xl shadow-premium p-8 transform rotate-2 hover:rotate-0 transition-transform duration-500">
-                <div className="absolute inset-0 bg-gradient-hero opacity-5 rounded-3xl"></div>
-                <div className="relative z-10">
-                  <div className="w-48 h-64 mx-auto bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl flex items-center justify-center">
-                    <div className="text-6xl font-bold text-primary/30">S</div>
-                  </div>
-                  <div className="mt-6 text-center">
-                    <h3 className="font-semibold text-foreground mb-2">Swissneo Formula</h3>
-                    <p className="text-sm text-muted-foreground">İsveçrə keyfiyyəti</p>
-                  </div>
+            <div className="relative mx-auto max-w-lg">
+              {/* Main mother-child image */}
+              <div className="relative bg-card rounded-3xl shadow-premium overflow-hidden transform hover:scale-105 transition-transform duration-500">
+                <div className="absolute inset-0 bg-gradient-hero opacity-10 rounded-3xl"></div>
+                <img 
+                  src={motherChildImage} 
+                  alt="Ana və övlad - Swissneo premium uşaq qidası"
+                  className="w-full h-auto rounded-3xl"
+                />
+                
+                {/* Overlay content */}
+                <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-4">
+                  <h3 className="font-semibold text-foreground mb-1">Swissneo Formula</h3>
+                  <p className="text-sm text-muted-foreground">Uşağınızın sağlam gələcəyi üçün</p>
                 </div>
               </div>
 
               {/* Floating quality badges */}
-              <div className="absolute -top-4 -right-4 bg-secondary text-secondary-foreground px-3 py-2 rounded-xl text-sm font-medium shadow-card">
+              <div className="absolute -top-4 -right-4 bg-secondary text-secondary-foreground px-4 py-2 rounded-xl text-sm font-medium shadow-card animate-bounce">
                 🇨🇭 Swiss Made
               </div>
-              <div className="absolute -bottom-4 -left-4 bg-primary text-primary-foreground px-3 py-2 rounded-xl text-sm font-medium shadow-card">
+              <div className="absolute -bottom-4 -left-4 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-medium shadow-card animate-bounce delay-500">
                 ✨ Premium
               </div>
             </div>
