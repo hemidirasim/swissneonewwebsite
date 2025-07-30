@@ -118,17 +118,23 @@ const AdminDataContext = createContext<AdminDataContextType | undefined>(undefin
 
 export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [adminData, setAdminData] = useState<AdminData>(defaultAdminData);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load data from localStorage on mount
   useEffect(() => {
     const savedData = localStorage.getItem('swissneo_admin_data');
     if (savedData) {
       try {
-        setAdminData(JSON.parse(savedData));
+        const parsedData = JSON.parse(savedData);
+        setAdminData(parsedData);
       } catch (error) {
         console.error('Error parsing admin data:', error);
         setAdminData(defaultAdminData);
       }
+    } else {
+      // If no saved data exists, save the default data
+      localStorage.setItem('swissneo_admin_data', JSON.stringify(defaultAdminData));
+      setAdminData(defaultAdminData);
     }
   }, []);
 
