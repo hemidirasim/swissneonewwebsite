@@ -1,22 +1,24 @@
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAdminData } from '@/contexts/AdminDataContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Target, Shield, Award, Users, Heart, Microscope } from 'lucide-react';
 
 export const About = () => {
   const { t } = useLanguage();
+  const { adminData } = useAdminData();
 
   const values = [
     {
       icon: <Target className="w-8 h-8" />,
       title: t('about.mission'),
-      description: t('about.mission.text'),
+      description: adminData.companyMission,
       color: 'text-primary'
     },
     {
       icon: <Shield className="w-8 h-8" />,
       title: t('about.quality'),
-      description: t('about.quality.text'),
+      description: adminData.companyQuality,
       color: 'text-secondary'
     }
   ];
@@ -40,7 +42,7 @@ export const About = () => {
             {t('about.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            {t('about.description')}
+            {adminData.companyDescription}
           </p>
         </div>
 

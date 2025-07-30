@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAdminData } from '@/contexts/AdminDataContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,27 +9,28 @@ import { Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react';
 
 export const Contact = () => {
   const { t } = useLanguage();
+  const { adminData } = useAdminData();
   const [isContactFormOpen, setIsContactFormOpen] = useState(false);
 
   const contactMethods = [
     {
       icon: <Phone className="w-6 h-6" />,
       title: 'Telefon',
-      value: '+994 XX XXX XX XX',
+      value: adminData.contactPhone,
       description: 'Bazar ertəsi - Cümə, 09:00-18:00',
       color: 'text-primary'
     },
     {
       icon: <Mail className="w-6 h-6" />,
       title: 'Email',
-      value: 'info@swissneo.az',
+      value: adminData.contactEmail,
       description: '24 saat ərzində cavab veririk',
       color: 'text-secondary'
     },
     {
       icon: <MapPin className="w-6 h-6" />,
       title: 'Ünvan',
-      value: 'Bakı, Azərbaycan',
+      value: adminData.contactAddress,
       description: 'Əsas ofis',
       color: 'text-accent'
     }

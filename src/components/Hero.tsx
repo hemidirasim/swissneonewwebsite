@@ -1,10 +1,12 @@
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAdminData } from '@/contexts/AdminDataContext';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Shield, Award, Heart } from 'lucide-react';
 import motherChildImage from '@/assets/mother-child-hero.jpg';
 
 export const Hero = () => {
   const { t } = useLanguage();
+  const { adminData } = useAdminData();
 
   const scrollToProducts = () => {
     document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
@@ -35,14 +37,14 @@ export const Hero = () => {
 
             {/* Main heading */}
             <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
-              <span className="text-primary">{t('hero.title')}</span>
+              <span className="text-primary">{adminData.heroTitle}</span>
               <br />
-              {t('hero.subtitle')}
+              {adminData.heroSubtitle}
             </h1>
 
             {/* Description */}
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl">
-              {t('hero.description')}
+              {adminData.heroDescription}
             </p>
 
             {/* Trust indicators */}

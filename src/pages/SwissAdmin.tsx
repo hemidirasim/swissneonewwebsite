@@ -20,31 +20,9 @@ import {
   BarChart3
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { AdminData } from '@/contexts/AdminDataContext';
 
 const ADMIN_PASSWORD = 'swissneo2024';
-
-interface AdminData {
-  // Hero Section
-  heroTitle: string;
-  heroSubtitle: string;
-  heroDescription: string;
-  
-  // Products
-  product1Name: string;
-  product1Description: string;
-  product2Name: string;
-  product2Description: string;
-  
-  // Contact Info
-  contactPhone: string;
-  contactEmail: string;
-  contactAddress: string;
-  
-  // Company Info
-  companyDescription: string;
-  companyMission: string;
-  companyQuality: string;
-}
 
 const SwissAdmin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -101,9 +79,11 @@ const SwissAdmin = () => {
 
   const handleSave = () => {
     localStorage.setItem('swissneo_admin_data', JSON.stringify(adminData));
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event('adminDataUpdated'));
     toast({
       title: 'Məlumatlar saxlanıldı!',
-      description: 'Dəyişikliklər uğurla saxlanıldı.',
+      description: 'Dəyişikliklər uğurla saxlanıldı və saytda görünəcək.',
     });
   };
 
