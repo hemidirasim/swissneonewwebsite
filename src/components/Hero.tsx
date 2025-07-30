@@ -5,7 +5,7 @@ import { ArrowRight, Shield, Award, Heart } from 'lucide-react';
 import motherChildImage from '@/assets/mother-child-hero.jpg';
 
 export const Hero = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { adminData } = useAdminData();
 
   const scrollToProducts = () => {
@@ -37,14 +37,14 @@ export const Hero = () => {
 
             {/* Main heading */}
             <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
-              <span className="text-primary">{adminData.heroTitle}</span>
+              <span className="text-primary">{adminData.heroTitle[language]}</span>
               <br />
-              {adminData.heroSubtitle}
+              {adminData.heroSubtitle[language]}
             </h1>
 
             {/* Description */}
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl">
-              {adminData.heroDescription}
+              {adminData.heroDescription[language]}
             </p>
 
             {/* Trust indicators */}

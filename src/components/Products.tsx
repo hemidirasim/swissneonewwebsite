@@ -5,25 +5,25 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Baby, Clock, Weight, MapPin } from 'lucide-react';
 
 export const Products = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { adminData } = useAdminData();
 
   const products = [
     {
       id: 1,
       image: '/lovable-uploads/b0d62079-dc9d-4d61-a539-2cde4f82d6c3.png',
-      name: adminData.product1Name,
+      name: adminData.product1Name[language],
       stage: t('product1.stage'),
-      description: adminData.product1Description,
+      description: adminData.product1Description[language],
       color: 'from-blue-400 to-blue-600',
       bgColor: 'bg-blue-50'
     },
     {
       id: 2,
       image: '/lovable-uploads/1b436833-1495-456b-bdfb-0184d54c29b7.png',
-      name: adminData.product2Name,
+      name: adminData.product2Name[language],
       stage: t('product2.stage'),
-      description: adminData.product2Description,
+      description: adminData.product2Description[language],
       color: 'from-green-400 to-green-600',
       bgColor: 'bg-green-50'
     }

@@ -8,7 +8,7 @@ import { ContactForm } from '@/components/ContactForm';
 import { Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react';
 
 export const Contact = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { adminData } = useAdminData();
   const [isContactFormOpen, setIsContactFormOpen] = useState(false);
 
@@ -30,7 +30,7 @@ export const Contact = () => {
     {
       icon: <MapPin className="w-6 h-6" />,
       title: 'Ünvan',
-      value: adminData.contactAddress,
+      value: adminData.contactAddress[language],
       description: 'Əsas ofis',
       color: 'text-accent'
     }
@@ -79,7 +79,11 @@ export const Contact = () => {
               Məhsullarımız, qidalanma məsləhətləri və ya Swissneo ailə proqramları haqqında məlumat üçün bizimlə əlaqə saxlayın.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white hover:text-primary">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="bg-white/10 border-white/20 text-white hover:bg-white hover:text-primary"
+              >
                 <Phone className="w-5 h-5 mr-2" />
                 Zəng et
               </Button>
@@ -90,7 +94,7 @@ export const Contact = () => {
                 onClick={() => setIsContactFormOpen(true)}
               >
                 <Mail className="w-5 h-5 mr-2" />
-                Email göndər
+                Sorğu göndər
               </Button>
             </div>
           </CardContent>

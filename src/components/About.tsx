@@ -5,20 +5,20 @@ import { Badge } from '@/components/ui/badge';
 import { Target, Shield, Award, Users, Heart, Microscope } from 'lucide-react';
 
 export const About = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { adminData } = useAdminData();
 
   const values = [
     {
       icon: <Target className="w-8 h-8" />,
       title: t('about.mission'),
-      description: adminData.companyMission,
+      description: adminData.companyMission[language],
       color: 'text-primary'
     },
     {
       icon: <Shield className="w-8 h-8" />,
       title: t('about.quality'),
-      description: adminData.companyQuality,
+      description: adminData.companyQuality[language],
       color: 'text-secondary'
     }
   ];
@@ -42,7 +42,7 @@ export const About = () => {
             {t('about.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            {adminData.companyDescription}
+            {adminData.companyDescription[language]}
           </p>
         </div>
 

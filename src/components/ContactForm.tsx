@@ -48,7 +48,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="w-5 h-5 text-primary" />
-            {language === 'az' ? 'Bizimlə əlaqə saxlayın' : 'Contact Us'}
+            {language === 'az' ? 'Sorğu göndərin' : 'Send Inquiry'}
           </DialogTitle>
         </DialogHeader>
         

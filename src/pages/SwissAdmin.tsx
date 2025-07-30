@@ -17,7 +17,8 @@ import {
   LogOut,
   Edit3,
   Users,
-  BarChart3
+  BarChart3,
+  Languages
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { AdminData } from '@/contexts/AdminDataContext';
@@ -27,31 +28,50 @@ const ADMIN_PASSWORD = 'swissneo2024';
 const SwissAdmin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [currentLang, setCurrentLang] = useState<'az' | 'en'>('az');
   const [adminData, setAdminData] = useState<AdminData>({
-    // Default values
-    heroTitle: 'İsveçrə keyfiyyətində',
-    heroSubtitle: 'Premium uşaq qidası',
-    heroDescription: 'Swissneo — 100 ildən artıq İsveçrə təcrübəsi ilə hazırlanmış super premium uşaq qarışığı. Uşağınızın sağlam inkişafı və güclü immunitet üçün.',
-    
-    product1Name: 'Swissneo 1',
-    product1Description: 'Doğulduğu gündən etibarən 6 ayadək olan körpələr üçün başlanğıc süd qarışığı',
-    product2Name: 'Swissneo 2',
-    product2Description: '6-12 aylıq körpələr üçün növbəti mərhələ süd qarışığı',
-    
+    heroTitle: { az: 'İsveçrə keyfiyyətində', en: 'Swiss Quality' },
+    heroSubtitle: { az: 'Premium uşaq qidası', en: 'Premium Baby Formula' },
+    heroDescription: { 
+      az: 'Swissneo — 100 ildən artıq İsveçrə təcrübəsi ilə hazırlanmış super premium uşaq qarışığı. Uşağınızın sağlam inkişafı və güclü immunitet üçün.',
+      en: 'Swissneo — super premium baby formula crafted with over 100 years of Swiss expertise. For your baby\'s healthy development and strong immunity.'
+    },
+    product1Name: { az: 'Swissneo 1', en: 'Swissneo 1' },
+    product1Description: { 
+      az: 'Doğulduğu gündən etibarən 6 ayadək olan körpələr üçün başlanğıc süd qarışığı',
+      en: 'Starting infant milk formula for babies from birth to 6 months'
+    },
+    product2Name: { az: 'Swissneo 2', en: 'Swissneo 2' },
+    product2Description: { 
+      az: '6-12 aylıq körpələr üçün növbəti mərhələ süd qarışığı',
+      en: 'Follow-on milk formula for babies from 6 to 12 months'
+    },
     contactPhone: '+994 XX XXX XX XX',
     contactEmail: 'info@swissneo.az',
-    contactAddress: 'Bakı, Azərbaycan',
-    
-    companyDescription: 'Swissneo — süd məhsulları sahəsində 100 ildən artıq təcrübəyə malik İsveçrənin super premium uşaq qidası markasıdır.',
-    companyMission: 'Keyfiyyətə önəm verən və uşaqlarına ən yaxşısını vermək istəyən Azərbaycan valideynlərinin artan tələbatını qarşılamaq.',
-    companyQuality: 'İsveçrənin ən yüksək keyfiyyət standartları ilə istehsal olunan məhsullarımız uşağınızın təhlükəsizliyi üçün bütün sertifikatları daşıyır.',
+    contactAddress: { az: 'Bakı, Azərbaycan', en: 'Baku, Azerbaijan' },
+    companyDescription: { 
+      az: 'Swissneo — süd məhsulları sahəsində 100 ildən artıq təcrübəyə malik İsveçrənin super premium uşaq qidası markasıdır.',
+      en: 'Swissneo is a super premium baby food brand from Switzerland with over 100 years of experience in dairy products.'
+    },
+    companyMission: { 
+      az: 'Keyfiyyətə önəm verən və uşaqlarına ən yaxşısını vermək istəyən Azərbaycan valideynlərinin artan tələbatını qarşılamaq.',
+      en: 'To meet the growing demand of knowledgeable Azerbaijani parents who value quality and want to give their children the best.'
+    },
+    companyQuality: { 
+      az: 'İsveçrənin ən yüksək keyfiyyət standartları ilə istehsal olunan məhsullarımız uşağınızın təhlükəsizliyi üçün bütün sertifikatları daşıyır.',
+      en: 'Our products manufactured with Switzerland\'s highest quality standards carry all certifications for your child\'s safety.'
+    },
   });
 
   // Load saved data on component mount
   useEffect(() => {
     const savedData = localStorage.getItem('swissneo_admin_data');
     if (savedData) {
-      setAdminData(JSON.parse(savedData));
+      try {
+        setAdminData(JSON.parse(savedData));
+      } catch (error) {
+        console.error('Error parsing admin data:', error);
+      }
     }
   }, []);
 
@@ -87,7 +107,17 @@ const SwissAdmin = () => {
     });
   };
 
-  const handleInputChange = (field: keyof AdminData, value: string) => {
+  const handleBilingualInputChange = (field: keyof AdminData, lang: 'az' | 'en', value: string) => {
+    setAdminData(prev => ({
+      ...prev,
+      [field]: {
+        ...prev[field] as { az: string; en: string },
+        [lang]: value
+      }
+    }));
+  };
+
+  const handleSimpleInputChange = (field: keyof AdminData, value: string) => {
     setAdminData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -144,6 +174,28 @@ const SwissAdmin = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              {/* Language Switcher */}
+              <div className="flex items-center gap-2">
+                <Languages className="w-4 h-4 text-muted-foreground" />
+                <div className="flex rounded-lg border border-border overflow-hidden">
+                  <Button
+                    variant={currentLang === 'az' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setCurrentLang('az')}
+                    className="rounded-none text-xs px-3 py-1"
+                  >
+                    AZ
+                  </Button>
+                  <Button
+                    variant={currentLang === 'en' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setCurrentLang('en')}
+                    className="rounded-none text-xs px-3 py-1"
+                  >
+                    EN
+                  </Button>
+                </div>
+              </div>
               <Button onClick={handleSave} variant="premium">
                 <Save className="w-4 h-4 mr-2" />
                 Saxla
@@ -159,6 +211,13 @@ const SwissAdmin = () => {
 
       {/* Dashboard Content */}
       <div className="container mx-auto px-6 py-8">
+        {/* Language Indicator */}
+        <div className="mb-6">
+          <Badge variant="outline" className="text-sm">
+            {currentLang === 'az' ? '🇦🇿 Azərbaycan dili' : '🇬🇧 English language'} redaktə edilir
+          </Badge>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -193,11 +252,11 @@ const SwissAdmin = () => {
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                  <Phone className="w-6 h-6 text-accent" />
+                  <Languages className="w-6 h-6 text-accent" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Əlaqə məlumatları</p>
-                  <p className="text-2xl font-bold">3</p>
+                  <p className="text-sm text-muted-foreground">Dillər</p>
+                  <p className="text-2xl font-bold">2</p>
                 </div>
               </div>
             </CardContent>
@@ -233,7 +292,7 @@ const SwissAdmin = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="w-5 h-5" />
-                  Ana səhifə məlumatları
+                  Ana səhifə məlumatları - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -241,8 +300,8 @@ const SwissAdmin = () => {
                   <Label htmlFor="heroTitle">Ana başlıq</Label>
                   <Input
                     id="heroTitle"
-                    value={adminData.heroTitle}
-                    onChange={(e) => handleInputChange('heroTitle', e.target.value)}
+                    value={adminData.heroTitle[currentLang]}
+                    onChange={(e) => handleBilingualInputChange('heroTitle', currentLang, e.target.value)}
                   />
                 </div>
                 
@@ -250,8 +309,8 @@ const SwissAdmin = () => {
                   <Label htmlFor="heroSubtitle">Alt başlıq</Label>
                   <Input
                     id="heroSubtitle"
-                    value={adminData.heroSubtitle}
-                    onChange={(e) => handleInputChange('heroSubtitle', e.target.value)}
+                    value={adminData.heroSubtitle[currentLang]}
+                    onChange={(e) => handleBilingualInputChange('heroSubtitle', currentLang, e.target.value)}
                   />
                 </div>
                 
@@ -259,8 +318,8 @@ const SwissAdmin = () => {
                   <Label htmlFor="heroDescription">Açıqlama</Label>
                   <Textarea
                     id="heroDescription"
-                    value={adminData.heroDescription}
-                    onChange={(e) => handleInputChange('heroDescription', e.target.value)}
+                    value={adminData.heroDescription[currentLang]}
+                    onChange={(e) => handleBilingualInputChange('heroDescription', currentLang, e.target.value)}
                     rows={4}
                   />
                 </div>
@@ -275,7 +334,7 @@ const SwissAdmin = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Package className="w-5 h-5" />
-                    Swissneo 1 (0-6 ay)
+                    Swissneo 1 (0-6 ay) - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -283,8 +342,8 @@ const SwissAdmin = () => {
                     <Label htmlFor="product1Name">Məhsul adı</Label>
                     <Input
                       id="product1Name"
-                      value={adminData.product1Name}
-                      onChange={(e) => handleInputChange('product1Name', e.target.value)}
+                      value={adminData.product1Name[currentLang]}
+                      onChange={(e) => handleBilingualInputChange('product1Name', currentLang, e.target.value)}
                     />
                   </div>
                   
@@ -292,8 +351,8 @@ const SwissAdmin = () => {
                     <Label htmlFor="product1Description">Açıqlama</Label>
                     <Textarea
                       id="product1Description"
-                      value={adminData.product1Description}
-                      onChange={(e) => handleInputChange('product1Description', e.target.value)}
+                      value={adminData.product1Description[currentLang]}
+                      onChange={(e) => handleBilingualInputChange('product1Description', currentLang, e.target.value)}
                       rows={3}
                     />
                   </div>
@@ -304,7 +363,7 @@ const SwissAdmin = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Package className="w-5 h-5" />
-                    Swissneo 2 (6-12 ay)
+                    Swissneo 2 (6-12 ay) - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -312,8 +371,8 @@ const SwissAdmin = () => {
                     <Label htmlFor="product2Name">Məhsul adı</Label>
                     <Input
                       id="product2Name"
-                      value={adminData.product2Name}
-                      onChange={(e) => handleInputChange('product2Name', e.target.value)}
+                      value={adminData.product2Name[currentLang]}
+                      onChange={(e) => handleBilingualInputChange('product2Name', currentLang, e.target.value)}
                     />
                   </div>
                   
@@ -321,8 +380,8 @@ const SwissAdmin = () => {
                     <Label htmlFor="product2Description">Açıqlama</Label>
                     <Textarea
                       id="product2Description"
-                      value={adminData.product2Description}
-                      onChange={(e) => handleInputChange('product2Description', e.target.value)}
+                      value={adminData.product2Description[currentLang]}
+                      onChange={(e) => handleBilingualInputChange('product2Description', currentLang, e.target.value)}
                       rows={3}
                     />
                   </div>
@@ -346,7 +405,7 @@ const SwissAdmin = () => {
                   <Input
                     id="contactPhone"
                     value={adminData.contactPhone}
-                    onChange={(e) => handleInputChange('contactPhone', e.target.value)}
+                    onChange={(e) => handleSimpleInputChange('contactPhone', e.target.value)}
                   />
                 </div>
                 
@@ -356,16 +415,16 @@ const SwissAdmin = () => {
                     id="contactEmail"
                     type="email"
                     value={adminData.contactEmail}
-                    onChange={(e) => handleInputChange('contactEmail', e.target.value)}
+                    onChange={(e) => handleSimpleInputChange('contactEmail', e.target.value)}
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="contactAddress">Ünvan</Label>
+                  <Label htmlFor="contactAddress">Ünvan - {currentLang === 'az' ? 'Azərbaycan' : 'English'}</Label>
                   <Input
                     id="contactAddress"
-                    value={adminData.contactAddress}
-                    onChange={(e) => handleInputChange('contactAddress', e.target.value)}
+                    value={adminData.contactAddress[currentLang]}
+                    onChange={(e) => handleBilingualInputChange('contactAddress', currentLang, e.target.value)}
                   />
                 </div>
               </CardContent>
@@ -378,7 +437,7 @@ const SwissAdmin = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="w-5 h-5" />
-                  Şirkət məlumatları
+                  Şirkət məlumatları - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -386,8 +445,8 @@ const SwissAdmin = () => {
                   <Label htmlFor="companyDescription">Şirkət açıqlaması</Label>
                   <Textarea
                     id="companyDescription"
-                    value={adminData.companyDescription}
-                    onChange={(e) => handleInputChange('companyDescription', e.target.value)}
+                    value={adminData.companyDescription[currentLang]}
+                    onChange={(e) => handleBilingualInputChange('companyDescription', currentLang, e.target.value)}
                     rows={3}
                   />
                 </div>
@@ -396,8 +455,8 @@ const SwissAdmin = () => {
                   <Label htmlFor="companyMission">Missiya</Label>
                   <Textarea
                     id="companyMission"
-                    value={adminData.companyMission}
-                    onChange={(e) => handleInputChange('companyMission', e.target.value)}
+                    value={adminData.companyMission[currentLang]}
+                    onChange={(e) => handleBilingualInputChange('companyMission', currentLang, e.target.value)}
                     rows={3}
                   />
                 </div>
@@ -406,8 +465,8 @@ const SwissAdmin = () => {
                   <Label htmlFor="companyQuality">Keyfiyyət təminatı</Label>
                   <Textarea
                     id="companyQuality"
-                    value={adminData.companyQuality}
-                    onChange={(e) => handleInputChange('companyQuality', e.target.value)}
+                    value={adminData.companyQuality[currentLang]}
+                    onChange={(e) => handleBilingualInputChange('companyQuality', currentLang, e.target.value)}
                     rows={3}
                   />
                 </div>
