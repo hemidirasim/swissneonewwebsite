@@ -24,10 +24,10 @@ export const About = () => {
   ];
 
   const stats = [
-    { number: '100+', label: 'İllik təcrübə' },
-    { number: '2', label: 'Məhsul çeşidi' },
-    { number: '🇨🇭', label: 'İsveçrə keyfiyyəti' },
-    { number: '100%', label: 'Təbii formula' }
+    { number: '100+', label: t('about.stats.experience') },
+    { number: '2', label: t('about.stats.products') },
+    { number: '🇨🇭', label: t('about.stats.quality') },
+    { number: '100%', label: t('about.stats.natural') }
   ];
 
   return (
@@ -81,8 +81,8 @@ export const About = () => {
         <Card className="border-0 shadow-card bg-gradient-subtle">
           <CardContent className="p-8">
             <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-foreground mb-4">İsveçrə keyfiyyət standartları</h3>
-              <p className="text-muted-foreground">Nə üçün İsveçrə süd məhsulları dünyada ən yaxşısıdır?</p>
+              <h3 className="text-2xl font-bold text-foreground mb-4">{t('about.swiss.title')}</h3>
+              <p className="text-muted-foreground">{t('about.swiss.subtitle')}</p>
             </div>
             
             <div className="grid md:grid-cols-3 gap-8">
@@ -90,24 +90,24 @@ export const About = () => {
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
                   <Microscope className="w-8 h-8 text-primary" />
                 </div>
-                <h4 className="font-semibold text-foreground mb-2">Elmi tədqiqat</h4>
-                <p className="text-sm text-muted-foreground">100 ildən artıq süd məhsulları sahəsində tədqiqat və inkişaf</p>
+                <h4 className="font-semibold text-foreground mb-2">{t('about.swiss.research')}</h4>
+                <p className="text-sm text-muted-foreground">{t('about.swiss.research.text')}</p>
               </div>
               
               <div className="text-center group">
                 <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-secondary/20 transition-colors">
                   <Heart className="w-8 h-8 text-secondary" />
                 </div>
-                <h4 className="font-semibold text-foreground mb-2">Təbii mənbə</h4>
-                <p className="text-sm text-muted-foreground">Alp dağlarının təmiz havasında bəslənən inəklərdən alınan süd</p>
+                <h4 className="font-semibold text-foreground mb-2">{t('about.swiss.natural')}</h4>
+                <p className="text-sm text-muted-foreground">{t('about.swiss.natural.text')}</p>
               </div>
               
               <div className="text-center group">
                 <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-accent/20 transition-colors">
                   <Award className="w-8 h-8 text-accent" />
                 </div>
-                <h4 className="font-semibold text-foreground mb-2">Sertifikat</h4>
-                <p className="text-sm text-muted-foreground">Bütün beynəlxalq keyfiyyət və təhlükəsizlik standartlarına uyğun</p>
+                <h4 className="font-semibold text-foreground mb-2">{t('about.swiss.cert')}</h4>
+                <p className="text-sm text-muted-foreground">{t('about.swiss.cert.text')}</p>
               </div>
             </div>
           </CardContent>

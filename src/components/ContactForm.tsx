@@ -45,10 +45,8 @@ export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => 
     window.dispatchEvent(new Event('contactSubmissionsUpdated'));
     
     toast({
-      title: language === 'az' ? 'Sorğu göndərildi!' : 'Inquiry sent!',
-      description: language === 'az' 
-        ? 'Tezliklə sizinlə əlaqə saxlayacağıq.' 
-        : 'We will contact you soon.',
+      title: t('form.success.title'),
+      description: t('form.success.description'),
     });
 
     // Reset form and close
@@ -62,7 +60,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="w-5 h-5 text-primary" />
-            {language === 'az' ? 'Sorğu göndərin' : 'Send Inquiry'}
+            {t('form.send.inquiry')}
           </DialogTitle>
         </DialogHeader>
         
@@ -70,13 +68,13 @@ export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => 
           <div className="space-y-2">
             <Label htmlFor="name" className="flex items-center gap-2">
               <User className="w-4 h-4" />
-              {language === 'az' ? 'Ad və Soyad' : 'Full Name'}
+              {t('form.fullname')}
             </Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
-              placeholder={language === 'az' ? 'Adınızı daxil edin' : 'Enter your name'}
+              placeholder={t('form.fullname.placeholder')}
               required
             />
           </div>
@@ -91,7 +89,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => 
               type="email"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
-              placeholder={language === 'az' ? 'Email ünvanınız' : 'Your email address'}
+              placeholder={t('form.email.placeholder')}
               required
             />
           </div>
@@ -99,14 +97,14 @@ export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => 
           <div className="space-y-2">
             <Label htmlFor="phone" className="flex items-center gap-2">
               <Phone className="w-4 h-4" />
-              {language === 'az' ? 'Telefon' : 'Phone'}
+              {t('form.phone')}
             </Label>
             <Input
               id="phone"
               type="tel"
               value={formData.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
-              placeholder={language === 'az' ? 'Telefon nömrəniz' : 'Your phone number'}
+              placeholder={t('form.phone.placeholder')}
               required
             />
           </div>
@@ -114,13 +112,13 @@ export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => 
           <div className="space-y-2">
             <Label htmlFor="message" className="flex items-center gap-2">
               <MessageCircle className="w-4 h-4" />
-              {language === 'az' ? 'Mesaj' : 'Message'}
+              {t('form.message')}
             </Label>
             <Textarea
               id="message"
               value={formData.message}
               onChange={(e) => handleInputChange('message', e.target.value)}
-              placeholder={language === 'az' ? 'Mesajınızı yazın...' : 'Write your message...'}
+              placeholder={t('form.message.placeholder')}
               rows={4}
               required
             />
@@ -128,11 +126,11 @@ export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => 
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-              {language === 'az' ? 'Ləğv et' : 'Cancel'}
+              {t('form.cancel')}
             </Button>
             <Button type="submit" variant="premium" className="flex-1">
               <Send className="w-4 h-4 mr-2" />
-              {language === 'az' ? 'Göndər' : 'Send'}
+              {t('form.send')}
             </Button>
           </div>
         </form>

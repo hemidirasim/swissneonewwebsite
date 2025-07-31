@@ -51,15 +51,15 @@ export const Hero = () => {
             <div className="flex flex-wrap gap-6 mb-8 justify-center lg:justify-start">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Shield className="w-5 h-5 text-primary" />
-                100+ İsveçrə təcrübəsi
+                100+ {t('hero.experience')}
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Heart className="w-5 h-5 text-secondary" />
-                Təbii komponentlər
+                {t('hero.natural')}
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Award className="w-5 h-5 text-accent" />
-                Premium keyfiyyət
+                {t('hero.premium')}
               </div>
             </div>
 
@@ -105,10 +105,10 @@ export const Hero = () => {
 
               {/* Floating quality badges */}
               <div className="absolute -top-4 -right-4 bg-secondary text-secondary-foreground px-4 py-2 rounded-xl text-sm font-medium shadow-card animate-bounce">
-                🇨🇭 Swiss Made
+                🇨🇭 {t('hero.swiss')}
               </div>
               <div className="absolute -bottom-4 -left-4 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-medium shadow-card animate-bounce delay-500">
-                ✨ Premium
+                ✨ {t('hero.premium.badge')}
               </div>
             </div>
           </div>

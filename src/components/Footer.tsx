@@ -2,7 +2,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Heart } from 'lucide-react';
 
 export const Footer = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <footer className="bg-foreground text-background py-12">
@@ -26,7 +26,7 @@ export const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold mb-4">Sürətli keçidlər</h4>
+            <h4 className="font-semibold mb-4">{t('footer.quicklinks')}</h4>
             <ul className="space-y-2">
               <li>
                 <button 
@@ -65,12 +65,12 @@ export const Footer = () => {
 
           {/* Info */}
           <div>
-            <h4 className="font-semibold mb-4">Məlumat</h4>
+            <h4 className="font-semibold mb-4">{t('footer.products.info')}</h4>
             <ul className="space-y-2 text-sm opacity-80">
-              <li>🇨🇭 İsveçrə istehsalı</li>
-              <li>🌱 100% təbii komponentlər</li>
-              <li>✨ Super premium keyfiyyət</li>
-              <li>👶 0-12 ay yaş qrupu</li>
+              <li>🇨🇭 {t('hero.swiss')}</li>
+              <li>🌱 100% {t('hero.natural')}</li>
+              <li>✨ Super {t('hero.premium')}</li>
+              <li>👶 0-12 {language === 'az' ? 'ay yaş qrupu' : 'months age group'}</li>
             </ul>
           </div>
         </div>
@@ -78,10 +78,10 @@ export const Footer = () => {
         {/* Bottom */}
         <div className="border-t border-background/20 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm opacity-80">
-            © 2024 Swissneo. Bütün hüquqlar qorunur.
+            © 2024 Swissneo. {t('footer.copyright')}
           </p>
           <div className="flex items-center gap-2 text-sm opacity-80 mt-4 md:mt-0">
-            <span>İsveçrə keyfiyyəti ilə hazırlanıb</span>
+            <span>{t('footer.made')}</span>
             <Heart className="w-4 h-4 text-red-400" />
           </div>
         </div>

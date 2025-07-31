@@ -15,23 +15,23 @@ export const Contact = () => {
   const contactMethods = [
     {
       icon: <Phone className="w-6 h-6" />,
-      title: 'Telefon',
+      title: t('contact.phone'),
       value: adminData.contactPhone,
-      description: 'Bazar ertəsi - Cümə, 09:00-18:00',
+      description: t('contact.phone.hours'),
       color: 'text-primary'
     },
     {
       icon: <Mail className="w-6 h-6" />,
-      title: 'Email',
+      title: t('contact.email'),
       value: adminData.contactEmail,
-      description: '24 saat ərzində cavab veririk',
+      description: t('contact.email.response'),
       color: 'text-secondary'
     },
     {
       icon: <MapPin className="w-6 h-6" />,
-      title: 'Ünvan',
+      title: t('contact.address'),
       value: adminData.contactAddress[language],
-      description: 'Əsas ofis',
+      description: t('contact.address.office'),
       color: 'text-accent'
     }
   ];
@@ -45,7 +45,7 @@ export const Contact = () => {
             {t('contact.title')}
           </Badge>
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Suallarınız var?
+            {t('contact.question')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             {t('contact.description')}
@@ -73,10 +73,10 @@ export const Contact = () => {
           <CardContent className="p-12 text-center">
             <MessageCircle className="w-16 h-16 mx-auto mb-6 opacity-80" />
             <h3 className="text-2xl font-bold mb-4">
-              Swissneo haqqında ətraflı məlumat almaq istəyirsiniz?
+              {t('contact.cta.title')}
             </h3>
             <p className="text-white/80 mb-8 max-w-2xl mx-auto">
-              Məhsullarımız, qidalanma məsləhətləri və ya Swissneo ailə proqramları haqqında məlumat üçün bizimlə əlaqə saxlayın.
+              {t('contact.cta.description')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
@@ -85,7 +85,7 @@ export const Contact = () => {
                 className="bg-white/10 border-white/20 text-white hover:bg-white hover:text-primary"
               >
                 <Phone className="w-5 h-5 mr-2" />
-                Zəng et
+                {t('contact.call')}
               </Button>
               <Button 
                 variant="outline" 
@@ -94,7 +94,7 @@ export const Contact = () => {
                 onClick={() => setIsContactFormOpen(true)}
               >
                 <Mail className="w-5 h-5 mr-2" />
-                Sorğu göndər
+                {t('contact.inquiry')}
               </Button>
             </div>
           </CardContent>

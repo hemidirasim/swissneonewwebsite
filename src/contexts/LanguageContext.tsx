@@ -22,6 +22,11 @@ const translations = {
     'hero.description': 'Swissneo — 100 ildən artıq İsveçrə təcrübəsi ilə hazırlanmış super premium uşaq qarışığı. Uşağınızın sağlam inkişafı və güclü immunitet üçün.',
     'hero.cta': 'Məhsulları kəşf edin',
     'hero.learn': 'Ətraflı öyrən',
+    'hero.experience': 'illik təcrübə',
+    'hero.natural': 'Təbii inqrediyentlər',
+    'hero.premium': 'Premium keyfiyyət',
+    'hero.swiss': 'İsveçrə istehsalı',
+    'hero.premium.badge': 'Premium',
     
     // Products
     'products.title': 'Məhsullar',
@@ -47,13 +52,54 @@ const translations = {
     'about.mission.text': 'Keyfiyyətə önəm verən və uşaqlarına ən yaxşısını vermək istəyən Azərbaycan valideynlərinin artan tələbatını qarşılamaq.',
     'about.quality': 'Keyfiyyət təminatı',
     'about.quality.text': 'İsveçrənin ən yüksək keyfiyyət standartları ilə istehsal olunan məhsullarımız uşağınızın təhlükəsizliyi üçün bütün sertifikatları daşıyır.',
+    'about.stats.experience': 'İllik təcrübə',
+    'about.stats.products': 'Məhsul çeşidi',
+    'about.stats.quality': 'İsveçrə keyfiyyəti',
+    'about.stats.natural': 'Təbii formula',
+    'about.swiss.title': 'İsveçrə keyfiyyət standartları',
+    'about.swiss.subtitle': 'Nə üçün İsveçrə süd məhsulları dünyada ən yaxşısıdır?',
+    'about.swiss.research': 'Elmi tədqiqat',
+    'about.swiss.research.text': '100 ildən artıq süd məhsulları sahəsində tədqiqat və inkişaf',
+    'about.swiss.natural': 'Təbii mənbə',
+    'about.swiss.natural.text': 'Alp dağlarının təmiz havasında bəslənən inəklərdən alınan süd',
+    'about.swiss.cert': 'Sertifikat',
+    'about.swiss.cert.text': 'Bütün beynəlxalq keyfiyyət və təhlükəsizlik standartlarına uyğun',
     
     // Contact
     'contact.title': 'Bizimlə əlaqə',
     'contact.description': 'Swissneo haqqında suallarınız varsa, bizimlə əlaqə saxlayın.',
+    'contact.question': 'Suallarınız var?',
+    'contact.phone': 'Telefon',
+    'contact.email': 'Email',
+    'contact.address': 'Ünvan',
+    'contact.phone.hours': 'Bazar ertəsi - Cümə, 09:00-18:00',
+    'contact.email.response': '24 saat ərzində cavab veririk',
+    'contact.address.office': 'Əsas ofis',
+    'contact.cta.title': 'Swissneo haqqında ətraflı məlumat almaq istəyirsiniz?',
+    'contact.cta.description': 'Məhsullarımız, qidalanma məsləhətləri və ya Swissneo ailə proqramları haqqında məlumat üçün bizimlə əlaqə saxlayın.',
+    'contact.call': 'Zəng et',
+    'contact.inquiry': 'Sorğu göndər',
     
     // Footer
-    'footer.description': 'İsveçrə keyfiyyətində premium uşaq qidası'
+    'footer.description': 'İsveçrə keyfiyyətində premium uşaq qidası',
+    'footer.quicklinks': 'Sürətli keçidlər',
+    'footer.products.info': 'Məhsul məlumatları',
+    'footer.copyright': 'Bütün hüquqlar qorunur.',
+    'footer.made': 'İsveçrə keyfiyyəti ilə hazırlanıb',
+    
+    // Contact Form
+    'form.send.inquiry': 'Sorğu göndərin',
+    'form.fullname': 'Ad və Soyad',
+    'form.fullname.placeholder': 'Adınızı daxil edin',
+    'form.email.placeholder': 'Email ünvanınız',
+    'form.phone': 'Telefon',
+    'form.phone.placeholder': 'Telefon nömrəniz',
+    'form.message': 'Mesaj',
+    'form.message.placeholder': 'Mesajınızı yazın...',
+    'form.cancel': 'Ləğv et',
+    'form.send': 'Göndər',
+    'form.success.title': 'Sorğu göndərildi!',
+    'form.success.description': 'Tezliklə sizinlə əlaqə saxlayacağıq.'
   },
   en: {
     // Navigation
@@ -68,6 +114,11 @@ const translations = {
     'hero.description': 'Swissneo — super premium baby formula crafted with over 100 years of Swiss expertise. For your baby\'s healthy development and strong immunity.',
     'hero.cta': 'Explore Products',
     'hero.learn': 'Learn More',
+    'hero.experience': 'years of experience',
+    'hero.natural': 'Natural ingredients',
+    'hero.premium': 'Premium quality',
+    'hero.swiss': 'Made in Switzerland',
+    'hero.premium.badge': 'Premium',
     
     // Products
     'products.title': 'Products',
@@ -93,13 +144,54 @@ const translations = {
     'about.mission.text': 'To meet the growing demand of knowledgeable Azerbaijani parents who value quality and want to give their children the best.',
     'about.quality': 'Quality Assurance',
     'about.quality.text': 'Our products manufactured with Switzerland\'s highest quality standards carry all certifications for your child\'s safety.',
+    'about.stats.experience': 'Years of experience',
+    'about.stats.products': 'Product range',
+    'about.stats.quality': 'Swiss quality',
+    'about.stats.natural': 'Natural formula',
+    'about.swiss.title': 'Swiss Quality Standards',
+    'about.swiss.subtitle': 'Why are Swiss dairy products the best in the world?',
+    'about.swiss.research': 'Scientific research',
+    'about.swiss.research.text': 'Over 100 years of research and development in dairy products',
+    'about.swiss.natural': 'Natural source',
+    'about.swiss.natural.text': 'Milk from cows grazing in the clean air of the Alps',
+    'about.swiss.cert': 'Certification',
+    'about.swiss.cert.text': 'Complies with all international quality and safety standards',
     
     // Contact
     'contact.title': 'Contact Us',
     'contact.description': 'If you have any questions about Swissneo, feel free to contact us.',
+    'contact.question': 'Have questions?',
+    'contact.phone': 'Phone',
+    'contact.email': 'Email',
+    'contact.address': 'Address',
+    'contact.phone.hours': 'Monday - Friday, 09:00-18:00',
+    'contact.email.response': 'We respond within 24 hours',
+    'contact.address.office': 'Main office',
+    'contact.cta.title': 'Want to learn more about Swissneo?',
+    'contact.cta.description': 'Contact us for information about our products, nutrition advice, or Swissneo family programs.',
+    'contact.call': 'Call us',
+    'contact.inquiry': 'Send Inquiry',
     
     // Footer
-    'footer.description': 'Premium baby food with Swiss quality'
+    'footer.description': 'Premium baby food with Swiss quality',
+    'footer.quicklinks': 'Quick Links',
+    'footer.products.info': 'Product Information',
+    'footer.copyright': 'All rights reserved.',
+    'footer.made': 'Made with Swiss quality',
+    
+    // Contact Form
+    'form.send.inquiry': 'Send Inquiry',
+    'form.fullname': 'Full Name',
+    'form.fullname.placeholder': 'Enter your name',
+    'form.email.placeholder': 'Your email address',
+    'form.phone': 'Phone',
+    'form.phone.placeholder': 'Your phone number',
+    'form.message': 'Message',
+    'form.message.placeholder': 'Write your message...',
+    'form.cancel': 'Cancel',
+    'form.send': 'Send',
+    'form.success.title': 'Inquiry sent!',
+    'form.success.description': 'We will contact you soon.'
   }
 };
 
