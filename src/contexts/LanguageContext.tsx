@@ -31,7 +31,7 @@ const translations = {
     
     // Products
     'products.title': 'Məhsullar',
-    'products.subtitle': 'Hər yaş qrupu üçün mükemmel qidalanma',
+    'products.subtitle': 'Hər yaş qrupu üçün mükəmməl qidalanma',
     'product1.name': 'Swissneo 1',
     'product1.stage': '0-6 ay',
     'product1.description': 'Doğulduğu gündən etibarən 6 ayadək olan körpələr üçün başlanğıc süd qarışığı',
