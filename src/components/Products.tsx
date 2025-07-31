@@ -98,7 +98,7 @@ export const Products = () => {
           <CardContent className="p-8">
             <div className="text-center mb-8">
               <h3 className="text-2xl font-bold text-foreground mb-2">{t('product.features')}</h3>
-              <p className="text-muted-foreground">Her məhsulda olan keyfiyyət xüsusiyyətləri</p>
+              <p className="text-muted-foreground">{t('product.featureQuality')}</p>
             </div>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -45,6 +45,7 @@ const translations = {
     'product.feature2': 'Vitaminlər və minerallarla zənginləşdirilmiş',
     'product.feature3': 'Prebiotiklər daxil',
     'product.feature4': 'Süni rənglər və qoruyucular yox',
+    'product.featureQuality':'Her məhsulda olan keyfiyyət xüsusiyyətləri',
     
     // About
     'about.title': 'İsveçrə keyfiyyəti, Azərbaycan ailələri üçün',
@@ -137,6 +138,7 @@ const translations = {
     'product.feature2': 'Enriched with vitamins and minerals',
     'product.feature3': 'Contains prebiotics',
     'product.feature4': 'No artificial colors or preservatives',
+    'product.featureQuality':'Quality features present in every product',
     
     // About
     'about.title': 'Swiss Quality for Azerbaijani Families',
