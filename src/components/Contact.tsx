@@ -83,9 +83,12 @@ export const Contact = () => {
                 variant="outline" 
                 size="lg" 
                 className="bg-white/10 border-white/20 text-white hover:bg-white hover:text-primary"
+                asChild
               >
-                <Phone className="w-5 h-5 mr-2" />
-                {t('contact.call')}
+                <a href={`tel:${adminData.contactPhone}`}>
+                  <Phone className="w-5 h-5 mr-2" />
+                  {t('contact.call')}
+                </a>
               </Button>
               <Button 
                 variant="outline" 
