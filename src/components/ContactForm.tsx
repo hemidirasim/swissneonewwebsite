@@ -29,9 +29,23 @@ export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simulate form submission
+    // Save form data to localStorage
+    const submission = {
+      id: Date.now().toString(),
+      ...formData,
+      date: new Date().toISOString(),
+      language: language
+    };
+
+    const existingSubmissions = JSON.parse(localStorage.getItem('swissneo_contact_submissions') || '[]');
+    const updatedSubmissions = [submission, ...existingSubmissions];
+    localStorage.setItem('swissneo_contact_submissions', JSON.stringify(updatedSubmissions));
+    
+    // Dispatch event to notify admin panel
+    window.dispatchEvent(new Event('contactSubmissionsUpdated'));
+    
     toast({
-      title: language === 'az' ? 'Mesaj göndərildi!' : 'Message sent!',
+      title: language === 'az' ? 'Sorğu göndərildi!' : 'Inquiry sent!',
       description: language === 'az' 
         ? 'Tezliklə sizinlə əlaqə saxlayacağıq.' 
         : 'We will contact you soon.',

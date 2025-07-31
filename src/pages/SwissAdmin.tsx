@@ -18,17 +18,33 @@ import {
   Edit3,
   Users,
   BarChart3,
-  Languages
+  Languages,
+  Mail,
+  MessageSquare,
+  Trash2,
+  Calendar,
+  Clock
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { AdminData } from '@/contexts/AdminDataContext';
 
 const ADMIN_PASSWORD = 'swissneo2024';
 
+interface ContactSubmission {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  date: string;
+  language: string;
+}
+
 const SwissAdmin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [currentLang, setCurrentLang] = useState<'az' | 'en'>('az');
+  const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
   const [adminData, setAdminData] = useState<AdminData>({
     heroTitle: { az: 'İsveçrə keyfiyyətində', en: 'Swiss Quality' },
     heroSubtitle: { az: 'Premium uşaq qidası', en: 'Premium Baby Formula' },
@@ -73,6 +89,31 @@ const SwissAdmin = () => {
         console.error('Error parsing admin data:', error);
       }
     }
+
+    // Load contact submissions
+    const savedSubmissions = localStorage.getItem('swissneo_contact_submissions');
+    if (savedSubmissions) {
+      try {
+        setContactSubmissions(JSON.parse(savedSubmissions));
+      } catch (error) {
+        console.error('Error parsing contact submissions:', error);
+      }
+    }
+
+    // Listen for new contact submissions
+    const handleSubmissionsUpdate = () => {
+      const submissions = localStorage.getItem('swissneo_contact_submissions');
+      if (submissions) {
+        try {
+          setContactSubmissions(JSON.parse(submissions));
+        } catch (error) {
+          console.error('Error parsing contact submissions:', error);
+        }
+      }
+    };
+
+    window.addEventListener('contactSubmissionsUpdated', handleSubmissionsUpdate);
+    return () => window.removeEventListener('contactSubmissionsUpdated', handleSubmissionsUpdate);
   }, []);
 
   const handleLogin = (e: React.FormEvent) => {
@@ -119,6 +160,27 @@ const SwissAdmin = () => {
 
   const handleSimpleInputChange = (field: keyof AdminData, value: string) => {
     setAdminData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleDeleteSubmission = (submissionId: string) => {
+    const updatedSubmissions = contactSubmissions.filter(sub => sub.id !== submissionId);
+    setContactSubmissions(updatedSubmissions);
+    localStorage.setItem('swissneo_contact_submissions', JSON.stringify(updatedSubmissions));
+    toast({
+      title: 'Sorğu silindi!',
+      description: 'Sorğu uğurla silindi.',
+    });
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('az-AZ', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   // Login form
@@ -279,11 +341,19 @@ const SwissAdmin = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="hero" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="hero">Ana səhifə</TabsTrigger>
             <TabsTrigger value="products">Məhsullar</TabsTrigger>
             <TabsTrigger value="contact">Əlaqə</TabsTrigger>
             <TabsTrigger value="company">Şirkət</TabsTrigger>
+            <TabsTrigger value="submissions" className="relative">
+              Sorğular
+              {contactSubmissions.length > 0 && (
+                <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 text-xs">
+                  {contactSubmissions.length}
+                </Badge>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           {/* Hero Section */}
@@ -470,6 +540,74 @@ const SwissAdmin = () => {
                     rows={3}
                   />
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Submissions Section */}
+          <TabsContent value="submissions">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5" />
+                  Gələn sorğular ({contactSubmissions.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {contactSubmissions.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Mail className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Hələ ki gələn sorğu yoxdur.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {contactSubmissions.map((submission) => (
+                      <Card key={submission.id} className="border-l-4 border-l-primary">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <Badge variant={submission.language === 'az' ? 'default' : 'secondary'}>
+                                {submission.language === 'az' ? '🇦🇿 AZ' : '🇬🇧 EN'}
+                              </Badge>
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Calendar className="w-4 h-4" />
+                                {formatDate(submission.date)}
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteSubmission(submission.id)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <Label className="text-xs text-muted-foreground">Ad və Soyad</Label>
+                              <p className="font-medium">{submission.name}</p>
+                            </div>
+                            <div>
+                              <Label className="text-xs text-muted-foreground">Email</Label>
+                              <p className="font-medium break-all">{submission.email}</p>
+                            </div>
+                            <div>
+                              <Label className="text-xs text-muted-foreground">Telefon</Label>
+                              <p className="font-medium">{submission.phone}</p>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <Label className="text-xs text-muted-foreground">Mesaj</Label>
+                            <p className="mt-1 p-3 bg-muted rounded-md text-sm">{submission.message}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
