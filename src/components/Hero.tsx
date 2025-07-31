@@ -99,7 +99,7 @@ export const Hero = () => {
                 {/* Overlay content */}
                 <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-4">
                   <h3 className="font-semibold text-foreground mb-1">Swissneo Formula</h3>
-                  <p className="text-sm text-muted-foreground">Uşağınızın sağlam gələcəyi üçün</p>
+                  <p className="text-sm text-muted-foreground">{t('hero.imageTitle')}</p>
                 </div>
               </div>
 

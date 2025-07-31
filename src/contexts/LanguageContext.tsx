@@ -27,6 +27,7 @@ const translations = {
     'hero.premium': 'Premium keyfiyyət',
     'hero.swiss': 'İsveçrə istehsalı',
     'hero.premium.badge': 'Premium',
+    'hero.imageTitle': 'Uşağınızın sağlam gələcəyi üçün',
     
     // Products
     'products.title': 'Məhsullar',
@@ -119,7 +120,7 @@ const translations = {
     'hero.premium': 'Premium quality',
     'hero.swiss': 'Made in Switzerland',
     'hero.premium.badge': 'Premium',
-    
+    'hero.imageTitle': 'For your child\'s healthy future',
     // Products
     'products.title': 'Products',
     'products.subtitle': 'Perfect nutrition for every age',
