@@ -2,11 +2,14 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdminData } from '@/contexts/AdminDataContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Baby, Clock, Weight, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, Baby, Clock, Weight, MapPin, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const Products = () => {
   const { t, language } = useLanguage();
   const { adminData } = useAdminData();
+  const navigate = useNavigate();
 
   const products = [
     {
@@ -76,7 +79,7 @@ export const Products = () => {
                     </div>
 
                     {/* Specifications */}
-                    <div className="space-y-3">
+                    <div className="space-y-3 mb-6">
                       <div className="flex items-center gap-3 text-sm">
                         <Weight className="w-4 h-4 text-primary" />
                         <span className="text-muted-foreground">{t('product.weight')}</span>
@@ -86,6 +89,15 @@ export const Products = () => {
                         <span className="text-muted-foreground">{t('product.origin')}</span>
                       </div>
                     </div>
+
+                    {/* View Details Button */}
+                    <Button 
+                      onClick={() => navigate(`/product/${product.id}`)}
+                      className="w-full flex items-center gap-2 group"
+                    >
+                      {t('product.detail.viewDetails')}
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
                   </div>
                 </div>
               </CardContent>

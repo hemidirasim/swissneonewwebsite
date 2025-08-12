@@ -23,111 +23,81 @@ import {
   MessageSquare,
   Trash2,
   Calendar,
-  Clock
+  Clock,
+  BookOpen,
+  AlertTriangle
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { AdminData } from '@/contexts/AdminDataContext';
-
-const ADMIN_PASSWORD = 'swissneo2024';
-
-interface ContactSubmission {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-  date: string;
-  language: string;
-}
+import databaseService, { User, SiteData } from '@/services/databaseService';
 
 const SwissAdmin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [currentLang, setCurrentLang] = useState<'az' | 'en'>('az');
-  const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
-  const [adminData, setAdminData] = useState<AdminData>({
-    heroTitle: { az: 'İsveçrə keyfiyyətində', en: 'Swiss Quality' },
-    heroSubtitle: { az: 'Premium uşaq qidası', en: 'Premium Baby Formula' },
-    heroDescription: { 
-      az: 'Swissneo — 100 ildən artıq İsveçrə təcrübəsi ilə hazırlanmış super premium uşaq qarışığı. Uşağınızın sağlam inkişafı və güclü immunitet üçün.',
-      en: 'Swissneo — super premium baby formula crafted with over 100 years of Swiss expertise. For your baby\'s healthy development and strong immunity.'
-    },
-    product1Name: { az: 'Swissneo 1', en: 'Swissneo 1' },
-    product1Description: { 
-      az: 'Doğulduğu gündən etibarən 6 ayadək olan körpələr üçün başlanğıc süd qarışığı',
-      en: 'Starting infant milk formula for babies from birth to 6 months'
-    },
-    product2Name: { az: 'Swissneo 2', en: 'Swissneo 2' },
-    product2Description: { 
-      az: '6-12 aylıq körpələr üçün növbəti mərhələ süd qarışığı',
-      en: 'Follow-on milk formula for babies from 6 to 12 months'
-    },
-    contactPhone: '+994 XX XXX XX XX',
-    contactEmail: 'info@swissneo.az',
-    contactAddress: { az: 'Bakı, Azərbaycan', en: 'Baku, Azerbaijan' },
-    companyDescription: { 
-      az: 'Swissneo — süd məhsulları sahəsində 100 ildən artıq təcrübəyə malik İsveçrənin super premium uşaq qidası markasıdır.',
-      en: 'Swissneo is a super premium baby food brand from Switzerland with over 100 years of experience in dairy products.'
-    },
-    companyMission: { 
-      az: 'Keyfiyyətə önəm verən və uşaqlarına ən yaxşısını vermək istəyən Azərbaycan valideynlərinin artan tələbatını qarşılamaq.',
-      en: 'To meet the growing demand of knowledgeable Azerbaijani parents who value quality and want to give their children the best.'
-    },
-    companyQuality: { 
-      az: 'İsveçrənin ən yüksək keyfiyyət standartları ilə istehsal olunan məhsullarımız uşağınızın təhlükəsizliyi üçün bütün sertifikatları daşıyır.',
-      en: 'Our products manufactured with Switzerland\'s highest quality standards carry all certifications for your child\'s safety.'
-    },
+  const [siteData, setSiteData] = useState<SiteData>({
+    heroTitle: { az: '', en: '' },
+    heroSubtitle: { az: '', en: '' },
+    heroDescription: { az: '', en: '' },
+    product1Name: { az: '', en: '' },
+    product1Description: { az: '', en: '' },
+    product2Name: { az: '', en: '' },
+    product2Description: { az: '', en: '' },
+    contactPhone: '',
+    contactEmail: '',
+    contactAddress: { az: '', en: '' },
+    companyDescription: { az: '', en: '' },
+    companyMission: { az: '', en: '' },
+    companyQuality: { az: '', en: '' },
+    instructionsTitle: { az: '', en: '' },
+    instructionsDescription: { az: '', en: '' },
+    instructionsSteps: { az: [], en: [] },
+    articlesTitle: { az: '', en: '' },
+    articlesDescription: { az: '', en: '' },
+    articles: [],
+    footerDescription: { az: '', en: '' },
+    footerCopyright: { az: '', en: '' }
   });
 
-  // Load saved data on component mount
+  // Load site data on mount
   useEffect(() => {
-    const savedData = localStorage.getItem('swissneo_admin_data');
-    if (savedData) {
-      try {
-        setAdminData(JSON.parse(savedData));
-      } catch (error) {
-        console.error('Error parsing admin data:', error);
-      }
-    }
-
-    // Load contact submissions
-    const savedSubmissions = localStorage.getItem('swissneo_contact_submissions');
-    if (savedSubmissions) {
-      try {
-        setContactSubmissions(JSON.parse(savedSubmissions));
-      } catch (error) {
-        console.error('Error parsing contact submissions:', error);
-      }
-    }
-
-    // Listen for new contact submissions
-    const handleSubmissionsUpdate = () => {
-      const submissions = localStorage.getItem('swissneo_contact_submissions');
-      if (submissions) {
-        try {
-          setContactSubmissions(JSON.parse(submissions));
-        } catch (error) {
-          console.error('Error parsing contact submissions:', error);
-        }
-      }
-    };
-
-    window.addEventListener('contactSubmissionsUpdated', handleSubmissionsUpdate);
-    return () => window.removeEventListener('contactSubmissionsUpdated', handleSubmissionsUpdate);
+    loadSiteData();
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const loadSiteData = async () => {
+    try {
+      const data = await databaseService.getSiteData();
+      setSiteData(data);
+    } catch (error) {
+      console.error('Error loading site data:', error);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
+    try {
+      const user = await databaseService.authenticateUser(username, password);
+      if (user) {
+        setIsAuthenticated(true);
+        setCurrentUser(user);
+        setUsername('');
+        setPassword('');
+        toast({
+          title: 'Giriş uğurlu!',
+          description: 'Admin panelinə xoş gəlmisiniz.',
+        });
+      } else {
+        toast({
+          title: 'Yanlış məlumatlar!',
+          description: 'İstifadəçi adı və ya şifrə yanlışdır.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
       toast({
-        title: 'Giriş uğurlu!',
-        description: 'Admin panelinə xoş gəlmisiniz.',
-      });
-    } else {
-      toast({
-        title: 'Yanlış şifrə!',
-        description: 'Doğru şifrəni daxil edin.',
+        title: 'Xəta!',
+        description: 'Giriş zamanı xəta baş verdi.',
         variant: 'destructive',
       });
     }
@@ -135,21 +105,33 @@ const SwissAdmin = () => {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    setCurrentUser(null);
+    setUsername('');
     setPassword('');
-  };
-
-  const handleSave = () => {
-    localStorage.setItem('swissneo_admin_data', JSON.stringify(adminData));
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new Event('adminDataUpdated'));
     toast({
-      title: 'Məlumatlar saxlanıldı!',
-      description: 'Dəyişikliklər uğurla saxlanıldı və saytda görünəcək.',
+      title: 'Çıxış edildi',
+      description: 'Təhlükəsiz şəkildə çıxış etdiniz.',
     });
   };
 
-  const handleBilingualInputChange = (field: keyof AdminData, lang: 'az' | 'en', value: string) => {
-    setAdminData(prev => ({
+  const handleSave = async () => {
+    try {
+      await databaseService.updateSiteData(siteData);
+      toast({
+        title: 'Məlumatlar saxlanıldı!',
+        description: 'Dəyişikliklər uğurla saxlanıldı və saytda görünəcək.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Xəta!',
+        description: 'Məlumatları saxlayarkən xəta baş verdi.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleBilingualInputChange = (field: keyof SiteData, lang: 'az' | 'en', value: string) => {
+    setSiteData(prev => ({
       ...prev,
       [field]: {
         ...prev[field] as { az: string; en: string },
@@ -158,18 +140,80 @@ const SwissAdmin = () => {
     }));
   };
 
-  const handleSimpleInputChange = (field: keyof AdminData, value: string) => {
-    setAdminData(prev => ({ ...prev, [field]: value }));
+  const handleSimpleInputChange = (field: keyof SiteData, value: string) => {
+    setSiteData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleDeleteSubmission = (submissionId: string) => {
-    const updatedSubmissions = contactSubmissions.filter(sub => sub.id !== submissionId);
-    setContactSubmissions(updatedSubmissions);
-    localStorage.setItem('swissneo_contact_submissions', JSON.stringify(updatedSubmissions));
-    toast({
-      title: 'Sorğu silindi!',
-      description: 'Sorğu uğurla silindi.',
-    });
+  const handleInstructionsStepChange = (lang: 'az' | 'en', index: number, value: string) => {
+    setSiteData(prev => ({
+      ...prev,
+      instructionsSteps: {
+        ...prev.instructionsSteps,
+        [lang]: prev.instructionsSteps[lang].map((step, i) => i === index ? value : step)
+      }
+    }));
+  };
+
+  const handleAddInstructionsStep = (lang: 'az' | 'en') => {
+    setSiteData(prev => ({
+      ...prev,
+      instructionsSteps: {
+        ...prev.instructionsSteps,
+        [lang]: [...prev.instructionsSteps[lang], 'Yeni addım']
+      }
+    }));
+  };
+
+  const handleRemoveInstructionsStep = (lang: 'az' | 'en', index: number) => {
+    setSiteData(prev => ({
+      ...prev,
+      instructionsSteps: {
+        ...prev.instructionsSteps,
+        [lang]: prev.instructionsSteps[lang].filter((_, i) => i !== index)
+      }
+    }));
+  };
+
+  const handleArticleChange = (articleId: string, field: string, lang: 'az' | 'en', value: string) => {
+    setSiteData(prev => ({
+      ...prev,
+      articles: prev.articles.map(article => 
+        article.id === articleId 
+          ? {
+              ...article,
+              [field]: {
+                ...article[field as keyof typeof article] as { az: string; en: string },
+                [lang]: value
+              }
+            }
+          : article
+      )
+    }));
+  };
+
+  const handleAddArticle = () => {
+    const newArticle = {
+      id: Date.now().toString(),
+      title: { az: 'Yeni məqalə', en: 'New Article' },
+      excerpt: { az: 'Qısa məzmun', en: 'Short excerpt' },
+      category: { az: 'Kateqoriya', en: 'Category' },
+      readTime: { az: '5 dəq', en: '5 min' },
+      author: { az: 'Müəllif', en: 'Author' },
+      date: new Date().toISOString().split('T')[0],
+      content: { az: 'Ətraflı məzmun...', en: 'Detailed content...' }
+    };
+
+    setSiteData(prev => ({
+      ...prev,
+      articles: [...prev.articles, newArticle]
+    }));
+  };
+
+  const handleRemoveArticle = (articleId: string) => {
+    setSiteData(prev => ({
+      ...prev,
+      articles: prev.articles.filter(article => article.id !== articleId)
+    }));
   };
 
   const formatDate = (dateString: string) => {
@@ -198,13 +242,24 @@ const SwissAdmin = () => {
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
+                <Label htmlFor="username">İstifadəçi adı</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="İstifadəçi adını daxil edin"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="password">Şifrə</Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Admin şifrəsini daxil edin"
+                  placeholder="Şifrəni daxil edin"
                   required
                 />
               </div>
@@ -213,6 +268,13 @@ const SwissAdmin = () => {
                 Daxil ol
               </Button>
             </form>
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-700">
+                <strong>Test məlumatları:</strong><br />
+                İstifadəçi adı: <code>admin</code><br />
+                Şifrə: <code>swissneo2024</code>
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -232,7 +294,9 @@ const SwissAdmin = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold">Swissneo Admin Panel</h1>
-                <p className="text-sm text-muted-foreground">Sayt məlumatlarını idarə edin</p>
+                <p className="text-sm text-muted-foreground">
+                  Xoş gəlmisiniz, {currentUser?.username}!
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -258,11 +322,15 @@ const SwissAdmin = () => {
                   </Button>
                 </div>
               </div>
-              <Button onClick={handleSave} variant="premium">
+              
+              {/* Save Button */}
+              <Button onClick={handleSave} variant="premium" size="sm">
                 <Save className="w-4 h-4 mr-2" />
                 Saxla
               </Button>
-              <Button onClick={handleLogout} variant="outline">
+              
+              {/* Logout Button */}
+              <Button onClick={handleLogout} variant="outline" size="sm">
                 <LogOut className="w-4 h-4 mr-2" />
                 Çıxış
               </Button>
@@ -271,88 +339,37 @@ const SwissAdmin = () => {
         </div>
       </header>
 
-      {/* Dashboard Content */}
-      <div className="container mx-auto px-6 py-8">
-        {/* Language Indicator */}
-        <div className="mb-6">
-          <Badge variant="outline" className="text-sm">
-            {currentLang === 'az' ? '🇦🇿 Azərbaycan dili' : '🇬🇧 English language'} redaktə edilir
-          </Badge>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Edit3 className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Mətn blokları</p>
-                  <p className="text-2xl font-bold">12</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
-                  <Package className="w-6 h-6 text-secondary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Məhsullar</p>
-                  <p className="text-2xl font-bold">2</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                  <Languages className="w-6 h-6 text-accent" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Dillər</p>
-                  <p className="text-2xl font-bold">2</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <Badge variant="secondary" className="bg-green-100 text-green-600">Aktiv</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Content Tabs */}
+      {/* Main Content */}
+      <main className="container mx-auto px-6 py-8">
         <Tabs defaultValue="hero" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="hero">Ana səhifə</TabsTrigger>
-            <TabsTrigger value="products">Məhsullar</TabsTrigger>
-            <TabsTrigger value="contact">Əlaqə</TabsTrigger>
-            <TabsTrigger value="company">Şirkət</TabsTrigger>
-            <TabsTrigger value="submissions" className="relative">
-              Sorğular
-              {contactSubmissions.length > 0 && (
-                <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 text-xs">
-                  {contactSubmissions.length}
-                </Badge>
-              )}
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="hero" className="flex items-center gap-2">
+              <Globe className="w-4 h-4" />
+              Hero
+            </TabsTrigger>
+            <TabsTrigger value="products" className="flex items-center gap-2">
+              <Package className="w-4 h-4" />
+              Məhsullar
+            </TabsTrigger>
+            <TabsTrigger value="contact" className="flex items-center gap-2">
+              <Phone className="w-4 h-4" />
+              Əlaqə
+            </TabsTrigger>
+            <TabsTrigger value="company" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Şirkət
+            </TabsTrigger>
+            <TabsTrigger value="instructions" className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4" />
+              Təlimatlar
+            </TabsTrigger>
+            <TabsTrigger value="articles" className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              Məqalələr
+            </TabsTrigger>
+            <TabsTrigger value="footer" className="flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Footer
             </TabsTrigger>
           </TabsList>
 
@@ -362,15 +379,15 @@ const SwissAdmin = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="w-5 h-5" />
-                  Ana səhifə məlumatları - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
+                  Hero Bölməsi - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="heroTitle">Ana başlıq</Label>
+                  <Label htmlFor="heroTitle">Başlıq</Label>
                   <Input
                     id="heroTitle"
-                    value={adminData.heroTitle[currentLang]}
+                    value={siteData.heroTitle?.[currentLang] || ''}
                     onChange={(e) => handleBilingualInputChange('heroTitle', currentLang, e.target.value)}
                   />
                 </div>
@@ -379,16 +396,16 @@ const SwissAdmin = () => {
                   <Label htmlFor="heroSubtitle">Alt başlıq</Label>
                   <Input
                     id="heroSubtitle"
-                    value={adminData.heroSubtitle[currentLang]}
+                    value={siteData.heroSubtitle?.[currentLang] || ''}
                     onChange={(e) => handleBilingualInputChange('heroSubtitle', currentLang, e.target.value)}
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="heroDescription">Açıqlama</Label>
+                  <Label htmlFor="heroDescription">Təsvir</Label>
                   <Textarea
                     id="heroDescription"
-                    value={adminData.heroDescription[currentLang]}
+                    value={siteData.heroDescription?.[currentLang] || ''}
                     onChange={(e) => handleBilingualInputChange('heroDescription', currentLang, e.target.value)}
                     rows={4}
                   />
@@ -400,28 +417,29 @@ const SwissAdmin = () => {
           {/* Products Section */}
           <TabsContent value="products">
             <div className="grid md:grid-cols-2 gap-6">
+              {/* Product 1 */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Package className="w-5 h-5" />
-                    Swissneo 1 (0-6 ay) - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
+                    Swissneo 1 - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="product1Name">Məhsul adı</Label>
                     <Input
                       id="product1Name"
-                      value={adminData.product1Name[currentLang]}
+                      value={siteData.product1Name?.[currentLang] || ''}
                       onChange={(e) => handleBilingualInputChange('product1Name', currentLang, e.target.value)}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="product1Description">Açıqlama</Label>
+                    <Label htmlFor="product1Description">Məhsul təsviri</Label>
                     <Textarea
                       id="product1Description"
-                      value={adminData.product1Description[currentLang]}
+                      value={siteData.product1Description?.[currentLang] || ''}
                       onChange={(e) => handleBilingualInputChange('product1Description', currentLang, e.target.value)}
                       rows={3}
                     />
@@ -429,28 +447,29 @@ const SwissAdmin = () => {
                 </CardContent>
               </Card>
 
+              {/* Product 2 */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Package className="w-5 h-5" />
-                    Swissneo 2 (6-12 ay) - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
+                    Swissneo 2 - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="product2Name">Məhsul adı</Label>
                     <Input
                       id="product2Name"
-                      value={adminData.product2Name[currentLang]}
+                      value={siteData.product2Name?.[currentLang] || ''}
                       onChange={(e) => handleBilingualInputChange('product2Name', currentLang, e.target.value)}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="product2Description">Açıqlama</Label>
+                    <Label htmlFor="product2Description">Məhsul təsviri</Label>
                     <Textarea
                       id="product2Description"
-                      value={adminData.product2Description[currentLang]}
+                      value={siteData.product2Description?.[currentLang] || ''}
                       onChange={(e) => handleBilingualInputChange('product2Description', currentLang, e.target.value)}
                       rows={3}
                     />
@@ -466,25 +485,25 @@ const SwissAdmin = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Phone className="w-5 h-5" />
-                  Əlaqə məlumatları
+                  Əlaqə Məlumatları
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="contactPhone">Telefon nömrəsi</Label>
+                  <Label htmlFor="contactPhone">Telefon</Label>
                   <Input
                     id="contactPhone"
-                    value={adminData.contactPhone}
+                    value={siteData.contactPhone || ''}
                     onChange={(e) => handleSimpleInputChange('contactPhone', e.target.value)}
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="contactEmail">Email ünvanı</Label>
+                  <Label htmlFor="contactEmail">Email</Label>
                   <Input
                     id="contactEmail"
                     type="email"
-                    value={adminData.contactEmail}
+                    value={siteData.contactEmail || ''}
                     onChange={(e) => handleSimpleInputChange('contactEmail', e.target.value)}
                   />
                 </div>
@@ -493,7 +512,7 @@ const SwissAdmin = () => {
                   <Label htmlFor="contactAddress">Ünvan - {currentLang === 'az' ? 'Azərbaycan' : 'English'}</Label>
                   <Input
                     id="contactAddress"
-                    value={adminData.contactAddress[currentLang]}
+                    value={siteData.contactAddress?.[currentLang] || ''}
                     onChange={(e) => handleBilingualInputChange('contactAddress', currentLang, e.target.value)}
                   />
                 </div>
@@ -507,15 +526,15 @@ const SwissAdmin = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="w-5 h-5" />
-                  Şirkət məlumatları - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
+                  Şirkət Məlumatları - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="companyDescription">Şirkət açıqlaması</Label>
+                  <Label htmlFor="companyDescription">Şirkət təsviri</Label>
                   <Textarea
                     id="companyDescription"
-                    value={adminData.companyDescription[currentLang]}
+                    value={siteData.companyDescription?.[currentLang] || ''}
                     onChange={(e) => handleBilingualInputChange('companyDescription', currentLang, e.target.value)}
                     rows={3}
                   />
@@ -525,17 +544,17 @@ const SwissAdmin = () => {
                   <Label htmlFor="companyMission">Missiya</Label>
                   <Textarea
                     id="companyMission"
-                    value={adminData.companyMission[currentLang]}
+                    value={siteData.companyMission?.[currentLang] || ''}
                     onChange={(e) => handleBilingualInputChange('companyMission', currentLang, e.target.value)}
                     rows={3}
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="companyQuality">Keyfiyyət təminatı</Label>
+                  <Label htmlFor="companyQuality">Keyfiyyət</Label>
                   <Textarea
                     id="companyQuality"
-                    value={adminData.companyQuality[currentLang]}
+                    value={siteData.companyQuality?.[currentLang] || ''}
                     onChange={(e) => handleBilingualInputChange('companyQuality', currentLang, e.target.value)}
                     rows={3}
                   />
@@ -544,83 +563,221 @@ const SwissAdmin = () => {
             </Card>
           </TabsContent>
 
-          {/* Submissions Section */}
-          <TabsContent value="submissions">
+          {/* Instructions Section */}
+          <TabsContent value="instructions">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5" />
-                  Gələn sorğular ({contactSubmissions.length})
+                  <AlertTriangle className="w-5 h-5" />
+                  Qidalandırma Təlimatları - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                {contactSubmissions.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Mail className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Hələ ki gələn sorğu yoxdur.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {contactSubmissions.map((submission) => (
-                      <Card key={submission.id} className="border-l-4 border-l-primary">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <Badge variant={submission.language === 'az' ? 'default' : 'secondary'}>
-                                {submission.language === 'az' ? '🇦🇿 AZ' : '🇬🇧 EN'}
-                              </Badge>
-                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                <Calendar className="w-4 h-4" />
-                                {formatDate(submission.date)}
-                              </div>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteSubmission(submission.id)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                              <Label className="text-xs text-muted-foreground">Ad və Soyad</Label>
-                              <p className="font-medium">{submission.name}</p>
-                            </div>
-                            <div>
-                              <Label className="text-xs text-muted-foreground">Email</Label>
-                              <p className="font-medium break-all">{submission.email}</p>
-                            </div>
-                            <div>
-                              <Label className="text-xs text-muted-foreground">Telefon</Label>
-                              <p className="font-medium">{submission.phone}</p>
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <Label className="text-xs text-muted-foreground">Mesaj</Label>
-                            <p className="mt-1 p-3 bg-muted rounded-md text-sm">{submission.message}</p>
-                          </div>
-                        </CardContent>
-                      </Card>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="instructionsTitle">Başlıq</Label>
+                  <Input
+                    id="instructionsTitle"
+                    value={siteData.instructionsTitle?.[currentLang] || ''}
+                    onChange={(e) => handleBilingualInputChange('instructionsTitle', currentLang, e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="instructionsDescription">Açıqlama</Label>
+                  <Textarea
+                    id="instructionsDescription"
+                    value={siteData.instructionsDescription?.[currentLang] || ''}
+                    onChange={(e) => handleBilingualInputChange('instructionsDescription', currentLang, e.target.value)}
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Təlimat addımları</Label>
+                  <div className="space-y-3">
+                    {(siteData.instructionsSteps?.[currentLang] || []).map((step, index) => (
+                      <div key={index} className="flex items-center gap-3">
+                        <Badge variant="outline" className="w-8 h-8 p-0 flex items-center justify-center">
+                          {index + 1}
+                        </Badge>
+                        <Input
+                          value={step}
+                          onChange={(e) => handleInstructionsStepChange(currentLang, index, e.target.value)}
+                          placeholder={`Addım ${index + 1}`}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveInstructionsStep(currentLang, index)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     ))}
+                    <Button
+                      variant="outline"
+                      onClick={() => handleAddInstructionsStep(currentLang)}
+                      className="w-full"
+                    >
+                      + Yeni addım əlavə et
+                    </Button>
                   </div>
-                )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Articles Section */}
+          <TabsContent value="articles">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  Məqalələr - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="articlesTitle">Bölmə başlığı</Label>
+                  <Input
+                    id="articlesTitle"
+                    value={siteData.articlesTitle?.[currentLang] || ''}
+                    onChange={(e) => handleBilingualInputChange('articlesTitle', currentLang, e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="articlesDescription">Bölmə açıqlaması</Label>
+                  <Textarea
+                    id="articlesDescription"
+                    value={siteData.articlesDescription?.[currentLang] || ''}
+                    onChange={(e) => handleBilingualInputChange('articlesDescription', currentLang, e.target.value)}
+                    rows={3}
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label>Məqalələr ({(siteData.articles || []).length})</Label>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleAddArticle()}
+                      size="sm"
+                    >
+                      + Yeni məqalə
+                    </Button>
+                  </div>
+                  
+                  {(siteData.articles || []).map((article, index) => (
+                    <Card key={article.id} className="border-l-4 border-l-primary">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <Badge variant="secondary">Məqalə {index + 1}</Badge>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveArticle(article.id)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Başlıq</Label>
+                            <Input
+                              value={article.title?.[currentLang] || ''}
+                              onChange={(e) => handleArticleChange(article.id, 'title', currentLang, e.target.value)}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label>Kateqoriya</Label>
+                            <Input
+                              value={article.category?.[currentLang] || ''}
+                              onChange={(e) => handleArticleChange(article.id, 'category', currentLang, e.target.value)}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label>Müəllif</Label>
+                            <Input
+                              value={article.author?.[currentLang] || ''}
+                              onChange={(e) => handleArticleChange(article.id, 'author', currentLang, e.target.value)}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label>Oxuma vaxtı</Label>
+                            <Input
+                              value={article.readTime?.[currentLang] || ''}
+                              onChange={(e) => handleArticleChange(article.id, 'readTime', currentLang, e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2 mt-4">
+                          <Label>Qısa məzmun</Label>
+                          <Textarea
+                            value={article.excerpt?.[currentLang] || ''}
+                            onChange={(e) => handleArticleChange(article.id, 'excerpt', currentLang, e.target.value)}
+                            rows={2}
+                          />
+                        </div>
+                        
+                        <div className="space-y-2 mt-4">
+                          <Label>Ətraflı məzmun</Label>
+                          <Textarea
+                            value={article.content?.[currentLang] || ''}
+                            onChange={(e) => handleArticleChange(article.id, 'content', currentLang, e.target.value)}
+                            rows={4}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Footer Section */}
+          <TabsContent value="footer">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="w-5 h-5" />
+                  Footer - {currentLang === 'az' ? 'Azərbaycan' : 'English'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="footerDescription">Footer təsviri</Label>
+                  <Textarea
+                    id="footerDescription"
+                    value={siteData.footerDescription?.[currentLang] || ''}
+                    onChange={(e) => handleBilingualInputChange('footerDescription', currentLang, e.target.value)}
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="footerCopyright">Müəllif hüququ</Label>
+                  <Input
+                    id="footerCopyright"
+                    value={siteData.footerCopyright?.[currentLang] || ''}
+                    onChange={(e) => handleBilingualInputChange('footerCopyright', currentLang, e.target.value)}
+                  />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-
-        {/* Save Button */}
-        <div className="flex justify-center pt-8">
-          <Button onClick={handleSave} variant="premium" size="lg">
-            <Save className="w-5 h-5 mr-2" />
-            Bütün dəyişiklikləri saxla
-          </Button>
-        </div>
-      </div>
+      </main>
     </div>
   );
 };

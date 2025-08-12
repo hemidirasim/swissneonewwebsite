@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAdminData } from '@/contexts/AdminDataContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,7 @@ interface ContactFormProps {
 
 export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
   const { t, language } = useLanguage();
+  const { addContactSubmission } = useAdminData();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,32 +28,30 @@ export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => 
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Save form data to localStorage
-    const submission = {
-      id: Date.now().toString(),
-      ...formData,
-      date: new Date().toISOString(),
-      language: language
-    };
+    try {
+      await addContactSubmission({
+        ...formData,
+        language: language
+      });
+      
+      toast({
+        title: t('form.success.title'),
+        description: t('form.success.description'),
+      });
 
-    const existingSubmissions = JSON.parse(localStorage.getItem('swissneo_contact_submissions') || '[]');
-    const updatedSubmissions = [submission, ...existingSubmissions];
-    localStorage.setItem('swissneo_contact_submissions', JSON.stringify(updatedSubmissions));
-    
-    // Dispatch event to notify admin panel
-    window.dispatchEvent(new Event('contactSubmissionsUpdated'));
-    
-    toast({
-      title: t('form.success.title'),
-      description: t('form.success.description'),
-    });
-
-    // Reset form and close
-    setFormData({ name: '', email: '', phone: '', message: '' });
-    onClose();
+      // Reset form and close
+      setFormData({ name: '', email: '', phone: '', message: '' });
+      onClose();
+    } catch (error) {
+      toast({
+        title: 'Xəta!',
+        description: 'Mesaj göndərilərkən xəta baş verdi.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (

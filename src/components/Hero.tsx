@@ -2,18 +2,36 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdminData } from '@/contexts/AdminDataContext';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Shield, Award, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import motherChildImage from '@/assets/mother-child-hero.jpg';
 
 export const Hero = () => {
   const { t, language } = useLanguage();
   const { adminData } = useAdminData();
+  const navigate = useNavigate();
 
   const scrollToProducts = () => {
-    document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+    const element = document.getElementById('products');
+    if (element) {
+      const headerHeight = 80; // Header hündürlüyü
+      const elementPosition = element.offsetTop - headerHeight;
+      window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const scrollToAbout = () => {
-    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+    const element = document.getElementById('about');
+    if (element) {
+      const headerHeight = 80; // Header hündürlüyü
+      const elementPosition = element.offsetTop - headerHeight;
+      window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (
@@ -68,7 +86,7 @@ export const Hero = () => {
               <Button 
                 variant="premium" 
                 size="lg"
-                onClick={scrollToProducts}
+                onClick={() => navigate('/products')}
                 className="group"
               >
                 {t('hero.cta')}
@@ -77,7 +95,7 @@ export const Hero = () => {
               <Button 
                 variant="outline" 
                 size="lg"
-                onClick={scrollToAbout}
+                onClick={() => navigate('/about')}
               >
                 {t('hero.learn')}
               </Button>

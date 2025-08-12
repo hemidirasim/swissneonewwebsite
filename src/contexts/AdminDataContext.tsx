@@ -1,188 +1,228 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import databaseService, { Article, ContactSubmission } from '@/services/databaseService';
 
-export interface AdminData {
-  // Hero Section - Bilingual
-  heroTitle: {
-    az: string;
-    en: string;
+interface SiteData {
+  hero: {
+    title: { az: string; en: string };
+    subtitle: { az: string; en: string };
+    description: { az: string; en: string };
   };
-  heroSubtitle: {
-    az: string;
-    en: string;
+  product1: {
+    name: { az: string; en: string };
+    description: { az: string; en: string };
   };
-  heroDescription: {
-    az: string;
-    en: string;
+  product2: {
+    name: { az: string; en: string };
+    description: { az: string; en: string };
   };
-  
-  // Products - Bilingual
-  product1Name: {
-    az: string;
-    en: string;
+  contact: {
+    phone: string;
+    email: string;
+    address: { az: string; en: string };
   };
-  product1Description: {
-    az: string;
-    en: string;
+  company: {
+    description: { az: string; en: string };
+    mission: { az: string; en: string };
+    quality: { az: string; en: string };
   };
-  product2Name: {
-    az: string;
-    en: string;
+  instructions: {
+    title: { az: string; en: string };
+    description: { az: string; en: string };
   };
-  product2Description: {
-    az: string;
-    en: string;
+  articles: {
+    title: { az: string; en: string };
+    description: { az: string; en: string };
   };
-  
-  // Contact Info - Same for both languages
-  contactPhone: string;
-  contactEmail: string;
-  contactAddress: {
-    az: string;
-    en: string;
-  };
-  
-  // Company Info - Bilingual
-  companyDescription: {
-    az: string;
-    en: string;
-  };
-  companyMission: {
-    az: string;
-    en: string;
-  };
-  companyQuality: {
-    az: string;
-    en: string;
+  footer: {
+    description: { az: string; en: string };
+    copyright: { az: string; en: string };
   };
 }
 
-const defaultAdminData: AdminData = {
-  heroTitle: {
-    az: 'İsveçrə keyfiyyətində',
-    en: 'Swiss Quality'
-  },
-  heroSubtitle: {
-    az: 'Premium uşaq qidası',
-    en: 'Premium Baby Formula'
-  },
-  heroDescription: {
-    az: 'Swissneo — 100 ildən artıq İsveçrə təcrübəsi ilə hazırlanmış super premium uşaq qarışığı. Uşağınızın sağlam inkişafı və güclü immunitet üçün.',
-    en: 'Swissneo — super premium baby formula crafted with over 100 years of Swiss expertise. For your baby\'s healthy development and strong immunity.'
-  },
-  
-  product1Name: {
-    az: 'Swissneo 1',
-    en: 'Swissneo 1'
-  },
-  product1Description: {
-    az: 'Doğulduğu gündən etibarən 6 ayadək olan körpələr üçün başlanğıc süd qarışığı',
-    en: 'Starting infant milk formula for babies from birth to 6 months'
-  },
-  product2Name: {
-    az: 'Swissneo 2',
-    en: 'Swissneo 2'
-  },
-  product2Description: {
-    az: '6-12 aylıq körpələr üçün növbəti mərhələ süd qarışığı',
-    en: 'Follow-on milk formula for babies from 6 to 12 months'
-  },
-  
-  contactPhone: '+994 XX XXX XX XX',
-  contactEmail: 'info@swissneo.az',
-  contactAddress: {
-    az: 'Bakı, Azərbaycan',
-    en: 'Baku, Azerbaijan'
-  },
-  
-  companyDescription: {
-    az: 'Swissneo — süd məhsulları sahəsində 100 ildən artıq təcrübəyə malik İsveçrənin super premium uşaq qidası markasıdır.',
-    en: 'Swissneo is a super premium baby food brand from Switzerland with over 100 years of experience in dairy products.'
-  },
-  companyMission: {
-    az: 'Keyfiyyətə önəm verən və uşaqlarına ən yaxşısını vermək istəyən Azərbaycan valideynlərinin artan tələbatını qarşılamaq.',
-    en: 'To meet the growing demand of knowledgeable Azerbaijani parents who value quality and want to give their children the best.'
-  },
-  companyQuality: {
-    az: 'İsveçrənin ən yüksək keyfiyyət standartları ilə istehsal olunan məhsullarımız uşağınızın təhlükəsizliyi üçün bütün sertifikatları daşıyır.',
-    en: 'Our products manufactured with Switzerland\'s highest quality standards carry all certifications for your child\'s safety.'
-  },
-};
-
 interface AdminDataContextType {
-  adminData: AdminData;
-  updateAdminData: (data: AdminData) => void;
-  refreshAdminData: () => void;
+  siteData: SiteData;
+  articles: Article[];
+  contactSubmissions: ContactSubmission[];
+  isLoading: boolean;
+  error: string | null;
+  updateSiteContent: (section: string, field: string, language: string, content: string) => Promise<void>;
+  refreshData: () => Promise<void>;
+  addContactSubmission: (submission: Omit<ContactSubmission, 'id' | 'created_at'>) => Promise<void>;
+  deleteContactSubmission: (id: number) => Promise<void>;
+  addArticle: (article: Omit<Article, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateArticle: (id: number, updates: Partial<Article>) => Promise<void>;
+  deleteArticle: (id: number) => Promise<void>;
 }
 
 const AdminDataContext = createContext<AdminDataContextType | undefined>(undefined);
 
 export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [adminData, setAdminData] = useState<AdminData>(defaultAdminData);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [siteData, setSiteData] = useState<SiteData>({
+    hero: { title: { az: '', en: '' }, subtitle: { az: '', en: '' }, description: { az: '', en: '' } },
+    product1: { name: { az: '', en: '' }, description: { az: '', en: '' } },
+    product2: { name: { az: '', en: '' }, description: { az: '', en: '' } },
+    contact: { phone: '', email: '', address: { az: '', en: '' } },
+    company: { description: { az: '', en: '' }, mission: { az: '', en: '' }, quality: { az: '', en: '' } },
+    instructions: { title: { az: '', en: '' }, description: { az: '', en: '' } },
+    articles: { title: { az: '', en: '' }, description: { az: '', en: '' } },
+    footer: { description: { az: '', en: '' }, copyright: { az: '', en: '' } }
+  });
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load data from localStorage on mount
+  // Load data on mount
   useEffect(() => {
-    const savedData = localStorage.getItem('swissneo_admin_data');
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        setAdminData(parsedData);
-      } catch (error) {
-        console.error('Error parsing admin data:', error);
-        setAdminData(defaultAdminData);
-      }
-    } else {
-      // If no saved data exists, save the default data
-      localStorage.setItem('swissneo_admin_data', JSON.stringify(defaultAdminData));
-      setAdminData(defaultAdminData);
-    }
+    loadData();
   }, []);
 
-  // Listen for localStorage changes (when admin saves data)
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const savedData = localStorage.getItem('swissneo_admin_data');
-      if (savedData) {
-        try {
-          setAdminData(JSON.parse(savedData));
-        } catch (error) {
-          console.error('Error parsing admin data:', error);
+  const loadData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const [contentData, articlesData, submissionsData] = await Promise.all([
+        databaseService.getSiteContent(),
+        databaseService.getArticles(),
+        databaseService.getContactSubmissions()
+      ]);
+
+      // Transform content data to SiteData structure
+      const transformedSiteData: SiteData = {
+        hero: {
+          title: { az: contentData.hero?.title?.az || '', en: contentData.hero?.title?.en || '' },
+          subtitle: { az: contentData.hero?.subtitle?.az || '', en: contentData.hero?.subtitle?.en || '' },
+          description: { az: contentData.hero?.description?.az || '', en: contentData.hero?.description?.en || '' }
+        },
+        product1: {
+          name: { az: contentData.product1?.name?.az || '', en: contentData.product1?.name?.en || '' },
+          description: { az: contentData.product1?.description?.az || '', en: contentData.product1?.description?.en || '' }
+        },
+        product2: {
+          name: { az: contentData.product2?.name?.az || '', en: contentData.product2?.name?.en || '' },
+          description: { az: contentData.product2?.description?.az || '', en: contentData.product2?.description?.en || '' }
+        },
+        contact: {
+          phone: contentData.contact?.phone?.az || '',
+          email: contentData.contact?.email?.az || '',
+          address: { az: contentData.contact?.address?.az || '', en: contentData.contact?.address?.en || '' }
+        },
+        company: {
+          description: { az: contentData.company?.description?.az || '', en: contentData.company?.description?.en || '' },
+          mission: { az: contentData.company?.mission?.az || '', en: contentData.company?.mission?.en || '' },
+          quality: { az: contentData.company?.quality?.az || '', en: contentData.company?.quality?.en || '' }
+        },
+        instructions: {
+          title: { az: contentData.instructions?.title?.az || '', en: contentData.instructions?.title?.en || '' },
+          description: { az: contentData.instructions?.description?.az || '', en: contentData.instructions?.description?.en || '' }
+        },
+        articles: {
+          title: { az: contentData.articles?.title?.az || '', en: contentData.articles?.title?.en || '' },
+          description: { az: contentData.articles?.description?.az || '', en: contentData.articles?.description?.en || '' }
+        },
+        footer: {
+          description: { az: contentData.footer?.description?.az || '', en: contentData.footer?.description?.en || '' },
+          copyright: { az: contentData.footer?.copyright?.az || '', en: contentData.footer?.copyright?.en || '' }
         }
-      }
-    };
+      };
 
-    // Listen for storage events from other tabs/windows
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Custom event for same-tab updates
-    window.addEventListener('adminDataUpdated', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('adminDataUpdated', handleStorageChange);
-    };
-  }, []);
-
-  const updateAdminData = (data: AdminData) => {
-    setAdminData(data);
-    localStorage.setItem('swissneo_admin_data', JSON.stringify(data));
-    // Dispatch custom event for same-tab updates
-    window.dispatchEvent(new Event('adminDataUpdated'));
+      setSiteData(transformedSiteData);
+      setArticles(articlesData);
+      setContactSubmissions(submissionsData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error loading data:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const refreshAdminData = () => {
-    const savedData = localStorage.getItem('swissneo_admin_data');
-    if (savedData) {
-      try {
-        setAdminData(JSON.parse(savedData));
-      } catch (error) {
-        console.error('Error parsing admin data:', error);
+  const updateSiteContent = async (section: string, field: string, language: string, content: string) => {
+    try {
+      await databaseService.updateSiteContent(section, field, language, content);
+      await loadData(); // Reload all data to get updated content
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error updating content');
+      throw err;
+    }
+  };
+
+  const refreshData = async () => {
+    await loadData();
+  };
+
+  const addContactSubmission = async (submission: Omit<ContactSubmission, 'id' | 'created_at'>) => {
+    try {
+      const newSubmission = await databaseService.createContactSubmission(submission);
+      setContactSubmissions(prev => [newSubmission, ...prev]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error adding contact submission');
+      throw err;
+    }
+  };
+
+  const deleteContactSubmission = async (id: number) => {
+    try {
+      const success = await databaseService.deleteContactSubmission(id);
+      if (success) {
+        setContactSubmissions(prev => prev.filter(sub => sub.id !== id));
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error deleting contact submission');
+      throw err;
+    }
+  };
+
+  const addArticle = async (article: Omit<Article, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const newArticle = await databaseService.createArticle(article);
+      setArticles(prev => [newArticle, ...prev]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error adding article');
+      throw err;
+    }
+  };
+
+  const updateArticle = async (id: number, updates: Partial<Article>) => {
+    try {
+      const updatedArticle = await databaseService.updateArticle(id, updates);
+      if (updatedArticle) {
+        setArticles(prev => prev.map(article => article.id === id ? updatedArticle : article));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error updating article');
+      throw err;
+    }
+  };
+
+  const deleteArticle = async (id: number) => {
+    try {
+      const success = await databaseService.deleteArticle(id);
+      if (success) {
+        setArticles(prev => prev.filter(article => article.id !== id));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error deleting article');
+      throw err;
     }
   };
 
   return (
-    <AdminDataContext.Provider value={{ adminData, updateAdminData, refreshAdminData }}>
+    <AdminDataContext.Provider value={{
+      siteData,
+      articles,
+      contactSubmissions,
+      isLoading,
+      error,
+      updateSiteContent,
+      refreshData,
+      addContactSubmission,
+      deleteContactSubmission,
+      addArticle,
+      updateArticle,
+      deleteArticle
+    }}>
       {children}
     </AdminDataContext.Provider>
   );
