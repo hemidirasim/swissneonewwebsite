@@ -1,0 +1,131 @@
+{
+  "heroTitle": {
+    "az": "İsveçrə keyfiyyətində",
+    "en": "Swiss Quality"
+  },
+  "heroSubtitle": {
+    "az": "Premium uşaq qidası",
+    "en": "Premium Baby Formula"
+  },
+  "heroDescription": {
+    "az": "Swissneo — 100 ildən artıq İsveçrə təcrübəsi ilə hazırlanmış super premium uşaq qarışığı. Uşağınızın sağlam inkişafı və güclü immunitet üçün.",
+    "en": "Swissneo — super premium baby formula crafted with over 100 years of Swiss expertise. For your baby's healthy development and strong immunity."
+  },
+  "product1Name": {
+    "az": "Swissneo Super Premium Formula 0-6 ay",
+    "en": "Swissneo Super Premium Formula 0-6 months"
+  },
+  "product1Description": {
+    "az": "Doğulduğu gündən etibarən 6 ayadək olan körpələr üçün başlanğıc süd qarışığı",
+    "en": "Starting infant milk formula for babies from birth to 6 months"
+  },
+  "product2Name": {
+    "az": "Swissneo Super Premium Formula 6-12 ay",
+    "en": "Swissneo Super Premium Formula 6-12 months"
+  },
+  "product2Description": {
+    "az": "6-12 aylıq körpələr üçün növbəti mərhələ süd qarışığı",
+    "en": "Follow-on milk formula for babies from 6 to 12 months"
+  },
+  "contactPhone": "+994 XX XXX XX XX",
+  "contactEmail": "info@swissneo.az",
+  "contactAddress": {
+    "az": "Bakı, Azərbaycan",
+    "en": "Baku, Azerbaijan"
+  },
+  "companyDescription": {
+    "az": "Swissneo — süd məhsulları sahəsində 100 ildən artıq təcrübəyə malik İsveçrənin super premium uşaq qidası markasıdır.",
+    "en": "Swissneo is a super premium baby food brand from Switzerland with over 100 years of experience in dairy products."
+  },
+  "companyMission": {
+    "az": "Keyfiyyətə önəm verən və uşaqlarına ən yaxşısını vermək istəyən Azərbaycan valideynlərinin artan tələbatını qarşılamaq.",
+    "en": "To meet the growing demand of knowledgeable Azerbaijani parents who value quality and want to give their children the best."
+  },
+  "companyQuality": {
+    "az": "İsveçrənin ən yüksək keyfiyyət standartları ilə istehsal olunan məhsullarımız uşağınızın təhlükəsizliyi üçün bütün sertifikatları daşıyır.",
+    "en": "Our products manufactured with Switzerland's highest quality standards carry all certifications for your child's safety."
+  },
+  "instructionsTitle": {
+    "az": "Qidalandırma Təlimatları",
+    "en": "Feeding Instructions"
+  },
+  "instructionsDescription": {
+    "az": "Körpənizi düzgün qidalandırmaq üçün vacib təlimatlar",
+    "en": "Important instructions for properly feeding your baby"
+  },
+  "articlesTitle": {
+    "az": "Məqalələr və Məsləhətlər",
+    "en": "Articles & Tips"
+  },
+  "articlesDescription": {
+    "az": "Körpə qidalandırması haqqında faydalı məqalələr",
+    "en": "Useful articles about baby nutrition"
+  },
+  "footerDescription": {
+    "az": "Swissneo — İsveçrə keyfiyyətində premium uşaq qidası",
+    "en": "Swissneo — Premium baby food with Swiss quality"
+  },
+  "footerCopyright": {
+    "az": "© 2024 Swissneo. Bütün hüquqlar qorunur.",
+    "en": "© 2024 Swissneo. All rights reserved."
+  },
+  "articles": [
+    {
+      "id": 1,
+      "title": {
+        "az": "İlk 6 Ayda Körpə Qidalandırması",
+        "en": "Baby Nutrition in First 6 Months"
+      },
+      "excerpt": {
+        "az": "Yeni doğulmuş körpələrin qidalandırılması üçün əsas məlumatlar",
+        "en": "Essential information for feeding newborns"
+      },
+      "category": {
+        "az": "Qidalandırma",
+        "en": "Nutrition"
+      },
+      "readTime": {
+        "az": "5 dəq",
+        "en": "5 min"
+      },
+      "author": {
+        "az": "Dr. Aynur Məmmədova",
+        "en": "Dr. Aynur Mammadova"
+      },
+      "date": "2024-01-15",
+      "content": {
+        "az": "Körpə qidalandırması haqqında ətraflı məlumat...",
+        "en": "Detailed information about baby nutrition..."
+      }
+    },
+    {
+      "id": 2,
+      "title": {
+        "az": "DHA və ARA-nın Əhəmiyyəti",
+        "en": "Importance of DHA and ARA"
+      },
+      "excerpt": {
+        "az": "Bu vacib yağ turşularının körpə inkişafındakı rolu",
+        "en": "The role of these essential fatty acids in baby development"
+      },
+      "category": {
+        "az": "Sağlamlıq",
+        "en": "Health"
+      },
+      "readTime": {
+        "az": "7 dəq",
+        "en": "7 min"
+      },
+      "author": {
+        "az": "Dr. Elnur Hüseynov",
+        "en": "Dr. Elnur Huseynov"
+      },
+      "date": "2024-01-20",
+      "content": {
+        "az": "DHA və ARA haqqında ətraflı məlumat...",
+        "en": "Detailed information about DHA and ARA..."
+      }
+    }
+  ],
+  "contactSubmissions": []
+}
