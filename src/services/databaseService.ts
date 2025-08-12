@@ -21,6 +21,15 @@ export interface ContactSubmission {
   createdAt: string;
 }
 
+export interface User {
+  id: number;
+  username: string;
+  password_hash: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
+}
+
 class DatabaseService {
   private data = { ...databaseData };
 
@@ -33,6 +42,22 @@ class DatabaseService {
   updateData(newData: any) {
     this.data = { ...this.data, ...newData };
     this.saveToLocalStorage();
+  }
+
+  // Authentication
+  async authenticateUser(username: string, password: string): Promise<User | null> {
+    // Simple authentication for admin
+    if (username === 'admin' && password === 'swissneo2024') {
+      return {
+        id: 1,
+        username: 'admin',
+        password_hash: 'hashed_password',
+        role: 'admin',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+    }
+    return null;
   }
 
   // Get articles
