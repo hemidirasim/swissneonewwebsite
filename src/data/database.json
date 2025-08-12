@@ -76,55 +76,23 @@
         "az": "İlk 6 Ayda Körpə Qidalandırması",
         "en": "Baby Nutrition in First 6 Months"
       },
-      "excerpt": {
-        "az": "Yeni doğulmuş körpələrin qidalandırılması üçün əsas məlumatlar",
-        "en": "Essential information for feeding newborns"
-      },
-      "category": {
-        "az": "Qidalandırma",
-        "en": "Nutrition"
-      },
-      "readTime": {
-        "az": "5 dəq",
-        "en": "5 min"
-      },
-      "author": {
-        "az": "Dr. Aynur Məmmədova",
-        "en": "Dr. Aynur Mammadova"
-      },
-      "date": "2024-01-15",
       "content": {
-        "az": "Körpə qidalandırması haqqında ətraflı məlumat...",
-        "en": "Detailed information about baby nutrition..."
-      }
+        "az": "Yeni doğulmuş körpələrin qidalandırılması üçün əsas məlumatlar. Körpə qidalandırması haqqında ətraflı məlumat və tövsiyələr. Hər valideyn üçün vacib olan bu məlumatlar uşağınızın sağlam inkişafı üçün çox vacibdir.",
+        "en": "Essential information for feeding newborns. Detailed information and recommendations about baby nutrition. This information is very important for every parent for the healthy development of your child."
+      },
+      "date": "2024-01-15"
     },
     {
       "id": 2,
       "title": {
-        "az": "DHA və ARA-nın Əhəmiyyəti",
-        "en": "Importance of DHA and ARA"
+        "az": "Körpə İmmunitetini Gücləndirmə",
+        "en": "Strengthening Baby Immunity"
       },
-      "excerpt": {
-        "az": "Bu vacib yağ turşularının körpə inkişafındakı rolu",
-        "en": "The role of these essential fatty acids in baby development"
-      },
-      "category": {
-        "az": "Sağlamlıq",
-        "en": "Health"
-      },
-      "readTime": {
-        "az": "7 dəq",
-        "en": "7 min"
-      },
-      "author": {
-        "az": "Dr. Elnur Hüseynov",
-        "en": "Dr. Elnur Huseynov"
-      },
-      "date": "2024-01-20",
       "content": {
-        "az": "DHA və ARA haqqında ətraflı məlumat...",
-        "en": "Detailed information about DHA and ARA..."
-      }
+        "az": "Körpənizin immunitet sistemini gücləndirmək üçün praktik məsləhətlər. Düzgün qidalandırma və immunitet arasındakı əlaqə haqqında məlumat. Uşağınızın sağlamlığı üçün vacib olan bu məlumatları oxuyun.",
+        "en": "Practical advice for strengthening your baby's immune system. Information about the relationship between proper nutrition and immunity. Read this important information for your child's health."
+      },
+      "date": "2024-01-20"
     }
   ],
   "contactSubmissions": []

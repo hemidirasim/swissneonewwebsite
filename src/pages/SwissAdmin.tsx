@@ -149,12 +149,7 @@ const SwissAdmin = () => {
         title: newArticle.title,
         content: newArticle.content,
         image: imageUrl,
-        date: new Date().toISOString(),
-        // Default values for required fields
-        excerpt: { az: '', en: '' },
-        category: { az: 'Ümumi', en: 'General' },
-        readTime: { az: '5 dəqiqə', en: '5 min' },
-        author: { az: 'Admin', en: 'Admin' }
+        date: new Date().toISOString()
       } as Omit<Article, 'id'>;
 
       addArticle(articleData);

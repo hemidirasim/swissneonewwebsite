@@ -4,13 +4,9 @@ import { put } from '@vercel/blob';
 export interface Article {
   id: number;
   title: { az: string; en: string };
-  excerpt: { az: string; en: string };
-  category: { az: string; en: string };
-  readTime: { az: string; en: string };
-  author: { az: string; en: string };
-  date: string;
   content: { az: string; en: string };
-  image?: string; // Şəkil yolu
+  image?: string;
+  date: string;
 }
 
 export interface ContactSubmission {
@@ -187,12 +183,6 @@ class DatabaseService {
     if (this.data.articles) {
       const index = this.data.articles.findIndex(article => article.id === id);
       if (index !== -1) {
-        // Şəkli də sil
-        const article = this.data.articles[index] as Article;
-        if (article.image) {
-          // Vercel Blob-dan şəkli silmək üçün API endpoint yarada bilərik
-          // Hələlik sadəcə məqaləni silirik
-        }
         this.data.articles.splice(index, 1);
         this.saveToLocalStorage();
         return true;
