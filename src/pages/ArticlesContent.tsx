@@ -3,7 +3,7 @@ import { useAdminData } from '@/contexts/AdminDataContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Calendar, Clock, User, BookOpen } from 'lucide-react';
+import { ArrowRight, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const ArticlesContent = () => {
@@ -14,10 +14,7 @@ export const ArticlesContent = () => {
   const articles = (adminData.articles || []).map(article => ({
     id: article.id,
     title: article.title[language],
-    excerpt: article.excerpt[language],
-    category: article.category[language],
-    readTime: article.readTime[language],
-    author: article.author[language],
+    content: article.content[language],
     date: article.date,
     image: article.image || '📄',
   }));
@@ -32,7 +29,7 @@ export const ArticlesContent = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <div className="flex items-center justify-center mb-4">
-            <BookOpen className="w-8 h-8 text-primary mr-3" />
+            <FileText className="w-8 h-8 text-primary mr-3" />
             <Badge variant="outline">
               {adminData.articlesTitle?.[language] || 'Məqalələr'}
             </Badge>
@@ -48,7 +45,7 @@ export const ArticlesContent = () => {
         {/* Articles Grid */}
         {articles.length === 0 ? (
           <div className="text-center py-16">
-            <BookOpen className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+            <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
             <h2 className="text-2xl font-bold mb-2">Hələ məqalə yoxdur</h2>
             <p className="text-muted-foreground">
               Tezliklə faydalı məqalələr əlavə ediləcək.
@@ -77,38 +74,21 @@ export const ArticlesContent = () => {
 
                   {/* Article Content */}
                   <div className="p-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Badge variant="secondary" className="text-xs">
-                        {article.category}
-                      </Badge>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3" />
-                        {article.readTime}
-                      </div>
-                    </div>
-
                     <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
                       {article.title}
                     </h3>
 
                     <p className="text-muted-foreground mb-4 line-clamp-3">
-                      {article.excerpt}
+                      {article.content?.substring(0, 150)}...
                     </p>
 
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <User className="w-3 h-3" />
-                          {article.author}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(article.date).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                        </div>
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(article.date).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
                       </div>
 
                       <Button

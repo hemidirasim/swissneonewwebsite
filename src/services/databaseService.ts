@@ -50,7 +50,7 @@ class DatabaseService {
   async authenticateUser(username: string, password: string): Promise<User | null> {
     // Simple authentication for admin
     if (username === 'admin' && password === 'swissneo2024') {
-      return {
+      const user = {
         id: 1,
         username: 'admin',
         password_hash: 'hashed_password',
@@ -58,8 +58,81 @@ class DatabaseService {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
+      
+      // Save session to localStorage
+      this.saveSession(user);
+      
+      return user;
     }
     return null;
+  }
+
+  // Save session
+  private saveSession(user: User) {
+    const session = {
+      user,
+      loginTime: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 gün
+    };
+    localStorage.setItem('swissneo-admin-session', JSON.stringify(session));
+  }
+
+  // Check if user is logged in
+  isLoggedIn(): boolean {
+    try {
+      const sessionData = localStorage.getItem('swissneo-admin-session');
+      if (!sessionData) return false;
+
+      const session = JSON.parse(sessionData);
+      const now = new Date();
+      const expiresAt = new Date(session.expiresAt);
+
+      // Session expired
+      if (now > expiresAt) {
+        this.logout();
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error checking session:', error);
+      return false;
+    }
+  }
+
+  // Get current user
+  getCurrentUser(): User | null {
+    try {
+      if (!this.isLoggedIn()) return null;
+
+      const sessionData = localStorage.getItem('swissneo-admin-session');
+      if (!sessionData) return null;
+
+      const session = JSON.parse(sessionData);
+      return session.user;
+    } catch (error) {
+      console.error('Error getting current user:', error);
+      return null;
+    }
+  }
+
+  // Logout
+  logout(): void {
+    localStorage.removeItem('swissneo-admin-session');
+  }
+
+  // Extend session
+  extendSession(): void {
+    try {
+      const sessionData = localStorage.getItem('swissneo-admin-session');
+      if (!sessionData) return;
+
+      const session = JSON.parse(sessionData);
+      session.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 gün
+      localStorage.setItem('swissneo-admin-session', JSON.stringify(session));
+    } catch (error) {
+      console.error('Error extending session:', error);
+    }
   }
 
   // Upload image to Vercel Blob Storage

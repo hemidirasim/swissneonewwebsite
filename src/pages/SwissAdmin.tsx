@@ -2,103 +2,58 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Shield, 
-  Settings, 
-  Package, 
-  Phone, 
-  Globe, 
-  Save, 
-  LogOut,
-  Edit3,
-  Users,
-  BarChart3,
-  Languages,
-  Mail,
-  MessageSquare,
-  Trash2,
-  Calendar,
-  Clock,
-  BookOpen,
-  AlertTriangle,
-  Plus,
-  Image as ImageIcon,
-  Upload
-} from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useAdminData } from '@/contexts/AdminDataContext';
 import databaseService, { Article, ContactSubmission } from '@/services/databaseService';
-
-interface User {
-  id: number;
-  username: string;
-  password_hash: string;
-  role: string;
-  created_at: string;
-  updated_at: string;
-}
+import { 
+  Settings, 
+  FileText, 
+  MessageSquare, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  LogOut,
+  Upload,
+  X
+} from 'lucide-react';
 
 const SwissAdmin = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [currentLang, setCurrentLang] = useState<'az' | 'en'>('az');
-  const [siteData, setSiteData] = useState<any>({
-    heroTitle: { az: '', en: '' },
-    heroSubtitle: { az: '', en: '' },
-    heroDescription: { az: '', en: '' },
-    product1Name: { az: '', en: '' },
-    product1Description: { az: '', en: '' },
-    product2Name: { az: '', en: '' },
-    product2Description: { az: '', en: '' },
-    contactPhone: '',
-    contactEmail: '',
-    contactAddress: { az: '', en: '' },
-    companyDescription: { az: '', en: '' },
-    companyMission: { az: '', en: '' },
-    companyQuality: { az: '', en: '' },
-    instructionsTitle: { az: '', en: '' },
-    instructionsDescription: { az: '', en: '' },
-    articlesTitle: { az: '', en: '' },
-    articlesDescription: { az: '', en: '' },
-    footerDescription: { az: '', en: '' },
-    footerCopyright: { az: '', en: '' }
-  });
-
-  // Articles state
+  const { language } = useLanguage();
+  const { adminData, updateAdminData, addArticle, updateArticle, deleteArticle, addContactSubmission, deleteContactSubmission } = useAdminData();
+  const { toast } = useToast();
+  
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [showArticleForm, setShowArticleForm] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [newArticle, setNewArticle] = useState<Partial<Article>>({
     title: { az: '', en: '' },
-    excerpt: { az: '', en: '' },
-    category: { az: '', en: '' },
-    readTime: { az: '', en: '' },
-    author: { az: '', en: '' },
     content: { az: '', en: '' },
     image: ''
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
 
-  // Load site data on mount
+  // Check session on mount
   useEffect(() => {
-    loadSiteData();
+    checkSession();
     loadArticles();
   }, []);
 
-  const loadSiteData = () => {
-    try {
-      const data = databaseService.getData();
-      setSiteData(data);
-    } catch (error) {
-      console.error('Error loading site data:', error);
-    }
+  const checkSession = () => {
+    const loggedIn = databaseService.isLoggedIn();
+    const user = databaseService.getCurrentUser();
+    setIsLoggedIn(loggedIn);
+    setCurrentUser(user);
   };
 
   const loadArticles = () => {
@@ -112,63 +67,62 @@ const SwissAdmin = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const username = formData.get('username') as string;
+    const password = formData.get('password') as string;
+
     try {
       const user = await databaseService.authenticateUser(username, password);
       if (user) {
-        setIsAuthenticated(true);
+        setIsLoggedIn(true);
         setCurrentUser(user);
-        setUsername('');
-        setPassword('');
         toast({
-          title: 'Giriş uğurlu!',
-          description: 'Admin panelinə xoş gəlmisiniz.',
+          title: "Giriş uğurlu!",
+          description: "Admin panelinə xoş gəlmisiniz.",
         });
       } else {
         toast({
-          title: 'Yanlış məlumatlar!',
-          description: 'İstifadəçi adı və ya şifrə yanlışdır.',
-          variant: 'destructive',
+          title: "Giriş uğursuz!",
+          description: "İstifadəçi adı və ya şifrə yanlışdır.",
+          variant: "destructive",
         });
       }
     } catch (error) {
       toast({
-        title: 'Xəta!',
-        description: 'Giriş zamanı xəta baş verdi.',
-        variant: 'destructive',
+        title: "Xəta!",
+        description: "Giriş zamanı xəta baş verdi.",
+        variant: "destructive",
       });
     }
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
+    databaseService.logout();
+    setIsLoggedIn(false);
     setCurrentUser(null);
     toast({
-      title: 'Çıxış edildi',
-      description: 'Admin panelindən çıxış etdiniz.',
+      title: "Çıxış edildi",
+      description: "Təhlükəsiz şəkildə çıxış etdiniz.",
     });
   };
 
   const updateSiteData = (field: string, value: any) => {
-    setSiteData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    const newData = { ...adminData };
+    if (field.includes('.')) {
+      const [parent, child] = field.split('.');
+      if (!newData[parent]) newData[parent] = {};
+      newData[parent][child] = value;
+    } else {
+      newData[field] = value;
+    }
+    updateAdminData(newData);
   };
 
   const saveSiteData = () => {
-    try {
-      databaseService.updateData(siteData);
-      toast({
-        title: 'Uğurlu!',
-        description: 'Məlumatlar yadda saxlanıldı.',
-      });
-    } catch (error) {
-      toast({
-        title: 'Xəta!',
-        description: 'Məlumatlar yadda saxlanıla bilmədi.',
-        variant: 'destructive',
-      });
-    }
+    toast({
+      title: "Yadda saxlanıldı!",
+      description: "Bütün dəyişikliklər uğurla yadda saxlanıldı.",
+    });
   };
 
   // Article functions
@@ -186,48 +140,54 @@ const SwissAdmin = () => {
 
   const handleAddArticle = async () => {
     try {
-      let imagePath = '';
+      let imageUrl = '';
       if (selectedImage) {
-        imagePath = await databaseService.uploadImage(selectedImage);
+        imageUrl = await databaseService.uploadImage(selectedImage);
       }
 
       const articleData = {
-        ...newArticle,
-        date: new Date().toISOString().split('T')[0],
-        image: imagePath
+        title: newArticle.title,
+        content: newArticle.content,
+        image: imageUrl,
+        date: new Date().toISOString(),
+        // Default values for required fields
+        excerpt: { az: '', en: '' },
+        category: { az: 'Ümumi', en: 'General' },
+        readTime: { az: '5 dəqiqə', en: '5 min' },
+        author: { az: 'Admin', en: 'Admin' }
       } as Omit<Article, 'id'>;
 
-      databaseService.addArticle(articleData);
-      loadArticles();
-      setShowArticleForm(false);
+      addArticle(articleData);
       setNewArticle({
         title: { az: '', en: '' },
-        excerpt: { az: '', en: '' },
-        category: { az: '', en: '' },
-        readTime: { az: '', en: '' },
-        author: { az: '', en: '' },
         content: { az: '', en: '' },
         image: ''
       });
       setSelectedImage(null);
       setImagePreview('');
+      setShowArticleForm(false);
+      loadArticles();
 
       toast({
-        title: 'Uğurlu!',
-        description: 'Məqalə əlavə edildi.',
+        title: "Məqalə əlavə edildi!",
+        description: "Yeni məqalə uğurla əlavə edildi.",
       });
     } catch (error) {
       toast({
-        title: 'Xəta!',
-        description: 'Məqalə əlavə edilə bilmədi.',
-        variant: 'destructive',
+        title: "Xəta!",
+        description: "Məqalə əlavə edilərkən xəta baş verdi.",
+        variant: "destructive",
       });
     }
   };
 
   const handleEditArticle = (article: Article) => {
     setEditingArticle(article);
-    setNewArticle(article);
+    setNewArticle({
+      title: article.title,
+      content: article.content,
+      image: article.image
+    });
     setImagePreview(article.image || '');
     setShowArticleForm(true);
   };
@@ -236,85 +196,74 @@ const SwissAdmin = () => {
     if (!editingArticle) return;
 
     try {
-      let imagePath = editingArticle.image || '';
+      let imageUrl = editingArticle.image || '';
       if (selectedImage) {
-        imagePath = await databaseService.uploadImage(selectedImage);
+        imageUrl = await databaseService.uploadImage(selectedImage);
       }
 
       const updates = {
-        ...newArticle,
-        image: imagePath
+        title: newArticle.title,
+        content: newArticle.content,
+        image: imageUrl
       };
 
-      databaseService.updateArticle(editingArticle.id, updates);
-      loadArticles();
-      setShowArticleForm(false);
+      updateArticle(editingArticle.id, updates);
       setEditingArticle(null);
       setNewArticle({
         title: { az: '', en: '' },
-        excerpt: { az: '', en: '' },
-        category: { az: '', en: '' },
-        readTime: { az: '', en: '' },
-        author: { az: '', en: '' },
         content: { az: '', en: '' },
         image: ''
       });
       setSelectedImage(null);
       setImagePreview('');
+      setShowArticleForm(false);
+      loadArticles();
 
       toast({
-        title: 'Uğurlu!',
-        description: 'Məqalə yeniləndi.',
+        title: "Məqalə yeniləndi!",
+        description: "Məqalə uğurla yeniləndi.",
       });
     } catch (error) {
       toast({
-        title: 'Xəta!',
-        description: 'Məqalə yenilənə bilmədi.',
-        variant: 'destructive',
+        title: "Xəta!",
+        description: "Məqalə yenilənərkən xəta baş verdi.",
+        variant: "destructive",
       });
     }
   };
 
   const handleDeleteArticle = (id: number) => {
     if (confirm('Bu məqaləni silmək istədiyinizə əminsiniz?')) {
-      try {
-        databaseService.deleteArticle(id);
-        loadArticles();
-        toast({
-          title: 'Uğurlu!',
-          description: 'Məqalə silindi.',
-        });
-      } catch (error) {
-        toast({
-          title: 'Xəta!',
-          description: 'Məqalə silinə bilmədi.',
-          variant: 'destructive',
-        });
-      }
+      deleteArticle(id);
+      loadArticles();
+      toast({
+        title: "Məqalə silindi!",
+        description: "Məqalə uğurla silindi.",
+      });
     }
   };
 
-  const updateArticleField = (field: keyof Article, lang: 'az' | 'en', value: string) => {
+  const updateArticleField = (field: keyof Article, value: any) => {
     setNewArticle(prev => ({
       ...prev,
-      [field]: {
-        ...prev[field] as { az: string; en: string },
-        [lang]: value
-      }
+      [field]: value
     }));
   };
 
-  // Login Form
-  if (!isAuthenticated) {
+  // Extend session on any action
+  const extendSession = () => {
+    databaseService.extendSession();
+  };
+
+  if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-              <Shield className="w-8 h-8 text-primary" />
-            </div>
-            <CardTitle className="text-2xl">Admin Panel</CardTitle>
-            <p className="text-muted-foreground">Swissneo Admin Panelinə giriş edin</p>
+            <CardTitle className="text-2xl font-bold text-gray-900">
+              Swissneo Admin Panel
+            </CardTitle>
+            <p className="text-gray-600">Zəhmət olmasa giriş edin</p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
@@ -322,33 +271,26 @@ const SwissAdmin = () => {
                 <Label htmlFor="username">İstifadəçi adı</Label>
                 <Input
                   id="username"
+                  name="username"
                   type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="admin"
                   required
+                  className="mt-1"
                 />
               </div>
               <div>
                 <Label htmlFor="password">Şifrə</Label>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
                   required
+                  className="mt-1"
                 />
               </div>
               <Button type="submit" className="w-full">
                 Giriş et
               </Button>
             </form>
-            <div className="mt-4 text-center text-sm text-muted-foreground">
-              <p>Test məlumatları:</p>
-              <p>İstifadəçi adı: <strong>admin</strong></p>
-              <p>Şifrə: <strong>swissneo2024</strong></p>
-            </div>
           </CardContent>
         </Card>
       </div>
@@ -356,16 +298,16 @@ const SwissAdmin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Shield className="w-8 h-8 text-primary" />
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-3">
+              <Settings className="w-8 h-8 text-blue-600" />
               <div>
-                <h1 className="text-xl font-bold">Swissneo Admin Panel</h1>
-                <p className="text-sm text-muted-foreground">
+                <h1 className="text-xl font-semibold text-gray-900">Swissneo Admin Panel</h1>
+                <p className="text-sm text-gray-500">
                   Xoş gəlmisiniz, {currentUser?.username}
                 </p>
               </div>
@@ -376,137 +318,113 @@ const SwissAdmin = () => {
             </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="content" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="content">Məzmun</TabsTrigger>
-            <TabsTrigger value="articles">Məqalələr</TabsTrigger>
-            <TabsTrigger value="contact">Əlaqə</TabsTrigger>
-            <TabsTrigger value="settings">Tənzimləmələr</TabsTrigger>
+            <TabsTrigger value="content" onClick={extendSession}>
+              <FileText className="w-4 h-4 mr-2" />
+              Məzmun
+            </TabsTrigger>
+            <TabsTrigger value="articles" onClick={extendSession}>
+              <FileText className="w-4 h-4 mr-2" />
+              Məqalələr
+            </TabsTrigger>
+            <TabsTrigger value="contact" onClick={extendSession}>
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Əlaqə
+            </TabsTrigger>
+            <TabsTrigger value="settings" onClick={extendSession}>
+              <Settings className="w-4 h-4 mr-2" />
+              Tənzimləmələr
+            </TabsTrigger>
           </TabsList>
 
           {/* Content Tab */}
           <TabsContent value="content" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Globe className="w-5 h-5" />
-                  Sayt Məzmunu
-                </CardTitle>
+                <CardTitle>Sayt Məzmunu</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Language Selector */}
-                <div className="flex gap-2">
-                  <Button
-                    variant={currentLang === 'az' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setCurrentLang('az')}
-                  >
-                    Azərbaycan
-                  </Button>
-                  <Button
-                    variant={currentLang === 'en' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setCurrentLang('en')}
-                  >
-                    English
-                  </Button>
-                </div>
-
                 {/* Hero Section */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Ana Səhifə</h3>
-                  <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Ana Səhifə</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label>Başlıq ({currentLang})</Label>
+                      <Label>Başlıq (AZ)</Label>
                       <Input
-                        value={siteData.heroTitle?.[currentLang] || ''}
-                        onChange={(e) => updateSiteData('heroTitle', {
-                          ...siteData.heroTitle,
-                          [currentLang]: e.target.value
-                        })}
+                        value={adminData.heroTitle?.az || ''}
+                        onChange={(e) => updateSiteData('heroTitle.az', e.target.value)}
+                        className="mt-1"
                       />
                     </div>
                     <div>
-                      <Label>Alt başlıq ({currentLang})</Label>
+                      <Label>Başlıq (EN)</Label>
                       <Input
-                        value={siteData.heroSubtitle?.[currentLang] || ''}
-                        onChange={(e) => updateSiteData('heroSubtitle', {
-                          ...siteData.heroSubtitle,
-                          [currentLang]: e.target.value
-                        })}
+                        value={adminData.heroTitle?.en || ''}
+                        onChange={(e) => updateSiteData('heroTitle.en', e.target.value)}
+                        className="mt-1"
                       />
                     </div>
-                  </div>
-                  <div>
-                    <Label>Təsvir ({currentLang})</Label>
-                    <Textarea
-                      value={siteData.heroDescription?.[currentLang] || ''}
-                      onChange={(e) => updateSiteData('heroDescription', {
-                        ...siteData.heroDescription,
-                        [currentLang]: e.target.value
-                      })}
-                      rows={3}
-                    />
+                    <div>
+                      <Label>Alt başlıq (AZ)</Label>
+                      <Input
+                        value={adminData.heroSubtitle?.az || ''}
+                        onChange={(e) => updateSiteData('heroSubtitle.az', e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label>Alt başlıq (EN)</Label>
+                      <Input
+                        value={adminData.heroSubtitle?.en || ''}
+                        onChange={(e) => updateSiteData('heroSubtitle.en', e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <Separator />
 
                 {/* Products Section */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Məhsullar</h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-4">
-                      <h4 className="font-medium">Swissneo 1 (0-6 ay)</h4>
-                      <div>
-                        <Label>Ad ({currentLang})</Label>
-                        <Input
-                          value={siteData.product1Name?.[currentLang] || ''}
-                          onChange={(e) => updateSiteData('product1Name', {
-                            ...siteData.product1Name,
-                            [currentLang]: e.target.value
-                          })}
-                        />
-                      </div>
-                      <div>
-                        <Label>Təsvir ({currentLang})</Label>
-                        <Textarea
-                          value={siteData.product1Description?.[currentLang] || ''}
-                          onChange={(e) => updateSiteData('product1Description', {
-                            ...siteData.product1Description,
-                            [currentLang]: e.target.value
-                          })}
-                          rows={2}
-                        />
-                      </div>
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Məhsullar</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Məhsul 1 Adı (AZ)</Label>
+                      <Input
+                        value={adminData.product1Name?.az || ''}
+                        onChange={(e) => updateSiteData('product1Name.az', e.target.value)}
+                        className="mt-1"
+                      />
                     </div>
-                    <div className="space-y-4">
-                      <h4 className="font-medium">Swissneo 2 (6-12 ay)</h4>
-                      <div>
-                        <Label>Ad ({currentLang})</Label>
-                        <Input
-                          value={siteData.product2Name?.[currentLang] || ''}
-                          onChange={(e) => updateSiteData('product2Name', {
-                            ...siteData.product2Name,
-                            [currentLang]: e.target.value
-                          })}
-                        />
-                      </div>
-                      <div>
-                        <Label>Təsvir ({currentLang})</Label>
-                        <Textarea
-                          value={siteData.product2Description?.[currentLang] || ''}
-                          onChange={(e) => updateSiteData('product2Description', {
-                            ...siteData.product2Description,
-                            [currentLang]: e.target.value
-                          })}
-                          rows={2}
-                        />
-                      </div>
+                    <div>
+                      <Label>Məhsul 1 Adı (EN)</Label>
+                      <Input
+                        value={adminData.product1Name?.en || ''}
+                        onChange={(e) => updateSiteData('product1Name.en', e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label>Məhsul 2 Adı (AZ)</Label>
+                      <Input
+                        value={adminData.product2Name?.az || ''}
+                        onChange={(e) => updateSiteData('product2Name.az', e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label>Məhsul 2 Adı (EN)</Label>
+                      <Input
+                        value={adminData.product2Name?.en || ''}
+                        onChange={(e) => updateSiteData('product2Name.en', e.target.value)}
+                        className="mt-1"
+                      />
                     </div>
                   </div>
                 </div>
@@ -514,38 +432,29 @@ const SwissAdmin = () => {
                 <Separator />
 
                 {/* Contact Section */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Əlaqə Məlumatları</h3>
-                  <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Əlaqə Məlumatları</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label>Telefon</Label>
                       <Input
-                        value={siteData.contactPhone || ''}
+                        value={adminData.contactPhone || ''}
                         onChange={(e) => updateSiteData('contactPhone', e.target.value)}
+                        className="mt-1"
                       />
                     </div>
                     <div>
                       <Label>Email</Label>
                       <Input
-                        value={siteData.contactEmail || ''}
+                        value={adminData.contactEmail || ''}
                         onChange={(e) => updateSiteData('contactEmail', e.target.value)}
+                        className="mt-1"
                       />
                     </div>
-                  </div>
-                  <div>
-                    <Label>Ünvan ({currentLang})</Label>
-                    <Input
-                      value={siteData.contactAddress?.[currentLang] || ''}
-                      onChange={(e) => updateSiteData('contactAddress', {
-                        ...siteData.contactAddress,
-                        [currentLang]: e.target.value
-                      })}
-                    />
                   </div>
                 </div>
 
                 <Button onClick={saveSiteData} className="w-full">
-                  <Save className="w-4 h-4 mr-2" />
                   Yadda saxla
                 </Button>
               </CardContent>
@@ -555,213 +464,177 @@ const SwissAdmin = () => {
           {/* Articles Tab */}
           <TabsContent value="articles" className="space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-5 h-5" />
-                    Məqalələr ({articles.length})
-                  </div>
-                  <Button onClick={() => setShowArticleForm(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Yeni Məqalə
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {showArticleForm ? (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">
-                        {editingArticle ? 'Məqaləni Redaktə Et' : 'Yeni Məqalə'}
-                      </h3>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setShowArticleForm(false);
-                          setEditingArticle(null);
-                          setNewArticle({
-                            title: { az: '', en: '' },
-                            excerpt: { az: '', en: '' },
-                            category: { az: '', en: '' },
-                            readTime: { az: '', en: '' },
-                            author: { az: '', en: '' },
-                            content: { az: '', en: '' },
-                            image: ''
-                          });
-                          setSelectedImage(null);
-                          setImagePreview('');
-                        }}
-                      >
-                        Ləğv et
-                      </Button>
-                    </div>
-
-                    {/* Language Selector */}
-                    <div className="flex gap-2">
-                      <Button
-                        variant={currentLang === 'az' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setCurrentLang('az')}
-                      >
-                        Azərbaycan
-                      </Button>
-                      <Button
-                        variant={currentLang === 'en' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setCurrentLang('en')}
-                      >
-                        English
-                      </Button>
-                    </div>
-
-                    {/* Article Form */}
-                    <div className="grid md:grid-cols-2 gap-4">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Məqalələr</CardTitle>
+                <Dialog open={showArticleForm} onOpenChange={setShowArticleForm}>
+                  <DialogTrigger asChild>
+                    <Button onClick={() => {
+                      setEditingArticle(null);
+                      setNewArticle({
+                        title: { az: '', en: '' },
+                        content: { az: '', en: '' },
+                        image: ''
+                      });
+                      setSelectedImage(null);
+                      setImagePreview('');
+                    }}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Yeni Məqalə
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>
+                        {editingArticle ? 'Məqaləni Redaktə Et' : 'Yeni Məqalə Əlavə Et'}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      {/* Image Upload */}
                       <div>
-                        <Label>Başlıq ({currentLang})</Label>
-                        <Input
-                          value={newArticle.title?.[currentLang] || ''}
-                          onChange={(e) => updateArticleField('title', currentLang, e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label>Kateqoriya ({currentLang})</Label>
-                        <Input
-                          value={newArticle.category?.[currentLang] || ''}
-                          onChange={(e) => updateArticleField('category', currentLang, e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label>Müəllif ({currentLang})</Label>
-                        <Input
-                          value={newArticle.author?.[currentLang] || ''}
-                          onChange={(e) => updateArticleField('author', currentLang, e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label>Oxuma vaxtı ({currentLang})</Label>
-                        <Input
-                          value={newArticle.readTime?.[currentLang] || ''}
-                          onChange={(e) => updateArticleField('readTime', currentLang, e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label>Qısa məzmun ({currentLang})</Label>
-                      <Textarea
-                        value={newArticle.excerpt?.[currentLang] || ''}
-                        onChange={(e) => updateArticleField('excerpt', currentLang, e.target.value)}
-                        rows={3}
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Ətraflı məzmun ({currentLang})</Label>
-                      <Textarea
-                        value={newArticle.content?.[currentLang] || ''}
-                        onChange={(e) => updateArticleField('content', currentLang, e.target.value)}
-                        rows={6}
-                      />
-                    </div>
-
-                    {/* Image Upload */}
-                    <div>
-                      <Label>Şəkil</Label>
-                      <div className="mt-2 space-y-4">
-                        <div className="flex items-center gap-4">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => document.getElementById('image-upload')?.click()}
-                          >
-                            <Upload className="w-4 h-4 mr-2" />
-                            Şəkil Seç
-                          </Button>
-                          <input
-                            id="image-upload"
+                        <Label>Şəkil</Label>
+                        <div className="mt-2 flex items-center space-x-4">
+                          <Input
                             type="file"
                             accept="image/*"
                             onChange={handleImageSelect}
-                            className="hidden"
+                            className="flex-1"
+                          />
+                          {imagePreview && (
+                            <div className="relative">
+                              <img
+                                src={imagePreview}
+                                alt="Preview"
+                                className="w-20 h-20 object-cover rounded"
+                              />
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                className="absolute -top-2 -right-2 w-6 h-6 p-0"
+                                onClick={() => {
+                                  setSelectedImage(null);
+                                  setImagePreview('');
+                                }}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Title */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Başlıq (AZ)</Label>
+                          <Input
+                            value={newArticle.title?.az || ''}
+                            onChange={(e) => updateArticleField('title', { ...newArticle.title, az: e.target.value })}
+                            className="mt-1"
                           />
                         </div>
-                        {imagePreview && (
-                          <div className="relative w-32 h-32">
-                            <img
-                              src={imagePreview}
-                              alt="Preview"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-                        )}
+                        <div>
+                          <Label>Başlıq (EN)</Label>
+                          <Input
+                            value={newArticle.title?.en || ''}
+                            onChange={(e) => updateArticleField('title', { ...newArticle.title, en: e.target.value })}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Məzmun (AZ)</Label>
+                          <Textarea
+                            value={newArticle.content?.az || ''}
+                            onChange={(e) => updateArticleField('content', { ...newArticle.content, az: e.target.value })}
+                            className="mt-1"
+                            rows={10}
+                          />
+                        </div>
+                        <div>
+                          <Label>Məzmun (EN)</Label>
+                          <Textarea
+                            value={newArticle.content?.en || ''}
+                            onChange={(e) => updateArticleField('content', { ...newArticle.content, en: e.target.value })}
+                            className="mt-1"
+                            rows={10}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end space-x-2">
+                        <Button variant="outline" onClick={() => setShowArticleForm(false)}>
+                          Ləğv et
+                        </Button>
+                        <Button onClick={editingArticle ? handleUpdateArticle : handleAddArticle}>
+                          {editingArticle ? 'Yenilə' : 'Əlavə et'}
+                        </Button>
                       </div>
                     </div>
-
-                    <Button
-                      onClick={editingArticle ? handleUpdateArticle : handleAddArticle}
-                      className="w-full"
-                    >
-                      <Save className="w-4 h-4 mr-2" />
-                      {editingArticle ? 'Yenilə' : 'Əlavə Et'}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {articles.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">
-                        Hələ heç bir məqalə yoxdur. Yeni məqalə əlavə edin.
-                      </p>
-                    ) : (
-                      articles.map((article) => (
-                        <Card key={article.id} className="p-4">
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-start gap-4 flex-1">
-                              {article.image && (
-                                <img
-                                  src={article.image}
-                                  alt={article.title[currentLang]}
-                                  className="w-16 h-16 object-cover rounded-lg"
-                                />
-                              )}
-                              <div className="flex-1">
-                                <h4 className="font-semibold">{article.title[currentLang]}</h4>
-                                <p className="text-sm text-muted-foreground">
-                                  {article.excerpt[currentLang]}
-                                </p>
-                                <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                                  <span>{article.author[currentLang]}</span>
-                                  <span>{article.category[currentLang]}</span>
-                                  <span>{article.readTime[currentLang]}</span>
-                                  <span>{article.date}</span>
-                                </div>
-                              </div>
+                  </DialogContent>
+                </Dialog>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Şəkil</TableHead>
+                      <TableHead>Başlıq</TableHead>
+                      <TableHead>Tarix</TableHead>
+                      <TableHead>Əməliyyatlar</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {articles.map((article) => (
+                      <TableRow key={article.id}>
+                        <TableCell>
+                          {article.image ? (
+                            <img
+                              src={article.image}
+                              alt={article.title[language]}
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                              <FileText className="w-6 h-6 text-gray-400" />
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleEditArticle(article)}
-                              >
-                                <Edit3 className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDeleteArticle(article.id)}
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{article.title[language]}</div>
+                            <div className="text-sm text-gray-500 line-clamp-2">
+                              {article.content[language]?.substring(0, 100)}...
                             </div>
                           </div>
-                        </Card>
-                      ))
-                    )}
-                  </div>
-                )}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(article.date).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditArticle(article)}
+                            >
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteArticle(article.id)}
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>
@@ -770,15 +643,45 @@ const SwissAdmin = () => {
           <TabsContent value="contact" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5" />
-                  Əlaqə Mesajları
-                </CardTitle>
+                <CardTitle>Əlaqə Mesajları</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  Əlaqə mesajları bölməsi tezliklə əlavə ediləcək.
-                </p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Ad</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Telefon</TableHead>
+                      <TableHead>Mesaj</TableHead>
+                      <TableHead>Tarix</TableHead>
+                      <TableHead>Əməliyyatlar</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(adminData.contactSubmissions || []).map((submission: ContactSubmission) => (
+                      <TableRow key={submission.id}>
+                        <TableCell>{submission.name}</TableCell>
+                        <TableCell>{submission.email}</TableCell>
+                        <TableCell>{submission.phone}</TableCell>
+                        <TableCell>
+                          <div className="max-w-xs truncate">{submission.message}</div>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(submission.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deleteContactSubmission(submission.id)}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>
@@ -787,15 +690,27 @@ const SwissAdmin = () => {
           <TabsContent value="settings" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="w-5 h-5" />
-                  Tənzimləmələr
-                </CardTitle>
+                <CardTitle>Tənzimləmələr</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Tənzimləmələr bölməsi tezliklə əlavə ediləcək.
-                </p>
+              <CardContent className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Sessiya Məlumatları</h3>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p><strong>İstifadəçi:</strong> {currentUser?.username}</p>
+                    <p><strong>Rol:</strong> {currentUser?.role}</p>
+                    <p><strong>Giriş vaxtı:</strong> {new Date().toLocaleString()}</p>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Təhlükəsizlik</h3>
+                  <Button variant="outline" onClick={handleLogout}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Çıxış et
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
