@@ -47,7 +47,7 @@ export interface ContactSubmission {
   created_at: string;
 }
 
-// Fallback data when database is not available
+// Fallback data when database is not available - ORIGINAL DATA
 const fallbackSiteContent = {
   hero: {
     title: { az: 'İsveçrə keyfiyyətində', en: 'Swiss Quality' },
@@ -55,11 +55,11 @@ const fallbackSiteContent = {
     description: { az: 'Swissneo — 100 ildən artıq İsveçrə təcrübəsi ilə hazırlanmış super premium uşaq qarışığı. Uşağınızın sağlam inkişafı və güclü immunitet üçün.', en: 'Swissneo — super premium baby formula crafted with over 100 years of Swiss expertise. For your baby\'s healthy development and strong immunity.' }
   },
   product1: {
-    name: { az: 'Swissneo 1', en: 'Swissneo 1' },
+    name: { az: 'Swissneo Super Premium Formula 0-6 ay', en: 'Swissneo Super Premium Formula 0-6 months' },
     description: { az: 'Doğulduğu gündən etibarən 6 ayadək olan körpələr üçün başlanğıc süd qarışığı', en: 'Starting infant milk formula for babies from birth to 6 months' }
   },
   product2: {
-    name: { az: 'Swissneo 2', en: 'Swissneo 2' },
+    name: { az: 'Swissneo Super Premium Formula 6-12 ay', en: 'Swissneo Super Premium Formula 6-12 months' },
     description: { az: '6-12 aylıq körpələr üçün növbəti mərhələ süd qarışığı', en: 'Follow-on milk formula for babies from 6 to 12 months' }
   },
   contact: {
