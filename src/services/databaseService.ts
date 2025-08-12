@@ -1,4 +1,5 @@
-import pool, { testConnection } from '@/config/database';
+// Client-side database service - uses fallback data only
+// PostgreSQL operations are handled server-side
 
 export interface User {
   id: number;
@@ -124,273 +125,99 @@ const fallbackArticles: Article[] = [
 ];
 
 class DatabaseService {
+  // Client-side only - always use fallback data
   private isConnected = false;
 
   constructor() {
-    this.checkConnection();
+    console.log('⚠️ Using client-side fallback data');
+    this.isConnected = false;
   }
 
-  private async checkConnection() {
-    try {
-      this.isConnected = await testConnection();
-      console.log(this.isConnected ? '✅ Database connected' : '⚠️ Using fallback data');
-    } catch (error) {
-      console.log('⚠️ Database connection failed, using fallback data');
-      this.isConnected = false;
-    }
-  }
-
-  // Authentication
+  // Authentication - client-side fallback
   async authenticateUser(username: string, password: string): Promise<User | null> {
-    if (!this.isConnected) {
-      // Fallback authentication
-      if (username === 'admin' && password === 'swissneo2024') {
-        return {
-          id: 1,
-          username: 'admin',
-          password_hash: 'fallback',
-          role: 'admin',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-      }
-      return null;
-    }
-
-    try {
-      const bcrypt = await import('bcrypt');
-      const result = await pool.query(
-        'SELECT * FROM users WHERE username = $1',
-        [username]
-      );
-
-      if (result.rows.length === 0) {
-        return null;
-      }
-
-      const user = result.rows[0];
-      const isValidPassword = await bcrypt.default.compare(password, user.password_hash);
-
-      if (!isValidPassword) {
-        return null;
-      }
-
-      return user;
-    } catch (error) {
-      console.error('Error authenticating user:', error);
-      return null;
-    }
-  }
-
-  // Site Content Operations
-  async getSiteContent(): Promise<Record<string, any>> {
-    if (!this.isConnected) {
-      return fallbackSiteContent;
-    }
-
-    try {
-      const result = await pool.query('SELECT * FROM site_content');
-      const content: Record<string, any> = {};
-
-      result.rows.forEach((row: SiteContent) => {
-        if (!content[row.section]) {
-          content[row.section] = {};
-        }
-        if (!content[row.section][row.field]) {
-          content[row.section][row.field] = {};
-        }
-        content[row.section][row.field][row.language] = row.content;
-      });
-
-      return content;
-    } catch (error) {
-      console.error('Error getting site content:', error);
-      return fallbackSiteContent;
-    }
-  }
-
-  async updateSiteContent(section: string, field: string, language: string, content: string): Promise<void> {
-    if (!this.isConnected) {
-      console.log('⚠️ Database not connected, content not saved');
-      return;
-    }
-
-    try {
-      await pool.query(
-        `INSERT INTO site_content (section, field, language, content) 
-         VALUES ($1, $2, $3, $4) 
-         ON CONFLICT (section, field, language) 
-         DO UPDATE SET content = $4, updated_at = CURRENT_TIMESTAMP`,
-        [section, field, language, content]
-      );
-    } catch (error) {
-      console.error('Error updating site content:', error);
-      throw error;
-    }
-  }
-
-  // Articles Operations
-  async getArticles(): Promise<Article[]> {
-    if (!this.isConnected) {
-      return fallbackArticles;
-    }
-
-    try {
-      const result = await pool.query('SELECT * FROM articles ORDER BY created_at DESC');
-      return result.rows;
-    } catch (error) {
-      console.error('Error getting articles:', error);
-      return fallbackArticles;
-    }
-  }
-
-  async getArticleById(id: number): Promise<Article | null> {
-    if (!this.isConnected) {
-      return fallbackArticles.find(article => article.id === id) || null;
-    }
-
-    try {
-      const result = await pool.query('SELECT * FROM articles WHERE id = $1', [id]);
-      return result.rows[0] || null;
-    } catch (error) {
-      console.error('Error getting article:', error);
-      return fallbackArticles.find(article => article.id === id) || null;
-    }
-  }
-
-  async createArticle(article: Omit<Article, 'id' | 'created_at' | 'updated_at'>): Promise<Article> {
-    if (!this.isConnected) {
-      const newArticle: Article = {
-        ...article,
-        id: Date.now(),
+    // Fallback authentication
+    if (username === 'admin' && password === 'swissneo2024') {
+      return {
+        id: 1,
+        username: 'admin',
+        password_hash: 'fallback',
+        role: 'admin',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
-      fallbackArticles.unshift(newArticle);
-      return newArticle;
     }
+    return null;
+  }
 
-    try {
-      const result = await pool.query(
-        `INSERT INTO articles (title_az, title_en, excerpt_az, excerpt_en, category_az, category_en, 
-         read_time_az, read_time_en, author_az, author_en, content_az, content_en) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
-         RETURNING *`,
-        [
-          article.title_az, article.title_en, article.excerpt_az, article.excerpt_en,
-          article.category_az, article.category_en, article.read_time_az, article.read_time_en,
-          article.author_az, article.author_en, article.content_az, article.content_en
-        ]
-      );
-      return result.rows[0];
-    } catch (error) {
-      console.error('Error creating article:', error);
-      throw error;
-    }
+  // Site Content Operations - always return fallback
+  async getSiteContent(): Promise<Record<string, any>> {
+    return fallbackSiteContent;
+  }
+
+  async updateSiteContent(section: string, field: string, language: string, content: string): Promise<void> {
+    console.log('⚠️ Client-side: Content update not saved (use admin panel)');
+    // In a real app, this would make an API call to the server
+  }
+
+  // Articles Operations - always return fallback
+  async getArticles(): Promise<Article[]> {
+    return fallbackArticles;
+  }
+
+  async getArticleById(id: number): Promise<Article | null> {
+    return fallbackArticles.find(article => article.id === id) || null;
+  }
+
+  async createArticle(article: Omit<Article, 'id' | 'created_at' | 'updated_at'>): Promise<Article> {
+    const newArticle: Article = {
+      ...article,
+      id: Date.now(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    fallbackArticles.unshift(newArticle);
+    return newArticle;
   }
 
   async updateArticle(id: number, updates: Partial<Article>): Promise<Article | null> {
-    if (!this.isConnected) {
-      const index = fallbackArticles.findIndex(article => article.id === id);
-      if (index !== -1) {
-        fallbackArticles[index] = { ...fallbackArticles[index], ...updates, updated_at: new Date().toISOString() };
-        return fallbackArticles[index];
-      }
-      return null;
+    const index = fallbackArticles.findIndex(article => article.id === id);
+    if (index !== -1) {
+      fallbackArticles[index] = { ...fallbackArticles[index], ...updates, updated_at: new Date().toISOString() };
+      return fallbackArticles[index];
     }
-
-    try {
-      const fields = Object.keys(updates).filter(key => key !== 'id' && key !== 'created_at' && key !== 'updated_at');
-      const values = Object.values(updates).filter((_, index) => fields[index]);
-      
-      if (fields.length === 0) return null;
-
-      const setClause = fields.map((field, index) => `${field} = $${index + 2}`).join(', ');
-      const query = `UPDATE articles SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *`;
-      
-      const result = await pool.query(query, [id, ...values]);
-      return result.rows[0] || null;
-    } catch (error) {
-      console.error('Error updating article:', error);
-      throw error;
-    }
+    return null;
   }
 
   async deleteArticle(id: number): Promise<boolean> {
-    if (!this.isConnected) {
-      const index = fallbackArticles.findIndex(article => article.id === id);
-      if (index !== -1) {
-        fallbackArticles.splice(index, 1);
-        return true;
-      }
-      return false;
+    const index = fallbackArticles.findIndex(article => article.id === id);
+    if (index !== -1) {
+      fallbackArticles.splice(index, 1);
+      return true;
     }
-
-    try {
-      const result = await pool.query('DELETE FROM articles WHERE id = $1', [id]);
-      return result.rowCount > 0;
-    } catch (error) {
-      console.error('Error deleting article:', error);
-      throw error;
-    }
+    return false;
   }
 
-  // Contact Submissions Operations
+  // Contact Submissions Operations - client-side only
   async getContactSubmissions(): Promise<ContactSubmission[]> {
-    if (!this.isConnected) {
-      return [];
-    }
-
-    try {
-      const result = await pool.query('SELECT * FROM contact_submissions ORDER BY created_at DESC');
-      return result.rows;
-    } catch (error) {
-      console.error('Error getting contact submissions:', error);
-      return [];
-    }
+    return [];
   }
 
   async createContactSubmission(submission: Omit<ContactSubmission, 'id' | 'created_at'>): Promise<ContactSubmission> {
-    if (!this.isConnected) {
-      const newSubmission: ContactSubmission = {
-        ...submission,
-        id: Date.now(),
-        created_at: new Date().toISOString()
-      };
-      return newSubmission;
-    }
-
-    try {
-      const result = await pool.query(
-        'INSERT INTO contact_submissions (name, email, phone, message, language) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [submission.name, submission.email, submission.phone, submission.message, submission.language]
-      );
-      return result.rows[0];
-    } catch (error) {
-      console.error('Error creating contact submission:', error);
-      throw error;
-    }
+    const newSubmission: ContactSubmission = {
+      ...submission,
+      id: Date.now(),
+      created_at: new Date().toISOString()
+    };
+    return newSubmission;
   }
 
   async deleteContactSubmission(id: number): Promise<boolean> {
-    if (!this.isConnected) {
-      return false;
-    }
-
-    try {
-      const result = await pool.query('DELETE FROM contact_submissions WHERE id = $1', [id]);
-      return result.rowCount > 0;
-    } catch (error) {
-      console.error('Error deleting contact submission:', error);
-      throw error;
-    }
+    return false;
   }
 
-  // Close database connection
+  // Close database connection - not needed for client-side
   async close() {
-    if (this.isConnected) {
-      await pool.end();
-    }
+    // No connection to close
   }
 }
 

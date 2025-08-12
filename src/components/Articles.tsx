@@ -19,17 +19,17 @@ import {
 
 export const Articles = () => {
   const { t, language } = useLanguage();
-  const { adminData } = useAdminData();
+  const { articles, siteData } = useAdminData();
   const navigate = useNavigate();
 
-  const articles = (adminData.articles || []).map(article => ({
+  const processedArticles = articles.map(article => ({
     id: article.id,
-    title: article.title[language],
-    excerpt: article.excerpt[language],
-    category: article.category[language],
-    readTime: article.readTime[language],
-    author: article.author[language],
-    date: article.date,
+    title: language === 'az' ? article.title_az : article.title_en,
+    excerpt: language === 'az' ? article.excerpt_az : article.excerpt_en,
+    category: language === 'az' ? article.category_az : article.category_en,
+    readTime: language === 'az' ? article.read_time_az : article.read_time_en,
+    author: language === 'az' ? article.author_az : article.author_en,
+    date: article.created_at,
     image: '📄',
     color: 'from-blue-400 to-blue-600',
     bgColor: 'bg-blue-50'
@@ -41,19 +41,19 @@ export const Articles = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <Badge variant="outline" className="mb-4">
-            {adminData.articlesTitle?.[language] || 'Məqalələr'}
+            {siteData.articles?.title?.[language] || 'Məqalələr'}
           </Badge>
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            {adminData.articlesTitle?.[language] || 'Məqalələr'}
+            {siteData.articles?.title?.[language] || 'Məqalələr'}
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            {adminData.articlesDescription?.[language] || 'Faydalı məqalələr'}
+            {siteData.articles?.description?.[language] || 'Faydalı məqalələr'}
           </p>
         </div>
 
         {/* Articles Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {articles.map((article) => (
+          {processedArticles.map((article) => (
             <Card key={article.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
               <CardContent className="p-0">
                 {/* Article Image */}
