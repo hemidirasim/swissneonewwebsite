@@ -2,7 +2,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdminData } from '@/contexts/AdminDataContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Target, Shield, Award, Users, Heart, Microscope } from 'lucide-react';
+import { 
+  Target, 
+  Shield, 
+  Microscope, 
+  Heart, 
+  Award 
+} from 'lucide-react';
 
 export const About = () => {
   const { t, language } = useLanguage();
@@ -12,13 +18,13 @@ export const About = () => {
     {
       icon: <Target className="w-8 h-8" />,
       title: t('about.mission'),
-      description: adminData.companyMission[language],
+      description: adminData?.companyMission?.[language] || 'Keyfiyyətə önəm verən və uşaqlarına ən yaxşısını vermək istəyən Azərbaycan valideynlərinin artan tələbatını qarşılamaq.',
       color: 'text-primary'
     },
     {
       icon: <Shield className="w-8 h-8" />,
       title: t('about.quality'),
-      description: adminData.companyQuality[language],
+      description: adminData?.companyQuality?.[language] || 'İsveçrənin ən yüksək keyfiyyət standartları ilə istehsal olunan məhsullarımız uşağınızın təhlükəsizliyi üçün bütün sertifikatları daşıyır.',
       color: 'text-secondary'
     }
   ];
@@ -42,7 +48,7 @@ export const About = () => {
             {t('about.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            {adminData.companyDescription[language]}
+            {adminData?.companyDescription?.[language] || 'Swissneo — süd məhsulları sahəsində 100 ildən artıq təcrübəyə malik İsveçrənin super premium uşaq qidası markasıdır.'}
           </p>
         </div>
 

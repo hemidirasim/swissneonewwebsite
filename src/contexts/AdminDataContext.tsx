@@ -16,7 +16,29 @@ interface AdminDataContextType {
 const AdminDataContext = createContext<AdminDataContextType | undefined>(undefined);
 
 export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [adminData, setAdminData] = useState<any>({});
+  const [adminData, setAdminData] = useState<any>({
+    heroTitle: { az: '', en: '' },
+    heroSubtitle: { az: '', en: '' },
+    heroDescription: { az: '', en: '' },
+    product1Name: { az: '', en: '' },
+    product1Description: { az: '', en: '' },
+    product2Name: { az: '', en: '' },
+    product2Description: { az: '', en: '' },
+    contactPhone: '',
+    contactEmail: '',
+    contactAddress: { az: '', en: '' },
+    companyDescription: { az: '', en: '' },
+    companyMission: { az: '', en: '' },
+    companyQuality: { az: '', en: '' },
+    instructionsTitle: { az: '', en: '' },
+    instructionsDescription: { az: '', en: '' },
+    articlesTitle: { az: '', en: '' },
+    articlesDescription: { az: '', en: '' },
+    footerDescription: { az: '', en: '' },
+    footerCopyright: { az: '', en: '' },
+    articles: [],
+    contactSubmissions: []
+  });
   const [articles, setArticles] = useState<Article[]>([]);
   const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
 

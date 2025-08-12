@@ -16,21 +16,21 @@ export const Contact = () => {
     {
       icon: <Phone className="w-6 h-6" />,
       title: t('contact.phone'),
-      value: adminData.contactPhone,
+      value: adminData?.contactPhone || '+994 XX XXX XX XX',
       description: t('contact.phone.hours'),
       color: 'text-primary'
     },
     {
       icon: <Mail className="w-6 h-6" />,
       title: t('contact.email'),
-      value: adminData.contactEmail,
+      value: adminData?.contactEmail || 'info@swissneo.az',
       description: t('contact.email.response'),
       color: 'text-secondary'
     },
     {
       icon: <MapPin className="w-6 h-6" />,
       title: t('contact.address'),
-      value: adminData.contactAddress[language],
+      value: adminData?.contactAddress?.[language] || 'Bakı, Azərbaycan',
       description: t('contact.address.office'),
       color: 'text-accent'
     }
@@ -85,7 +85,7 @@ export const Contact = () => {
                 className="bg-white/10 border-white/20 text-white hover:bg-white hover:text-primary"
                 asChild
               >
-                <a href={`tel:${adminData.contactPhone}`}>
+                <a href={`tel:${adminData?.contactPhone || '+994 XX XXX XX XX'}`}>
                   <Phone className="w-5 h-5 mr-2" />
                   {t('contact.call')}
                 </a>

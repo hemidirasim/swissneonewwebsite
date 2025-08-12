@@ -3,8 +3,16 @@ import { useAdminData } from '@/contexts/AdminDataContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Baby, Clock, Weight, MapPin, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  ArrowRight, 
+  Weight, 
+  MapPin, 
+  Shield, 
+  Heart, 
+  Award, 
+  Star 
+} from 'lucide-react';
 
 export const Products = () => {
   const { t, language } = useLanguage();
@@ -15,18 +23,18 @@ export const Products = () => {
     {
       id: 1,
       image: '/lovable-uploads/b0d62079-dc9d-4d61-a539-2cde4f82d6c3.png',
-      name: adminData.product1Name[language],
+      name: adminData?.product1Name?.[language] || 'Swissneo Super Premium Formula 0-6 ay',
       stage: t('product1.stage'),
-      description: adminData.product1Description[language],
+      description: adminData?.product1Description?.[language] || 'Doğulduğu gündən etibarən 6 ayadək olan körpələr üçün başlanğıc süd qarışığı',
       color: 'from-blue-400 to-blue-600',
       bgColor: 'bg-blue-50'
     },
     {
       id: 2,
       image: '/lovable-uploads/1b436833-1495-456b-bdfb-0184d54c29b7.png',
-      name: adminData.product2Name[language],
+      name: adminData?.product2Name?.[language] || 'Swissneo Super Premium Formula 6-12 ay',
       stage: t('product2.stage'),
-      description: adminData.product2Description[language],
+      description: adminData?.product2Description?.[language] || '6-12 aylıq körpələr üçün növbəti mərhələ süd qarışığı',
       color: 'from-green-400 to-green-600',
       bgColor: 'bg-green-50'
     }
@@ -109,15 +117,20 @@ export const Products = () => {
         <Card className="border-0 shadow-card">
           <CardContent className="p-8">
             <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-foreground mb-2">{t('product.features')}</h3>
-              <p className="text-muted-foreground">{t('product.featureQuality')}</p>
+              <h3 className="text-2xl font-bold text-foreground mb-4">{t('product.features.title')}</h3>
+              <p className="text-muted-foreground">{t('product.features.description')}</p>
             </div>
-            
+
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {features.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3 group">
-                  <CheckCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                  <span className="text-sm text-foreground">{feature}</span>
+                <div key={index} className="text-center p-4 rounded-xl bg-card/50">
+                  <div className="w-12 h-12 mx-auto mb-3 bg-primary/10 rounded-full flex items-center justify-center">
+                    {index === 0 && <Shield className="w-6 h-6 text-primary" />}
+                    {index === 1 && <Heart className="w-6 h-6 text-secondary" />}
+                    {index === 2 && <Award className="w-6 h-6 text-accent" />}
+                    {index === 3 && <Star className="w-6 h-6 text-yellow-500" />}
+                  </div>
+                  <p className="text-sm font-medium text-foreground">{feature}</p>
                 </div>
               ))}
             </div>

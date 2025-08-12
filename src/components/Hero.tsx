@@ -1,8 +1,13 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdminData } from '@/contexts/AdminDataContext';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Shield, Award, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  Award, 
+  Shield, 
+  Heart, 
+  ArrowRight 
+} from 'lucide-react';
 import motherChildImage from '@/assets/mother-child-hero.jpg';
 
 export const Hero = () => {
@@ -55,14 +60,14 @@ export const Hero = () => {
 
             {/* Main heading */}
             <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
-              <span className="text-primary">{adminData.heroTitle[language]}</span>
+              <span className="text-primary">{adminData?.heroTitle?.[language] || 'İsveçrə keyfiyyətində'}</span>
               <br />
-              {adminData.heroSubtitle[language]}
+              {adminData?.heroSubtitle?.[language] || 'Premium uşaq qidası'}
             </h1>
 
             {/* Description */}
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl">
-              {adminData.heroDescription[language]}
+              {adminData?.heroDescription?.[language] || 'Swissneo — 100 ildən artıq İsveçrə təcrübəsi ilə hazırlanmış super premium uşaq qarışığı. Uşağınızın sağlam inkişafı və güclü immunitet üçün.'}
             </p>
 
             {/* Trust indicators */}
