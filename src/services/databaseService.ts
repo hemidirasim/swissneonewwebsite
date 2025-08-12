@@ -1,4 +1,5 @@
 import databaseData from '@/data/database.json';
+import { put } from '@vercel/blob';
 
 export interface Article {
   id: number;
@@ -61,90 +62,23 @@ class DatabaseService {
     return null;
   }
 
-  // Upload image
+  // Upload image to Vercel Blob Storage
   async uploadImage(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          // Canvas istifadə edərək şəkli yenidən ölçüləndir
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          
-          // Maksimum ölçülər
-          const maxWidth = 800;
-          const maxHeight = 600;
-          
-          let { width, height } = img;
-          
-          // Ölçüləri yenidən hesabla
-          if (width > height) {
-            if (width > maxWidth) {
-              height = (height * maxWidth) / width;
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width = (width * maxHeight) / height;
-              height = maxHeight;
-            }
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          
-          ctx?.drawImage(img, 0, 0, width, height);
-          
-          // Şəkli blob-a çevir
-          canvas.toBlob((blob) => {
-            if (blob) {
-              // Fayl adını yarat
-              const timestamp = Date.now();
-              const fileName = `article_${timestamp}.jpg`;
-              const filePath = `/uploads/articles/${fileName}`;
-              
-              // Blob-u fayl kimi yadda saxla (localStorage-də)
-              const imageData = {
-                name: fileName,
-                path: filePath,
-                data: URL.createObjectURL(blob),
-                timestamp: timestamp
-              };
-              
-              // Şəkil məlumatlarını localStorage-də saxla
-              const savedImages = JSON.parse(localStorage.getItem('swissneo-images') || '[]');
-              savedImages.push(imageData);
-              localStorage.setItem('swissneo-images', JSON.stringify(savedImages));
-              
-              resolve(filePath);
-            } else {
-              reject(new Error('Şəkil yüklənə bilmədi'));
-            }
-          }, 'image/jpeg', 0.8);
-        };
-        img.src = e.target?.result as string;
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  // Get uploaded images
-  getUploadedImages(): string[] {
-    const savedImages = JSON.parse(localStorage.getItem('swissneo-images') || '[]');
-    return savedImages.map((img: any) => img.path);
-  }
-
-  // Delete image
-  deleteImage(imagePath: string): boolean {
     try {
-      const savedImages = JSON.parse(localStorage.getItem('swissneo-images') || '[]');
-      const filteredImages = savedImages.filter((img: any) => img.path !== imagePath);
-      localStorage.setItem('swissneo-images', JSON.stringify(filteredImages));
-      return true;
+      // Create unique filename
+      const timestamp = Date.now();
+      const fileName = `article_${timestamp}_${file.name}`;
+      
+      // Upload to Vercel Blob
+      const { url } = await put(fileName, file, {
+        access: 'public',
+        addRandomSuffix: false
+      });
+      
+      return url;
     } catch (error) {
-      console.error('Error deleting image:', error);
-      return false;
+      console.error('Error uploading image:', error);
+      throw new Error('Şəkil yüklənə bilmədi');
     }
   }
 
@@ -183,7 +117,8 @@ class DatabaseService {
         // Şəkli də sil
         const article = this.data.articles[index] as Article;
         if (article.image) {
-          this.deleteImage(article.image);
+          // Vercel Blob-dan şəkli silmək üçün API endpoint yarada bilərik
+          // Hələlik sadəcə məqaləni silirik
         }
         this.data.articles.splice(index, 1);
         this.saveToLocalStorage();

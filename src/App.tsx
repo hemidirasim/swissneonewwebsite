@@ -10,8 +10,8 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import ProductsPage from "./pages/ProductsPage";
 import InstructionsPage from "./pages/InstructionsPage";
-import { ArticlesPage } from "./pages/ArticlesPage";
-import { ArticleDetailPage } from "./pages/ArticleDetailPage";
+import ArticlesPage from "./pages/ArticlesPage";
+import ArticleDetailPage from "./pages/ArticleDetailPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
