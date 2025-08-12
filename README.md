@@ -1,210 +1,145 @@
-# 🍼 Swissneo - Super Premium Baby Formula Website
+# Swissneo - Super Premium Baby Formula
 
-[![GitHub](https://img.shields.io/badge/GitHub-Swissneo-blue?style=flat&logo=github)](https://github.com/hemidirasim/swiss-neo)
-[![React](https://img.shields.io/badge/React-18.3.1-blue?style=flat&logo=react)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue?style=flat&logo=postgresql)](https://www.postgresql.org/)
+İsveçrədə istehsal olunmuş super premium uşaq qarışığı. 100 ildən artıq təcrübə ilə hazırlanmış təbii və təhlükəsiz formula.
 
-## 🌟 Xüsusiyyətlər
+## 🚀 Vercel Deployment
 
-### 🎨 **Modern UI/UX**
-- **Responsive Design** - Bütün cihazlarda mükəmməl görünüş
-- **Dark/Light Mode** - Avtomatik tema dəyişmə
-- **Smooth Animations** - Professional animasiyalar
-- **Accessibility** - WCAG standartlarına uyğun
+Bu layihə Vercel-ə yükləmək üçün hazırlanıb.
 
-### 🌍 **İki Dilli Dəstək**
-- **Azərbaycan dili** - Əsas dil
-- **İngilis dili** - Beynəlxalq dəstək
-- **Avtomatik dil dəyişmə** - İstifadəçi təcrübəsi
+### Deployment Addımları:
 
-### 🔐 **Təhlükəsizlik**
-- **PostgreSQL Database** - Remote server-də saxlanılır
-- **Bcrypt şifrələmə** - Təhlükəsiz şifrə hash
-- **SQL Injection qorunması** - Parameterized queries
-- **SSL bağlantısı** - Təhlükəsiz data ötürülməsi
+1. **Vercel CLI quraşdırın:**
+   ```bash
+   npm i -g vercel
+   ```
 
-### 📱 **Səhifələr**
-- **Ana Səhifə** - Hero section, məhsullar, məlumatlar
-- **Məhsul Detalları** - Ətraflı məhsul məlumatları
-- **Haqqımızda** - Şirkət məlumatları
-- **Əlaqə** - Əlaqə formu və məlumatları
-- **Təlimatlar** - Qidalandırma təlimatları
-- **Məqalələr** - Sağlamlıq məqalələri
-- **Admin Panel** - Məzmun idarəetməsi
+2. **Vercel-ə giriş edin:**
+   ```bash
+   vercel login
+   ```
 
-## 🚀 Quraşdırma
+3. **Layihəni deploy edin:**
+   ```bash
+   vercel
+   ```
 
-### Tələblər
-- Node.js 18+ 
-- npm/yarn
-- PostgreSQL database
+4. **Production-a deploy edin:**
+   ```bash
+   vercel --prod
+   ```
 
-### Quraşdırma addımları
+### Vercel Environment Variables:
+
+Vercel dashboard-da aşağıdakı environment variables-ları əlavə edin:
+
+```
+VITE_APP_NAME=Swissneo
+VITE_APP_DESCRIPTION=Super Premium Baby Formula
+VITE_ADMIN_USERNAME=admin
+VITE_ADMIN_PASSWORD=swissneo2024
+VITE_CONTACT_EMAIL=info@swissneo.az
+VITE_CONTACT_PHONE=+994 XX XXX XX XX
+```
+
+## 🛠️ Local Development
+
+### Quraşdırma:
 
 ```bash
-# Repository-ni klonlayın
-git clone https://github.com/hemidirasim/swiss-neo.git
-cd swiss-neo
-
 # Dependencies quraşdırın
 npm install
 
 # Development server başladın
 npm run dev
-```
 
-### Database Quraşdırması
-
-1. **PostgreSQL database** yaradın
-2. **Database məlumatlarını** konfiqurasiya edin:
-   ```typescript
-   // src/config/database.ts
-   host: 'your-database-host',
-   database: 'your-database-name',
-   user: 'your-username',
-   password: 'your-password'
-   ```
-
-3. **Schema-nı** yükləyin:
-   ```bash
-   # Database schema-nı yükləyin
-   psql -h your-host -U your-user -d your-database -f src/database/schema.sql
-   ```
-
-## 📖 İstifadə
-
-### Development
-```bash
-# Development server
-npm run dev
-
-# Build production
+# Build edin
 npm run build
 
-# Preview production build
+# Preview edin
 npm run preview
 ```
 
-### Admin Panel
+### Admin Panel:
+
 - **URL**: `http://localhost:8080/swissadmin`
 - **İstifadəçi adı**: `admin`
 - **Şifrə**: `swissneo2024`
 
-### Avtomatik Deploy
-```bash
-# Dəyişiklikləri avtomatik push et
-npm run push
-
-# Build və push
-npm run deploy
-```
-
-## 🏗️ Texnologiya Stack
-
-### Frontend
-- **React 18** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool
-- **Tailwind CSS** - Styling
-- **Shadcn/ui** - UI components
-- **React Router** - Navigation
-- **React Query** - Data fetching
-
-### Backend
-- **PostgreSQL** - Database
-- **Node.js** - Runtime
-- **Bcrypt** - Password hashing
-- **pg** - PostgreSQL client
-
-### Development Tools
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
-- **TypeScript** - Type checking
-
 ## 📁 Layihə Strukturu
 
 ```
-swiss-neo/
-├── public/                 # Static files
-├── src/
-│   ├── components/         # React components
-│   ├── contexts/          # React contexts
-│   ├── pages/             # Page components
-│   ├── services/          # API services
-│   ├── config/            # Configuration
-│   ├── database/          # Database schema
-│   └── lib/               # Utilities
-├── scripts/               # Build scripts
-└── package.json
+src/
+├── components/          # UI komponentləri
+├── contexts/           # React Context-lər
+├── data/              # Məlumat faylları
+├── hooks/             # Custom hooks
+├── pages/             # Səhifələr
+├── services/          # API və database xidmətləri
+└── utils/             # Utility funksiyaları
 ```
 
-## 🔧 Konfiqurasiya
+## 🎨 Xüsusiyyətlər
 
-### Environment Variables
-```bash
-# Database
-DB_HOST=your-database-host
-DB_PORT=5432
-DB_NAME=your-database-name
-DB_USER=your-username
-DB_PASSWORD=your-password
+### ✅ Tamamlanmış:
+- ✅ Responsive dizayn
+- ✅ İki dilli dəstək (Azərbaycan/İngilis)
+- ✅ Admin panel
+- ✅ Məqalələr idarəetməsi
+- ✅ Şəkil yükləmə sistemi
+- ✅ Contact form
+- ✅ SEO optimizasiyası
+- ✅ Vercel deployment
 
-# JWT
-JWT_SECRET=your-secret-key
-```
+### 🔧 Texnologiyalar:
+- **Frontend**: React 18 + TypeScript
+- **Styling**: Tailwind CSS + Shadcn/ui
+- **Routing**: React Router DOM
+- **State Management**: React Context API
+- **Build Tool**: Vite
+- **Deployment**: Vercel
 
-### Database Schema
-- **users** - İstifadəçi autentifikasiyası
-- **site_content** - Sayt məzmunu
-- **articles** - Məqalələr
-- **contact_submissions** - Əlaqə formları
+## 📱 Responsive Dizayn
 
-## 🚀 Deploy
+- ✅ Mobile (320px+)
+- ✅ Tablet (768px+)
+- ✅ Desktop (1024px+)
+- ✅ Large Desktop (1440px+)
 
-### Vercel
-```bash
-# Vercel CLI quraşdırın
-npm i -g vercel
+## 🌐 Browser Dəstəyi
 
-# Deploy edin
-vercel
-```
+- ✅ Chrome (latest)
+- ✅ Firefox (latest)
+- ✅ Safari (latest)
+- ✅ Edge (latest)
 
-### Netlify
-```bash
-# Build edin
-npm run build
+## 🔒 Təhlükəsizlik
 
-# Netlify-a yükləyin
-netlify deploy --prod --dir=dist
-```
+- ✅ XSS qorunması
+- ✅ Content Security Policy
+- ✅ Secure headers
+- ✅ Input validation
 
-## 🤝 Töhfə
+## 📊 Performance
 
-1. **Fork** edin
-2. **Feature branch** yaradın (`git checkout -b feature/amazing-feature`)
-3. **Commit** edin (`git commit -m 'Add amazing feature'`)
-4. **Push** edin (`git push origin feature/amazing-feature`)
-5. **Pull Request** yaradın
+- ✅ Code splitting
+- ✅ Lazy loading
+- ✅ Image optimization
+- ✅ Bundle optimization
+
+## 🚀 Deployment Status
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/hemidirasim/swiss-neo)
+
+## 📞 Əlaqə
+
+- **Email**: info@swissneo.az
+- **Telefon**: +994 XX XXX XX XX
+- **Ünvan**: Bakı, Azərbaycan
 
 ## 📄 Lisenziya
 
 Bu layihə MIT lisenziyası altında yayımlanır.
 
-## 📞 Əlaqə
-
-- **Website**: [swissneo.az](https://swissneo.az)
-- **Email**: info@swissneo.az
-- **GitHub**: [@hemidirasim](https://github.com/hemidirasim)
-
-## 🙏 Təşəkkür
-
-- **React Team** - Mükəmməl framework
-- **Vite Team** - Sürətli build tool
-- **Tailwind CSS** - Utility-first CSS
-- **Shadcn/ui** - Gözəl UI components
-
 ---
 
-**Swissneo** - İsveçrə keyfiyyətində premium uşaq qidası 🍼🇨🇭
+**Swissneo** - İsveçrə keyfiyyətində premium uşaq qidası 🍼
