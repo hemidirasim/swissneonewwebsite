@@ -3,19 +3,8 @@ import { useAdminData } from '@/contexts/AdminDataContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  BookOpen, 
-  Baby, 
-  Heart, 
-  Clock, 
-  ArrowRight,
-  Leaf,
-  Shield,
-  Star,
-  Users,
-  Calendar
-} from 'lucide-react';
 
 export const Articles = () => {
   const { t, language } = useLanguage();
@@ -30,10 +19,13 @@ export const Articles = () => {
     readTime: article.readTime[language],
     author: article.author[language],
     date: article.date,
-    image: '📄',
+    image: article.image || '📄',
     color: 'from-blue-400 to-blue-600',
-    bgColor: 'bg-blue-50'
   }));
+
+  const handleArticleClick = (articleId: number) => {
+    navigate(`/articles/${articleId}`);
+  };
 
   return (
     <section id="articles" className="py-20 bg-gradient-subtle">
@@ -57,42 +49,84 @@ export const Articles = () => {
             <Card key={article.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
               <CardContent className="p-0">
                 {/* Article Image */}
-                <div className={`${article.bgColor} p-8 text-center relative overflow-hidden`}>
-                  <div className={`absolute inset-0 bg-gradient-to-br ${article.color} opacity-10`}></div>
-                  <div className="text-6xl mb-4 relative z-10">{article.image}</div>
-                  <Badge variant="secondary" className="relative z-10">
-                    {article.category}
-                  </Badge>
+                <div className="relative h-48 overflow-hidden">
+                  {article.image && article.image !== '📄' ? (
+                    <img
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-4xl">
+                      📄
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
 
                 {/* Article Content */}
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <Clock className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">{article.readTime}</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {article.category}
+                    </Badge>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Clock className="w-3 h-3" />
+                      {article.readTime}
+                    </div>
                   </div>
 
-                  <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                  <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
                     {article.title}
                   </h3>
 
-                  <p className="text-muted-foreground mb-4 leading-relaxed">
+                  <p className="text-muted-foreground mb-4 line-clamp-3">
                     {article.excerpt}
                   </p>
 
-                  <Button 
-                    variant="ghost" 
-                    className="p-0 h-auto text-primary hover:text-primary/80 group-hover:translate-x-1 transition-transform"
-                    onClick={() => navigate(`/article/${article.id}`)}
-                  >
-                    {language === 'az' ? 'Oxu' : 'Read'}
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        {article.author}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(article.date).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleArticleClick(article.id)}
+                      className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {/* View All Button */}
+        {articles.length > 0 && (
+          <div className="text-center">
+            <Button
+              onClick={() => navigate('/articles')}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              {t('articles.viewAll')}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );

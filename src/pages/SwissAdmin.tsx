@@ -25,7 +25,10 @@ import {
   Calendar,
   Clock,
   BookOpen,
-  AlertTriangle
+  AlertTriangle,
+  Plus,
+  Image as ImageIcon,
+  Upload
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import databaseService, { Article, ContactSubmission } from '@/services/databaseService';
@@ -67,9 +70,26 @@ const SwissAdmin = () => {
     footerCopyright: { az: '', en: '' }
   });
 
+  // Articles state
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [showArticleForm, setShowArticleForm] = useState(false);
+  const [editingArticle, setEditingArticle] = useState<Article | null>(null);
+  const [newArticle, setNewArticle] = useState<Partial<Article>>({
+    title: { az: '', en: '' },
+    excerpt: { az: '', en: '' },
+    category: { az: '', en: '' },
+    readTime: { az: '', en: '' },
+    author: { az: '', en: '' },
+    content: { az: '', en: '' },
+    image: ''
+  });
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
+
   // Load site data on mount
   useEffect(() => {
     loadSiteData();
+    loadArticles();
   }, []);
 
   const loadSiteData = () => {
@@ -78,6 +98,15 @@ const SwissAdmin = () => {
       setSiteData(data);
     } catch (error) {
       console.error('Error loading site data:', error);
+    }
+  };
+
+  const loadArticles = () => {
+    try {
+      const articlesData = databaseService.getArticles();
+      setArticles(articlesData);
+    } catch (error) {
+      console.error('Error loading articles:', error);
     }
   };
 
@@ -140,6 +169,139 @@ const SwissAdmin = () => {
         variant: 'destructive',
       });
     }
+  };
+
+  // Article functions
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAddArticle = async () => {
+    try {
+      let imagePath = '';
+      if (selectedImage) {
+        imagePath = await databaseService.uploadImage(selectedImage);
+      }
+
+      const articleData = {
+        ...newArticle,
+        date: new Date().toISOString().split('T')[0],
+        image: imagePath
+      } as Omit<Article, 'id'>;
+
+      databaseService.addArticle(articleData);
+      loadArticles();
+      setShowArticleForm(false);
+      setNewArticle({
+        title: { az: '', en: '' },
+        excerpt: { az: '', en: '' },
+        category: { az: '', en: '' },
+        readTime: { az: '', en: '' },
+        author: { az: '', en: '' },
+        content: { az: '', en: '' },
+        image: ''
+      });
+      setSelectedImage(null);
+      setImagePreview('');
+
+      toast({
+        title: 'Uğurlu!',
+        description: 'Məqalə əlavə edildi.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Xəta!',
+        description: 'Məqalə əlavə edilə bilmədi.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleEditArticle = (article: Article) => {
+    setEditingArticle(article);
+    setNewArticle(article);
+    setImagePreview(article.image || '');
+    setShowArticleForm(true);
+  };
+
+  const handleUpdateArticle = async () => {
+    if (!editingArticle) return;
+
+    try {
+      let imagePath = editingArticle.image || '';
+      if (selectedImage) {
+        imagePath = await databaseService.uploadImage(selectedImage);
+      }
+
+      const updates = {
+        ...newArticle,
+        image: imagePath
+      };
+
+      databaseService.updateArticle(editingArticle.id, updates);
+      loadArticles();
+      setShowArticleForm(false);
+      setEditingArticle(null);
+      setNewArticle({
+        title: { az: '', en: '' },
+        excerpt: { az: '', en: '' },
+        category: { az: '', en: '' },
+        readTime: { az: '', en: '' },
+        author: { az: '', en: '' },
+        content: { az: '', en: '' },
+        image: ''
+      });
+      setSelectedImage(null);
+      setImagePreview('');
+
+      toast({
+        title: 'Uğurlu!',
+        description: 'Məqalə yeniləndi.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Xəta!',
+        description: 'Məqalə yenilənə bilmədi.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleDeleteArticle = (id: number) => {
+    if (confirm('Bu məqaləni silmək istədiyinizə əminsiniz?')) {
+      try {
+        databaseService.deleteArticle(id);
+        loadArticles();
+        toast({
+          title: 'Uğurlu!',
+          description: 'Məqalə silindi.',
+        });
+      } catch (error) {
+        toast({
+          title: 'Xəta!',
+          description: 'Məqalə silinə bilmədi.',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
+  const updateArticleField = (field: keyof Article, lang: 'az' | 'en', value: string) => {
+    setNewArticle(prev => ({
+      ...prev,
+      [field]: {
+        ...prev[field] as { az: string; en: string },
+        [lang]: value
+      }
+    }));
   };
 
   // Login Form
@@ -394,15 +556,212 @@ const SwissAdmin = () => {
           <TabsContent value="articles" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  Məqalələr
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-5 h-5" />
+                    Məqalələr ({articles.length})
+                  </div>
+                  <Button onClick={() => setShowArticleForm(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Yeni Məqalə
+                  </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  Məqalələr bölməsi tezliklə əlavə ediləcək.
-                </p>
+                {showArticleForm ? (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold">
+                        {editingArticle ? 'Məqaləni Redaktə Et' : 'Yeni Məqalə'}
+                      </h3>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setShowArticleForm(false);
+                          setEditingArticle(null);
+                          setNewArticle({
+                            title: { az: '', en: '' },
+                            excerpt: { az: '', en: '' },
+                            category: { az: '', en: '' },
+                            readTime: { az: '', en: '' },
+                            author: { az: '', en: '' },
+                            content: { az: '', en: '' },
+                            image: ''
+                          });
+                          setSelectedImage(null);
+                          setImagePreview('');
+                        }}
+                      >
+                        Ləğv et
+                      </Button>
+                    </div>
+
+                    {/* Language Selector */}
+                    <div className="flex gap-2">
+                      <Button
+                        variant={currentLang === 'az' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setCurrentLang('az')}
+                      >
+                        Azərbaycan
+                      </Button>
+                      <Button
+                        variant={currentLang === 'en' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setCurrentLang('en')}
+                      >
+                        English
+                      </Button>
+                    </div>
+
+                    {/* Article Form */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Başlıq ({currentLang})</Label>
+                        <Input
+                          value={newArticle.title?.[currentLang] || ''}
+                          onChange={(e) => updateArticleField('title', currentLang, e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label>Kateqoriya ({currentLang})</Label>
+                        <Input
+                          value={newArticle.category?.[currentLang] || ''}
+                          onChange={(e) => updateArticleField('category', currentLang, e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Müəllif ({currentLang})</Label>
+                        <Input
+                          value={newArticle.author?.[currentLang] || ''}
+                          onChange={(e) => updateArticleField('author', currentLang, e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label>Oxuma vaxtı ({currentLang})</Label>
+                        <Input
+                          value={newArticle.readTime?.[currentLang] || ''}
+                          onChange={(e) => updateArticleField('readTime', currentLang, e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label>Qısa məzmun ({currentLang})</Label>
+                      <Textarea
+                        value={newArticle.excerpt?.[currentLang] || ''}
+                        onChange={(e) => updateArticleField('excerpt', currentLang, e.target.value)}
+                        rows={3}
+                      />
+                    </div>
+
+                    <div>
+                      <Label>Ətraflı məzmun ({currentLang})</Label>
+                      <Textarea
+                        value={newArticle.content?.[currentLang] || ''}
+                        onChange={(e) => updateArticleField('content', currentLang, e.target.value)}
+                        rows={6}
+                      />
+                    </div>
+
+                    {/* Image Upload */}
+                    <div>
+                      <Label>Şəkil</Label>
+                      <div className="mt-2 space-y-4">
+                        <div className="flex items-center gap-4">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => document.getElementById('image-upload')?.click()}
+                          >
+                            <Upload className="w-4 h-4 mr-2" />
+                            Şəkil Seç
+                          </Button>
+                          <input
+                            id="image-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageSelect}
+                            className="hidden"
+                          />
+                        </div>
+                        {imagePreview && (
+                          <div className="relative w-32 h-32">
+                            <img
+                              src={imagePreview}
+                              alt="Preview"
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={editingArticle ? handleUpdateArticle : handleAddArticle}
+                      className="w-full"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {editingArticle ? 'Yenilə' : 'Əlavə Et'}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {articles.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-8">
+                        Hələ heç bir məqalə yoxdur. Yeni məqalə əlavə edin.
+                      </p>
+                    ) : (
+                      articles.map((article) => (
+                        <Card key={article.id} className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start gap-4 flex-1">
+                              {article.image && (
+                                <img
+                                  src={article.image}
+                                  alt={article.title[currentLang]}
+                                  className="w-16 h-16 object-cover rounded-lg"
+                                />
+                              )}
+                              <div className="flex-1">
+                                <h4 className="font-semibold">{article.title[currentLang]}</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {article.excerpt[currentLang]}
+                                </p>
+                                <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                                  <span>{article.author[currentLang]}</span>
+                                  <span>{article.category[currentLang]}</span>
+                                  <span>{article.readTime[currentLang]}</span>
+                                  <span>{article.date}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditArticle(article)}
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDeleteArticle(article.id)}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      ))
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
