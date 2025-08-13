@@ -59,7 +59,9 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setContactSubmissions(contactData);
     } catch (error) {
       console.error('❌ Error loading data:', error);
-      // Keep existing data if database fails
+      // No fallback - only remote database
+      setArticles([]);
+      setContactSubmissions([]);
     } finally {
       setLoading(false);
     }
