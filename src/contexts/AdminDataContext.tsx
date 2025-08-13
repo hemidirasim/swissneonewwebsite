@@ -41,6 +41,7 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const loadData = async () => {
     try {
       setLoading(true);
+      console.log('🔄 Loading data from remote database...');
       
       // Initialize database tables
       await initializeDatabase();
@@ -51,10 +52,13 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         loadContactSubmissions()
       ]);
       
+      console.log('📝 Articles loaded:', articlesData.length);
+      console.log('📧 Contact submissions loaded:', contactData.length);
+      
       setArticles(articlesData);
       setContactSubmissions(contactData);
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('❌ Error loading data:', error);
       // Keep existing data if database fails
     } finally {
       setLoading(false);

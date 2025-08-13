@@ -11,6 +11,9 @@ export const Articles = () => {
   const { adminData, articles, loading } = useAdminData();
   const navigate = useNavigate();
 
+  console.log('📋 Articles component - articles:', articles);
+  console.log('📋 Articles component - loading:', loading);
+
   const handleArticleClick = (articleId: string) => {
     navigate(`/articles/${articleId}`);
   };
