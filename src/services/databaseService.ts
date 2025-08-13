@@ -1,5 +1,5 @@
 import databaseData from '@/data/database.json';
-import { put } from '@vercel/blob';
+import { ImageService } from './imageService';
 
 export interface Article {
   id: number;
@@ -136,43 +136,31 @@ class DatabaseService {
     }
   }
 
-  // Upload image to Vercel Blob Storage via API
+  // Upload image using ImageService
   async uploadImage(file: File): Promise<string> {
     try {
-      // Check if we're in a browser environment
-      if (typeof window === 'undefined') {
-        console.warn('Not in browser environment, skipping image upload');
-        return 'https://via.placeholder.com/400x300?text=No+Image';
+      // Validate image first
+      const validation = ImageService.validateImage(file);
+      if (!validation.isValid) {
+        throw new Error(validation.error);
       }
 
-      // Create FormData
-      const formData = new FormData();
-      formData.append('file', file);
-
-      // Upload to API endpoint
-      const response = await fetch('/api/upload-image', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Upload failed: ${response.statusText}`);
+      // Compress image if needed
+      let processedFile = file;
+      if (file.size > 5 * 1024 * 1024) { // Compress if > 5MB
+        processedFile = await ImageService.compressImage(file, 1024);
       }
 
-      const result = await response.json();
+      // Upload using ImageService
+      const imageUrl = await ImageService.uploadImage(processedFile);
       
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
-      console.log('Image uploaded successfully to Vercel Blob:', result.url);
-      return result.url;
+      console.log('Image uploaded successfully:', imageUrl);
+      return imageUrl;
       
     } catch (error) {
       console.error('Error uploading image:', error);
       
-      // Fallback: return a placeholder image URL
+      // Final fallback: return a placeholder image URL
       return 'https://via.placeholder.com/400x300?text=Image+Upload+Failed';
     }
   }
