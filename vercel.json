@@ -13,7 +13,7 @@
     }
   ],
   "functions": {
-    "api/upload-image.cjs": {
+    "api/upload-image.js": {
       "maxDuration": 30
     }
   },
