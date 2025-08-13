@@ -48,7 +48,7 @@ export const Products = () => {
   ];
 
   return (
-    <section id="products" className="py-32 bg-gradient-subtle">
+    <section id="products" className="py-24 bg-gradient-subtle">
       <div className="container mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">

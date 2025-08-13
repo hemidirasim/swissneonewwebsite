@@ -31,8 +31,8 @@ export const Articles = () => {
   }
 
   return (
-    <section id="articles" className="py-20 bg-gradient-subtle">
-      <div className="container mx-auto px-6 py-20">
+    <section id="articles" className="py-24 bg-gradient-subtle">
+      <div className="container mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
           <Badge variant="outline" className="mb-4">
