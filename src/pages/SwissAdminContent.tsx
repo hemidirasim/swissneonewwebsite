@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdminData } from '@/contexts/AdminDataContext';
-import { Article } from '@/services/databaseService';
+import { Article } from '@/services/prismaService';
 import { uploadImageWithFallback, validateImage } from '@/services/imageService';
 import { 
   Plus, 

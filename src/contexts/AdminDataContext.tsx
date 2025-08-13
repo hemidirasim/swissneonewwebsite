@@ -10,7 +10,7 @@ import {
   addContactSubmission,
   deleteContactSubmission,
   initializeDatabase 
-} from '@/services/databaseService';
+} from '@/services/prismaService';
 
 interface AdminDataContextType {
   adminData: any;
