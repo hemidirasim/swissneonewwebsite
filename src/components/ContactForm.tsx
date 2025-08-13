@@ -33,8 +33,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => 
     
     try {
       await addContactSubmission({
-        ...formData,
-        language: language
+        name: formData.name,
+        email: formData.email,
+        message: formData.message
       });
       
       toast({

@@ -1,293 +1,240 @@
-import databaseData from '@/data/database.json';
-import { validateImage, compressImage, uploadImageWithFallback } from './imageService';
+import { uploadImageWithFallback, validateImage, compressImage } from './imageService';
 
+// Database configuration
+const DB_CONFIG = {
+  host: 'j2tw.your-database.de',
+  user: 'swissp_1',
+  password: 'ti6NdPyN2uHREREA',
+  database: 'swissp_db1',
+  port: 5432,
+  ssl: false
+};
+
+// Types
 export interface Article {
-  id: number;
-  title: { az: string; en: string };
-  content: { az: string; en: string };
-  image?: string;
-  date: string;
-}
-
-export interface ContactSubmission {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-  language: string;
-  createdAt: string;
-}
-
-export interface User {
-  id: number;
-  username: string;
-  password_hash: string;
-  role: string;
+  id: string;
+  title: string;
+  content: string;
+  image: string;
+  category: string;
   created_at: string;
   updated_at: string;
 }
 
-class DatabaseService {
-  private data: any;
+export interface ContactSubmission {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  created_at: string;
+}
 
-  constructor() {
-    // Initialize data from localStorage or default
-    this.loadFromLocalStorage();
-  }
-
-  // Get all data
-  getData() {
-    return this.data;
-  }
-
-  // Update data
-  updateData(newData: any) {
-    this.data = { ...this.data, ...newData };
-    this.saveToLocalStorage();
-  }
-
-  // Authentication
-  async authenticateUser(username: string, password: string): Promise<User | null> {
-    // Simple authentication for admin
-    if (username === 'admin' && password === 'swissneo2024') {
-      const user = {
-        id: 1,
-        username: 'admin',
-        password_hash: 'hashed_password',
-        role: 'admin',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      
-      // Save session to localStorage
-      this.saveSession(user);
-      
-      return user;
-    }
-    return null;
-  }
-
-  // Save session
-  private saveSession(user: User) {
-    const session = {
-      user,
-      loginTime: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 gün
-    };
-    localStorage.setItem('swissneo-admin-session', JSON.stringify(session));
-  }
-
-  // Check if user is logged in
-  isLoggedIn(): boolean {
-    try {
-      const sessionData = localStorage.getItem('swissneo-admin-session');
-      if (!sessionData) return false;
-
-      const session = JSON.parse(sessionData);
-      const now = new Date();
-      const expiresAt = new Date(session.expiresAt);
-
-      // Session expired
-      if (now > expiresAt) {
-        this.logout();
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Error checking session:', error);
-      return false;
-    }
-  }
-
-  // Get current user
-  getCurrentUser(): User | null {
-    try {
-      if (!this.isLoggedIn()) return null;
-
-      const sessionData = localStorage.getItem('swissneo-admin-session');
-      if (!sessionData) return null;
-
-      const session = JSON.parse(sessionData);
-      return session.user;
-    } catch (error) {
-      console.error('Error getting current user:', error);
-      return null;
-    }
-  }
-
-  // Logout
-  logout(): void {
-    localStorage.removeItem('swissneo-admin-session');
-  }
-
-  // Extend session
-  extendSession(): void {
-    try {
-      const sessionData = localStorage.getItem('swissneo-admin-session');
-      if (!sessionData) return;
-
-      const session = JSON.parse(sessionData);
-      session.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 gün
-      localStorage.setItem('swissneo-admin-session', JSON.stringify(session));
-    } catch (error) {
-      console.error('Error extending session:', error);
-    }
-  }
-
-  // Upload image using image service (Vercel Blob Storage)
-  async uploadImage(file: File): Promise<string> {
-    try {
-      // Validate image first
-      const validation = validateImage(file);
-      if (!validation.isValid) {
-        throw new Error(validation.error);
-      }
-
-      // Compress image if needed
-      let processedFile = file;
-      if (file.size > 5 * 1024 * 1024) { // Compress if > 5MB
-        processedFile = await compressImage(file, 1024);
-      }
-
-      // Upload using image service (Vercel Blob Storage)
-      const imageUrl = await uploadImageWithFallback(processedFile);
-      
-      console.log('Image uploaded successfully:', imageUrl);
-      return imageUrl;
-      
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      
-      // Final fallback: return a placeholder image URL
-      return 'https://via.placeholder.com/400x300?text=Image+Upload+Failed';
-    }
-  }
-
-  // Get articles
-  getArticles(): Article[] {
-    return this.data.articles || [];
-  }
-
-  // Add article
-  addArticle(article: Omit<Article, 'id'>): Article {
-    const newArticle: Article = {
-      ...article,
-      id: Date.now()
-    };
-    
-    // Ensure articles array exists
-    if (!this.data.articles) {
-      this.data.articles = [];
-    }
-    
-    this.data.articles = [...this.data.articles, newArticle];
-    this.saveToLocalStorage();
-    
-    console.log('Article added successfully:', newArticle);
-    console.log('Total articles:', this.data.articles.length);
-    
-    return newArticle;
-  }
-
-  // Update article
-  updateArticle(id: number, updates: Partial<Article>): Article | null {
-    const index = this.data.articles?.findIndex(article => article.id === id);
-    if (index !== undefined && index !== -1 && this.data.articles) {
-      this.data.articles[index] = { ...this.data.articles[index], ...updates };
-      this.saveToLocalStorage();
-      return this.data.articles[index];
-    }
-    return null;
-  }
-
-  // Delete article
-  deleteArticle(id: number): boolean {
-    if (this.data.articles) {
-      const index = this.data.articles.findIndex(article => article.id === id);
-      if (index !== -1) {
-        this.data.articles.splice(index, 1);
-        this.saveToLocalStorage();
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // Get contact submissions
-  getContactSubmissions(): ContactSubmission[] {
-    return this.data.contactSubmissions || [];
-  }
-
-  // Add contact submission
-  addContactSubmission(submission: Omit<ContactSubmission, 'id' | 'createdAt'>): ContactSubmission {
-    const newSubmission: ContactSubmission = {
-      ...submission,
-      id: Date.now(),
-      createdAt: new Date().toISOString()
-    };
-    
-    // Ensure contactSubmissions array exists
-    if (!this.data.contactSubmissions) {
-      this.data.contactSubmissions = [];
-    }
-    
-    this.data.contactSubmissions = [...this.data.contactSubmissions, newSubmission];
-    this.saveToLocalStorage();
-    return newSubmission;
-  }
-
-  // Delete contact submission
-  deleteContactSubmission(id: number): boolean {
-    if (this.data.contactSubmissions) {
-      const index = this.data.contactSubmissions.findIndex(submission => submission.id === id);
-      if (index !== -1) {
-        this.data.contactSubmissions.splice(index, 1);
-        this.saveToLocalStorage();
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // Save to localStorage
-  private saveToLocalStorage() {
-    try {
-      localStorage.setItem('swissneo-database', JSON.stringify(this.data));
-      console.log('Data saved to localStorage:', this.data);
-    } catch (error) {
-      console.error('Error saving to localStorage:', error);
-    }
-  }
-
-  // Load from localStorage
-  private loadFromLocalStorage() {
-    try {
-      const saved = localStorage.getItem('swissneo-database');
-      if (saved) {
-        this.data = JSON.parse(saved);
-        console.log('Data loaded from localStorage:', this.data);
-      } else {
-        // Initialize with default data if nothing in localStorage
-        this.data = { ...databaseData };
-        console.log('Initialized with default data:', this.data);
-      }
-    } catch (error) {
-      console.error('Error loading from localStorage:', error);
-      // Fallback to default data
-      this.data = { ...databaseData };
-    }
-  }
-
-  // Reset to default data
-  resetToDefault() {
-    this.data = { ...databaseData };
-    this.saveToLocalStorage();
+// Database connection function
+async function getConnection() {
+  try {
+    const { Pool } = await import('pg');
+    const pool = new Pool(DB_CONFIG);
+    return pool;
+  } catch (error) {
+    console.error('Database connection error:', error);
+    throw new Error('Database connection failed');
   }
 }
 
-// Create singleton instance
-const databaseService = new DatabaseService();
+// Initialize database tables
+export async function initializeDatabase() {
+  try {
+    const pool = await getConnection();
+    
+    // Create articles table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS articles (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title VARCHAR(255) NOT NULL,
+        content TEXT NOT NULL,
+        image TEXT NOT NULL,
+        category VARCHAR(100) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-export default databaseService;
+    // Create contact_submissions table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS contact_submissions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.end();
+    console.log('Database tables initialized successfully');
+  } catch (error) {
+    console.error('Database initialization error:', error);
+    throw error;
+  }
+}
+
+// Load articles from database
+export async function loadArticles(): Promise<Article[]> {
+  try {
+    const pool = await getConnection();
+    const result = await pool.query('SELECT * FROM articles ORDER BY created_at DESC');
+    await pool.end();
+    
+    return result.rows as Article[];
+  } catch (error) {
+    console.error('Error loading articles:', error);
+    // Fallback to localStorage if database fails
+    const stored = localStorage.getItem('articles');
+    return stored ? JSON.parse(stored) : [];
+  }
+}
+
+// Save article to database
+export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | 'updated_at'>): Promise<Article> {
+  try {
+    const pool = await getConnection();
+    const now = new Date().toISOString();
+    
+    const result = await pool.query(
+      'INSERT INTO articles (title, content, image, category, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [article.title, article.content, article.image, article.category, now, now]
+    );
+    
+    await pool.end();
+    
+    return result.rows[0] as Article;
+  } catch (error) {
+    console.error('Error saving article:', error);
+    throw error;
+  }
+}
+
+// Update article in database
+export async function updateArticle(id: string, updates: Partial<Article>): Promise<Article> {
+  try {
+    const pool = await getConnection();
+    const now = new Date().toISOString();
+    
+    const updateFields = [];
+    const updateValues = [];
+    let paramIndex = 1;
+    
+    if (updates.title !== undefined) {
+      updateFields.push(`title = $${paramIndex++}`);
+      updateValues.push(updates.title);
+    }
+    if (updates.content !== undefined) {
+      updateFields.push(`content = $${paramIndex++}`);
+      updateValues.push(updates.content);
+    }
+    if (updates.image !== undefined) {
+      updateFields.push(`image = $${paramIndex++}`);
+      updateValues.push(updates.image);
+    }
+    if (updates.category !== undefined) {
+      updateFields.push(`category = $${paramIndex++}`);
+      updateValues.push(updates.category);
+    }
+    
+    updateFields.push(`updated_at = $${paramIndex++}`);
+    updateValues.push(now);
+    updateValues.push(id);
+    
+    const result = await pool.query(
+      `UPDATE articles SET ${updateFields.join(', ')} WHERE id = $${paramIndex} RETURNING *`,
+      updateValues
+    );
+    
+    await pool.end();
+    
+    if (result.rows.length === 0) {
+      throw new Error('Article not found');
+    }
+    
+    return result.rows[0] as Article;
+  } catch (error) {
+    console.error('Error updating article:', error);
+    throw error;
+  }
+}
+
+// Delete article from database
+export async function deleteArticle(id: string): Promise<void> {
+  try {
+    const pool = await getConnection();
+    await pool.query('DELETE FROM articles WHERE id = $1', [id]);
+    await pool.end();
+  } catch (error) {
+    console.error('Error deleting article:', error);
+    throw error;
+  }
+}
+
+// Load contact submissions from database
+export async function loadContactSubmissions(): Promise<ContactSubmission[]> {
+  try {
+    const pool = await getConnection();
+    const result = await pool.query('SELECT * FROM contact_submissions ORDER BY created_at DESC');
+    await pool.end();
+    
+    return result.rows as ContactSubmission[];
+  } catch (error) {
+    console.error('Error loading contact submissions:', error);
+    // Fallback to localStorage if database fails
+    const stored = localStorage.getItem('contactSubmissions');
+    return stored ? JSON.parse(stored) : [];
+  }
+}
+
+// Add contact submission to database
+export async function addContactSubmission(submission: Omit<ContactSubmission, 'id' | 'created_at'>): Promise<ContactSubmission> {
+  try {
+    const pool = await getConnection();
+    const now = new Date().toISOString();
+    
+    const result = await pool.query(
+      'INSERT INTO contact_submissions (name, email, message, created_at) VALUES ($1, $2, $3, $4) RETURNING *',
+      [submission.name, submission.email, submission.message, now]
+    );
+    
+    await pool.end();
+    
+    return result.rows[0] as ContactSubmission;
+  } catch (error) {
+    console.error('Error adding contact submission:', error);
+    throw error;
+  }
+}
+
+// Delete contact submission from database
+export async function deleteContactSubmission(id: string): Promise<void> {
+  try {
+    const pool = await getConnection();
+    await pool.query('DELETE FROM contact_submissions WHERE id = $1', [id]);
+    await pool.end();
+  } catch (error) {
+    console.error('Error deleting contact submission:', error);
+    throw error;
+  }
+}
+
+// Upload image function (unchanged)
+export const uploadImage = async (file: File): Promise<string> => {
+  const validation = validateImage(file);
+  if (!validation.isValid) {
+    throw new Error(validation.error);
+  }
+
+  try {
+    const compressedFile = await compressImage(file);
+    return await uploadImageWithFallback(compressedFile);
+  } catch (error) {
+    console.error('Image upload failed:', error);
+    throw error;
+  }
+};

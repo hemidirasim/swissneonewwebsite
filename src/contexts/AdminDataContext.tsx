@@ -1,16 +1,28 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import databaseService, { Article, ContactSubmission } from '@/services/databaseService';
+import { 
+  Article, 
+  ContactSubmission, 
+  loadArticles, 
+  saveArticle, 
+  updateArticle, 
+  deleteArticle, 
+  loadContactSubmissions, 
+  addContactSubmission,
+  deleteContactSubmission,
+  initializeDatabase 
+} from '@/services/databaseService';
 
 interface AdminDataContextType {
   adminData: any;
   articles: Article[];
   contactSubmissions: ContactSubmission[];
   updateAdminData: (newData: any) => void;
-  addArticle: (article: Omit<Article, 'id'>) => void;
-  updateArticle: (id: number, updates: Partial<Article>) => void;
-  deleteArticle: (id: number) => void;
-  addContactSubmission: (submission: Omit<ContactSubmission, 'id' | 'createdAt'>) => void;
-  deleteContactSubmission: (id: number) => void;
+  addArticle: (article: Omit<Article, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateArticle: (id: string, updates: Partial<Article>) => Promise<void>;
+  deleteArticle: (id: string) => Promise<void>;
+  addContactSubmission: (submission: Omit<ContactSubmission, 'id' | 'created_at'>) => Promise<void>;
+  deleteContactSubmission: (id: string) => Promise<void>;
+  loading: boolean;
 }
 
 const AdminDataContext = createContext<AdminDataContextType | undefined>(undefined);
@@ -35,53 +47,94 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     articlesTitle: { az: '', en: '' },
     articlesDescription: { az: '', en: '' },
     footerDescription: { az: '', en: '' },
-    footerCopyright: { az: '', en: '' },
-    articles: [],
-    contactSubmissions: []
+    footerCopyright: { az: '', en: '' }
   });
   const [articles, setArticles] = useState<Article[]>([]);
   const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Load data on mount
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = () => {
-    const data = databaseService.getData();
-    setAdminData(data);
-    setArticles(data.articles || []);
-    setContactSubmissions(data.contactSubmissions || []);
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      
+      // Initialize database tables
+      await initializeDatabase();
+      
+      // Load articles and contact submissions
+      const [articlesData, contactData] = await Promise.all([
+        loadArticles(),
+        loadContactSubmissions()
+      ]);
+      
+      setArticles(articlesData);
+      setContactSubmissions(contactData);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      // Keep existing data if database fails
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateAdminData = (newData: any) => {
-    databaseService.updateData(newData);
-    loadData();
+    setAdminData(prev => ({ ...prev, ...newData }));
   };
 
-  const addArticle = (article: Omit<Article, 'id'>) => {
-    databaseService.addArticle(article);
-    loadData();
+  const addArticle = async (article: Omit<Article, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const newArticle = await saveArticle(article);
+      setArticles(prev => [newArticle, ...prev]);
+    } catch (error) {
+      console.error('Error adding article:', error);
+      throw error;
+    }
   };
 
-  const updateArticle = (id: number, updates: Partial<Article>) => {
-    databaseService.updateArticle(id, updates);
-    loadData();
+  const updateArticleById = async (id: string, updates: Partial<Article>) => {
+    try {
+      const updatedArticle = await updateArticle(id, updates);
+      setArticles(prev => prev.map(article => 
+        article.id === id ? updatedArticle : article
+      ));
+    } catch (error) {
+      console.error('Error updating article:', error);
+      throw error;
+    }
   };
 
-  const deleteArticle = (id: number) => {
-    databaseService.deleteArticle(id);
-    loadData();
+  const deleteArticleById = async (id: string) => {
+    try {
+      await deleteArticle(id);
+      setArticles(prev => prev.filter(article => article.id !== id));
+    } catch (error) {
+      console.error('Error deleting article:', error);
+      throw error;
+    }
   };
 
-  const addContactSubmission = (submission: Omit<ContactSubmission, 'id' | 'createdAt'>) => {
-    databaseService.addContactSubmission(submission);
-    loadData();
+  const addContactSubmissionHandler = async (submission: Omit<ContactSubmission, 'id' | 'created_at'>) => {
+    try {
+      const newSubmission = await addContactSubmission(submission);
+      setContactSubmissions(prev => [newSubmission, ...prev]);
+    } catch (error) {
+      console.error('Error adding contact submission:', error);
+      throw error;
+    }
   };
 
-  const deleteContactSubmission = (id: number) => {
-    databaseService.deleteContactSubmission(id);
-    loadData();
+  const deleteContactSubmissionHandler = async (id: string) => {
+    try {
+      await deleteContactSubmission(id);
+      setContactSubmissions(prev => prev.filter(submission => submission.id !== id));
+    } catch (error) {
+      console.error('Error deleting contact submission:', error);
+      throw error;
+    }
   };
 
   return (
@@ -91,10 +144,11 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       contactSubmissions,
       updateAdminData,
       addArticle,
-      updateArticle,
-      deleteArticle,
-      addContactSubmission,
-      deleteContactSubmission
+      updateArticle: updateArticleById,
+      deleteArticle: deleteArticleById,
+      addContactSubmission: addContactSubmissionHandler,
+      deleteContactSubmission: deleteContactSubmissionHandler,
+      loading
     }}>
       {children}
     </AdminDataContext.Provider>

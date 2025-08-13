@@ -8,21 +8,24 @@ import { useNavigate } from 'react-router-dom';
 
 export const Articles = () => {
   const { t, language } = useLanguage();
-  const { adminData } = useAdminData();
+  const { adminData, articles, loading } = useAdminData();
   const navigate = useNavigate();
 
-  const articles = (adminData.articles || []).map(article => ({
-    id: article.id,
-    title: article.title[language],
-    content: article.content[language],
-    date: article.date,
-    image: article.image || '📄',
-    color: 'from-blue-400 to-blue-600',
-  }));
-
-  const handleArticleClick = (articleId: number) => {
+  const handleArticleClick = (articleId: string) => {
     navigate(`/articles/${articleId}`);
   };
+
+  if (loading) {
+    return (
+      <section id="articles" className="py-20 bg-gradient-subtle">
+        <div className="container mx-auto px-6">
+          <div className="text-center">
+            <p>Məqalələr yüklənir...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="articles" className="py-20 bg-gradient-subtle">
@@ -75,7 +78,7 @@ export const Articles = () => {
                     <div className="text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        {new Date(article.date).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
+                        {new Date(article.created_at).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric'
@@ -98,16 +101,14 @@ export const Articles = () => {
           ))}
         </div>
 
-        {/* View All Button */}
-        <div className="text-center">
-          <Button
-            onClick={() => navigate('/articles')}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105"
-          >
-            Bütün məqalələri gör
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </div>
+        {/* No Articles Message */}
+        {articles.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">
+              Hələ heç bir məqalə yoxdur.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
