@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
@@ -13,6 +14,7 @@ import { Article } from '@/services/prismaService';
 import { uploadImageWithFallback, validateImage } from '@/services/imageService';
 import { AdminLogin } from '@/components/AdminLogin';
 import { isAdminLoggedIn, getStoredAdminData, logoutAdmin } from '@/services/authService';
+import { RichTextEditor } from '@/components/RichTextEditor';
 import type { Admin } from '@/services/authService';
 import { 
   Plus, 
@@ -24,6 +26,18 @@ import {
   FileText,
   Image as ImageIcon
 } from 'lucide-react';
+
+// Predefined categories
+const CATEGORIES = [
+  { value: 'nutrition', label: 'Qidalanma' },
+  { value: 'health', label: 'Sağlamlıq' },
+  { value: 'development', label: 'İnkişaf' },
+  { value: 'tips', label: 'Məsləhətlər' },
+  { value: 'feeding', label: 'Qidalandırma' },
+  { value: 'immunity', label: 'İmmunitet' },
+  { value: 'growth', label: 'Böyümə' },
+  { value: 'general', label: 'Ümumi' }
+];
 
 export const SwissAdminContent = () => {
   const { language } = useLanguage();
@@ -84,10 +98,6 @@ export const SwissAdminContent = () => {
     });
   };
 
-
-
-
-
   // Image upload with validation
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -98,15 +108,13 @@ export const SwissAdminContent = () => {
     if (!validation.isValid) {
       toast({
         title: "Xəta!",
-        description: validation.error || "Şəkil yüklənərkən xəta baş verdi.",
+        description: validation.error,
         variant: "destructive",
       });
       return;
     }
 
     setSelectedImage(file);
-
-    // Create preview
     const reader = new FileReader();
     reader.onload = (e) => {
       setImagePreview(e.target?.result as string);
@@ -117,10 +125,7 @@ export const SwissAdminContent = () => {
   const handleImageRemove = () => {
     setSelectedImage(null);
     setImagePreview('');
-    setNewArticle(prev => ({ ...prev, image: '' }));
   };
-
-
 
   const handleAddArticle = async () => {
     if (!newArticle.title || !newArticle.content || !newArticle.category) {
@@ -134,8 +139,8 @@ export const SwissAdminContent = () => {
 
     setIsUploading(true);
     try {
-      console.log('🔄 Admin panel: Məqalə əlavə edilir...');
-      console.log('📝 Məqalə məlumatları:', newArticle);
+      console.log('🔄 Admin panel: Yeni məqalə əlavə edilir...');
+      console.log('📝 Yeni məqalə məlumatları:', newArticle);
       
       let imageUrl = '';
       
@@ -156,11 +161,11 @@ export const SwissAdminContent = () => {
       const articleData = {
         title: newArticle.title,
         content: newArticle.content,
-        image: imageUrl || 'https://via.placeholder.com/400x300?text=No+Image',
+        image: imageUrl,
         category: newArticle.category
       };
 
-      console.log('📤 Remote databazaya göndərilən məlumat:', articleData);
+      console.log('📤 Remote databazaya göndərilən məlumatlar:', articleData);
       await addArticle(articleData);
       
       setNewArticle({
@@ -174,7 +179,7 @@ export const SwissAdminContent = () => {
       setShowArticleForm(false);
       toast({
         title: "Məqalə əlavə edildi!",
-        description: "Yeni məqalə uğurla əlavə edildi.",
+        description: "Məqalə uğurla əlavə edildi.",
       });
     } catch (error) {
       console.error('Error adding article:', error);
@@ -189,12 +194,10 @@ export const SwissAdminContent = () => {
   };
 
   const handleUpdateArticle = async () => {
-    if (!editingArticle) return;
-
-    if (!newArticle.title || !newArticle.content) {
+    if (!editingArticle || !newArticle.title || !newArticle.content || !newArticle.category) {
       toast({
         title: "Xəta!",
-        description: "Başlıq və məzmun məcburidir.",
+        description: "Başlıq, məzmun və kateqoriya məcburidir.",
         variant: "destructive",
       });
       return;
@@ -225,7 +228,8 @@ export const SwissAdminContent = () => {
       const updates = {
         title: newArticle.title,
         content: newArticle.content,
-        image: imageUrl
+        image: imageUrl,
+        category: newArticle.category
       };
 
       console.log('📤 Remote databazaya göndərilən yeniləmələr:', updates);
@@ -262,7 +266,8 @@ export const SwissAdminContent = () => {
     setNewArticle({
       title: article.title,
       content: article.content,
-      image: article.image
+      image: article.image,
+      category: article.category
     });
     setImagePreview(article.image || '');
     setShowArticleForm(true);
@@ -279,51 +284,16 @@ export const SwissAdminContent = () => {
     }
   };
 
-  const handleSeedDemoData = async () => {
-    if (!confirm('Demo məlumat əlavə etmək istədiyinizə əminsiniz? Mövcud məlumatlar silinəcək.')) {
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/seed-demo-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (result.success) {
-        toast({
-          title: "Demo məlumat əlavə edildi!",
-          description: `${result.data.articles} məqalə və ${result.data.contactSubmissions} əlaqə əlavə edildi.`,
-        });
-        
-        // Refresh data
-        window.location.reload();
-      } else {
-        throw new Error(result.error || 'Demo məlumat əlavə edilə bilmədi');
-      }
-    } catch (error) {
-      console.error('Error seeding demo data:', error);
-      toast({
-        title: "Xəta!",
-        description: "Demo məlumat əlavə edilərkən xəta baş verdi.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const updateArticleField = (field: keyof Article, value: any) => {
     setNewArticle(prev => ({
       ...prev,
       [field]: value
     }));
+  };
+
+  const getCategoryLabel = (value: string) => {
+    const category = CATEGORIES.find(cat => cat.value === value);
+    return category ? category.label : value;
   };
 
   if (!isLoggedIn) {
@@ -375,101 +345,110 @@ export const SwissAdminContent = () => {
                     Yeni Məqalə
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>
                       {editingArticle ? 'Məqaləni Redaktə Et' : 'Yeni Məqalə Əlavə Et'}
                     </DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-4">
-                  {/* Image Upload */}
-                  <div>
-                    <Label>Şəkil</Label>
-                    <div className="mt-2">
-                      {imagePreview ? (
-                        <div className="relative inline-block">
-                          <img
-                            src={imagePreview}
-                            alt="Preview"
-                            className="w-32 h-32 object-cover rounded-lg border"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="sm"
-                            className="absolute -top-2 -right-2"
-                            onClick={handleImageRemove}
-                          >
-                            <X className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <Label htmlFor="image-upload" className="cursor-pointer">
-                            <span className="text-blue-600 hover:text-blue-500">
-                              Şəkil seçin
-                            </span>
-                          </Label>
-                          <Input
-                            id="image-upload"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageSelect}
-                            className="hidden"
-                          />
-                        </div>
-                      )}
+                  <div className="space-y-6">
+                    {/* Image Upload */}
+                    <div>
+                      <Label>Şəkil</Label>
+                      <div className="mt-2">
+                        {imagePreview ? (
+                          <div className="relative inline-block">
+                            <img
+                              src={imagePreview}
+                              alt="Preview"
+                              className="w-32 h-32 object-cover rounded-lg border"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="absolute -top-2 -right-2"
+                              onClick={handleImageRemove}
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                            <Label htmlFor="image-upload" className="cursor-pointer">
+                              <span className="text-blue-600 hover:text-blue-500">
+                                Şəkil seçin
+                              </span>
+                            </Label>
+                            <Input
+                              id="image-upload"
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageSelect}
+                              className="hidden"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Title */}
+                    <div>
+                      <Label>Başlıq</Label>
+                      <Input
+                        value={newArticle.title || ''}
+                        onChange={(e) => updateArticleField('title', e.target.value)}
+                        className="mt-1"
+                        placeholder="Məqalə başlığı..."
+                      />
+                    </div>
+
+                    {/* Category */}
+                    <div>
+                      <Label>Kateqoriya</Label>
+                      <Select 
+                        value={newArticle.category || ''} 
+                        onValueChange={(value) => updateArticleField('category', value)}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Kateqoriya seçin..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CATEGORIES.map((category) => (
+                            <SelectItem key={category.value} value={category.value}>
+                              {category.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Content */}
+                    <div>
+                      <Label>Məzmun</Label>
+                      <div className="mt-1">
+                        <RichTextEditor
+                          value={newArticle.content || ''}
+                          onChange={(value) => updateArticleField('content', value)}
+                          placeholder="Məqalə məzmunu..."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end space-x-2">
+                      <Button variant="outline" onClick={() => setShowArticleForm(false)}>
+                        Ləğv et
+                      </Button>
+                      <Button 
+                        onClick={editingArticle ? handleUpdateArticle : handleAddArticle}
+                        disabled={isUploading}
+                      >
+                        {isUploading ? 'Yüklənir...' : (editingArticle ? 'Yenilə' : 'Əlavə et')}
+                      </Button>
                     </div>
                   </div>
-
-                  {/* Title */}
-                  <div>
-                    <Label>Başlıq</Label>
-                    <Input
-                      value={newArticle.title || ''}
-                      onChange={(e) => updateArticleField('title', e.target.value)}
-                      className="mt-1"
-                      placeholder="Məqalə başlığı..."
-                    />
-                  </div>
-
-                  {/* Category */}
-                  <div>
-                    <Label>Kateqoriya</Label>
-                    <Input
-                      value={newArticle.category || ''}
-                      onChange={(e) => updateArticleField('category', e.target.value)}
-                      className="mt-1"
-                      placeholder="Məqalə kateqoriyası..."
-                    />
-                  </div>
-
-                  {/* Content */}
-                  <div>
-                    <Label>Məzmun</Label>
-                    <Textarea
-                      value={newArticle.content || ''}
-                      onChange={(e) => updateArticleField('content', e.target.value)}
-                      className="mt-1"
-                      rows={10}
-                      placeholder="Məqalə məzmunu..."
-                    />
-                  </div>
-
-                  <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={() => setShowArticleForm(false)}>
-                      Ləğv et
-                    </Button>
-                    <Button 
-                      onClick={editingArticle ? handleUpdateArticle : handleAddArticle}
-                      disabled={isUploading}
-                    >
-                      {isUploading ? 'Yüklənir...' : (editingArticle ? 'Yenilə' : 'Əlavə et')}
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
+                </DialogContent>
             </Dialog>
           </CardHeader>
           <CardContent>
@@ -478,6 +457,7 @@ export const SwissAdminContent = () => {
                 <TableRow>
                   <TableHead>Şəkil</TableHead>
                   <TableHead>Başlıq</TableHead>
+                  <TableHead>Kateqoriya</TableHead>
                   <TableHead>Tarix</TableHead>
                   <TableHead>Əməliyyatlar</TableHead>
                 </TableRow>
@@ -502,12 +482,17 @@ export const SwissAdminContent = () => {
                       <div>
                         <div className="font-medium">{article.title}</div>
                         <div className="text-sm text-gray-500 line-clamp-2">
-                          {article.content?.substring(0, 100)}...
+                          {article.content?.replace(/<[^>]*>/g, '').substring(0, 100)}...
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                                              {new Date(article.created_at).toLocaleDateString()}
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {getCategoryLabel(article.category)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {new Date(article.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
