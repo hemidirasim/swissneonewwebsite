@@ -1,21 +1,7 @@
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
-let prisma;
-
-try {
-  prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL
-      }
-    }
-  });
-} catch (error) {
-  console.error('Prisma client initialization error:', error);
-}
-
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -33,20 +19,41 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  try {
-    // Test database connection
-    await prisma.$connect();
-    console.log('Database connected successfully for auth');
-  } catch (error) {
-    console.error('Database connection error:', error);
+  // Check environment variables
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    console.error('DATABASE_URL is missing');
     return res.status(500).json({
       success: false,
-      error: 'Database connection failed',
+      error: 'DATABASE_URL environment variable is missing'
+    });
+  }
+
+  let prisma;
+  try {
+    console.log('Creating Prisma client for auth...');
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: databaseUrl
+        }
+      }
+    });
+    console.log('Prisma client created successfully for auth');
+  } catch (error) {
+    console.error('Prisma client creation error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Prisma client creation failed',
       details: error.message
     });
   }
 
   try {
+    console.log('Connecting to database for auth...');
+    await prisma.$connect();
+    console.log('Database connected successfully for auth');
+
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -105,5 +112,14 @@ module.exports = async function handler(req, res) {
       error: 'Authentication failed',
       details: error.message
     });
+  } finally {
+    if (prisma) {
+      try {
+        await prisma.$disconnect();
+        console.log('Database connection closed for auth');
+      } catch (error) {
+        console.error('Error closing database connection:', error);
+      }
+    }
   }
-};
+}

@@ -1,15 +1,6 @@
-const { Pool } = require('pg');
+import { PrismaClient } from '@prisma/client';
 
-const DB_CONFIG = {
-  host: 'j2tw.your-database.de',
-  user: 'swissp_1',
-  password: 'ti6NdPyN2uHREREA',
-  database: 'swissp_db1',
-  port: 5432,
-  ssl: false
-};
-
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -37,20 +28,6 @@ module.exports = async function handler(req, res) {
           databaseUrl: !!databaseUrl,
           blobToken: !!blobToken
         }
-      });
-    }
-
-    // Try to import Prisma
-    let PrismaClient;
-    try {
-      PrismaClient = require('@prisma/client').PrismaClient;
-      console.log('Prisma client imported successfully');
-    } catch (error) {
-      console.error('Prisma import error:', error);
-      return res.status(500).json({
-        success: false,
-        error: 'Prisma client import failed',
-        details: error.message
       });
     }
 
@@ -122,4 +99,4 @@ module.exports = async function handler(req, res) {
       details: error.message
     });
   }
-};
+}
