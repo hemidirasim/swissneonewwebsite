@@ -86,6 +86,7 @@ npm run preview
 - ✅ **Remove** və **Replace** düymələri
 - ✅ **Responsive design**
 - ✅ **Vercel Blob Storage** inteqrasiyası
+- ✅ **Fallback system** (base64 encoding)
 
 ### Xüsusiyyətlər:
 - 🎯 **Drag & Drop** - Şəkli sürükləyib buraxın
@@ -96,6 +97,7 @@ npm run preview
 - 🗑️ **Remove Image** - Şəkli silin
 - 📱 **Mobile Friendly** - Mobil cihazlarda işləyir
 - ☁️ **Cloud Storage** - Vercel Blob Storage-a yüklənir
+- 🔄 **Fallback System** - Vercel uğursuz olsa base64 istifadə edir
 
 ### Dəstəklənən Formatlar:
 - ✅ **PNG** - Rəqəmsal şəkillər
@@ -107,21 +109,28 @@ npm run preview
 - 📏 **Maksimum 5MB** fayl ölçüsü
 - ⚡ **Sürətli yükləmə**
 - ☁️ **Vercel Blob Storage** ilə saxlanılır
+- 💾 **Base64 fallback** sistem
 
 ### API Endpoint:
 - 🔗 **`/api/upload-image`** - Şəkil yükləmə endpoint-i
 - 📤 **FormData** ilə şəkil göndərilir
 - ☁️ **Vercel Blob Storage**-a yüklənir
 - 🔗 **Public URL** qaytarılır
+- 🔄 **Fallback** base64 encoding
 
 ### Şəkil Yükləmə Prosesi:
 1. **Şəkil seçilir** visual uploader ilə
 2. **Preview** göstərilir (base64)
-3. **FormData** yaradılır
-4. **`/api/upload-image`** endpoint-inə göndərilir
-5. **Vercel Blob Storage**-a yüklənir
-6. **Public URL** qaytarılır
-7. **Məqalə ilə birlikdə** saxlanılır
+3. **Vercel Blob Storage**-a yükləmə cəhdi
+4. **Uğurlu olsa** - Public URL qaytarılır
+5. **Uğursuz olsa** - Base64 encoding istifadə edilir
+6. **Məqalə ilə birlikdə** saxlanılır
+
+### Data Persistence:
+- 💾 **localStorage** ilə məqalələr saxlanılır
+- 🔄 **Singleton pattern** - Tək instance
+- 📊 **Console logging** - Debug üçün
+- 🛡️ **Error handling** - Fallback sistemlər
 
 ## 🏗️ Project Structure
 

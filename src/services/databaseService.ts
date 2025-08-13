@@ -29,7 +29,12 @@ export interface User {
 }
 
 class DatabaseService {
-  private data = { ...databaseData };
+  private data: any;
+
+  constructor() {
+    // Initialize data from localStorage or default
+    this.loadFromLocalStorage();
+  }
 
   // Get all data
   getData() {
@@ -183,8 +188,18 @@ class DatabaseService {
       ...article,
       id: Date.now()
     };
-    this.data.articles = [...(this.data.articles || []), newArticle];
+    
+    // Ensure articles array exists
+    if (!this.data.articles) {
+      this.data.articles = [];
+    }
+    
+    this.data.articles = [...this.data.articles, newArticle];
     this.saveToLocalStorage();
+    
+    console.log('Article added successfully:', newArticle);
+    console.log('Total articles:', this.data.articles.length);
+    
     return newArticle;
   }
 
@@ -224,7 +239,13 @@ class DatabaseService {
       id: Date.now(),
       createdAt: new Date().toISOString()
     };
-    this.data.contactSubmissions = [...(this.data.contactSubmissions || []), newSubmission];
+    
+    // Ensure contactSubmissions array exists
+    if (!this.data.contactSubmissions) {
+      this.data.contactSubmissions = [];
+    }
+    
+    this.data.contactSubmissions = [...this.data.contactSubmissions, newSubmission];
     this.saveToLocalStorage();
     return newSubmission;
   }
@@ -246,20 +267,28 @@ class DatabaseService {
   private saveToLocalStorage() {
     try {
       localStorage.setItem('swissneo-database', JSON.stringify(this.data));
+      console.log('Data saved to localStorage:', this.data);
     } catch (error) {
       console.error('Error saving to localStorage:', error);
     }
   }
 
   // Load from localStorage
-  loadFromLocalStorage() {
+  private loadFromLocalStorage() {
     try {
       const saved = localStorage.getItem('swissneo-database');
       if (saved) {
         this.data = JSON.parse(saved);
+        console.log('Data loaded from localStorage:', this.data);
+      } else {
+        // Initialize with default data if nothing in localStorage
+        this.data = { ...databaseData };
+        console.log('Initialized with default data:', this.data);
       }
     } catch (error) {
       console.error('Error loading from localStorage:', error);
+      // Fallback to default data
+      this.data = { ...databaseData };
     }
   }
 
@@ -272,8 +301,5 @@ class DatabaseService {
 
 // Create singleton instance
 const databaseService = new DatabaseService();
-
-// Load data from localStorage on initialization
-databaseService.loadFromLocalStorage();
 
 export default databaseService;

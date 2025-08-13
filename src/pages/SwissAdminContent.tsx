@@ -143,32 +143,43 @@ export const SwissAdminContent = () => {
     try {
       let imageUrl = '';
       if (selectedImage) {
-        // Vercel Blob Storage-a yüklə
-        imageUrl = await databaseService.uploadImage(selectedImage);
+        try {
+          // Vercel Blob Storage-a yüklə
+          imageUrl = await databaseService.uploadImage(selectedImage);
+          
+          // Check if upload failed
+          if (imageUrl.includes('placeholder') || imageUrl.includes('failed')) {
+            // Fallback to base64
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const base64Data = e.target?.result as string;
+              imageUrl = base64Data;
+              
+              // Continue with article creation
+              createArticleWithImage(imageUrl);
+            };
+            reader.readAsDataURL(selectedImage);
+            return; // Exit early, will continue in callback
+          }
+        } catch (error) {
+          console.error('Vercel Blob upload failed, using base64 fallback:', error);
+          // Fallback to base64
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64Data = e.target?.result as string;
+            imageUrl = base64Data;
+            
+            // Continue with article creation
+            createArticleWithImage(imageUrl);
+          };
+          reader.readAsDataURL(selectedImage);
+          return; // Exit early, will continue in callback
+        }
       }
-
-      const articleData = {
-        title: newArticle.title,
-        content: newArticle.content,
-        image: imageUrl, // Vercel Blob URL
-        date: new Date().toISOString()
-      } as Omit<Article, 'id'>;
-
-      addArticle(articleData);
-      setNewArticle({
-        title: { az: '', en: '' },
-        content: { az: '', en: '' },
-        image: ''
-      });
-      setSelectedImage(null);
-      setImagePreview('');
-      setShowArticleForm(false);
-      loadArticles();
-
-      toast({
-        title: "Məqalə əlavə edildi!",
-        description: "Yeni məqalə uğurla əlavə edildi.",
-      });
+      
+      // If no image or upload successful, create article directly
+      createArticleWithImage(imageUrl);
+      
     } catch (error) {
       console.error('Error adding article:', error);
       toast({
@@ -177,6 +188,31 @@ export const SwissAdminContent = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const createArticleWithImage = (imageUrl: string) => {
+    const articleData = {
+      title: newArticle.title,
+      content: newArticle.content,
+      image: imageUrl,
+      date: new Date().toISOString()
+    } as Omit<Article, 'id'>;
+
+    addArticle(articleData);
+    setNewArticle({
+      title: { az: '', en: '' },
+      content: { az: '', en: '' },
+      image: ''
+    });
+    setSelectedImage(null);
+    setImagePreview('');
+    setShowArticleForm(false);
+    loadArticles();
+
+    toast({
+      title: "Məqalə əlavə edildi!",
+      description: "Yeni məqalə uğurla əlavə edildi.",
+    });
   };
 
   const handleEditArticle = (article: Article) => {
@@ -196,32 +232,43 @@ export const SwissAdminContent = () => {
     try {
       let imageUrl = editingArticle.image || '';
       if (selectedImage) {
-        // Vercel Blob Storage-a yüklə
-        imageUrl = await databaseService.uploadImage(selectedImage);
+        try {
+          // Vercel Blob Storage-a yüklə
+          imageUrl = await databaseService.uploadImage(selectedImage);
+          
+          // Check if upload failed
+          if (imageUrl.includes('placeholder') || imageUrl.includes('failed')) {
+            // Fallback to base64
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const base64Data = e.target?.result as string;
+              imageUrl = base64Data;
+              
+              // Continue with article update
+              updateArticleWithImage(imageUrl);
+            };
+            reader.readAsDataURL(selectedImage);
+            return; // Exit early, will continue in callback
+          }
+        } catch (error) {
+          console.error('Vercel Blob upload failed, using base64 fallback:', error);
+          // Fallback to base64
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64Data = e.target?.result as string;
+            imageUrl = base64Data;
+            
+            // Continue with article update
+            updateArticleWithImage(imageUrl);
+          };
+          reader.readAsDataURL(selectedImage);
+          return; // Exit early, will continue in callback
+        }
       }
-
-      const updates = {
-        title: newArticle.title,
-        content: newArticle.content,
-        image: imageUrl // Vercel Blob URL
-      };
-
-      updateArticle(editingArticle.id, updates);
-      setEditingArticle(null);
-      setNewArticle({
-        title: { az: '', en: '' },
-        content: { az: '', en: '' },
-        image: ''
-      });
-      setSelectedImage(null);
-      setImagePreview('');
-      setShowArticleForm(false);
-      loadArticles();
-
-      toast({
-        title: "Məqalə yeniləndi!",
-        description: "Məqalə uğurla yeniləndi.",
-      });
+      
+      // If no image or upload successful, update article directly
+      updateArticleWithImage(imageUrl);
+      
     } catch (error) {
       console.error('Error updating article:', error);
       toast({
@@ -230,6 +277,31 @@ export const SwissAdminContent = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const updateArticleWithImage = (imageUrl: string) => {
+    const updates = {
+      title: newArticle.title,
+      content: newArticle.content,
+      image: imageUrl
+    };
+
+    updateArticle(editingArticle!.id, updates);
+    setEditingArticle(null);
+    setNewArticle({
+      title: { az: '', en: '' },
+      content: { az: '', en: '' },
+      image: ''
+    });
+    setSelectedImage(null);
+    setImagePreview('');
+    setShowArticleForm(false);
+    loadArticles();
+
+    toast({
+      title: "Məqalə yeniləndi!",
+      description: "Məqalə uğurla yeniləndi.",
+    });
   };
 
   const handleDeleteArticle = (id: number) => {
