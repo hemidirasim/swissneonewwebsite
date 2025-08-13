@@ -1,6 +1,7 @@
 import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
+// Vercel Blob Storage upload endpoint
 export async function POST(request) {
   try {
     const { file, fileName, fileType } = await request.json();
