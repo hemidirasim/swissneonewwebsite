@@ -18,8 +18,7 @@ import {
   Upload,
   X,
   FileText,
-  Image as ImageIcon,
-  TestTube
+  Image as ImageIcon
 } from 'lucide-react';
 
 export const SwissAdminContent = () => {
@@ -103,33 +102,7 @@ export const SwissAdminContent = () => {
     });
   };
 
-  // Test API endpoints
-  const testAPI = async () => {
-    try {
-      toast({
-        title: "API test edilir...",
-        description: "Vercel API endpoint-ləri yoxlanılır.",
-      });
 
-      // Test the test endpoint first
-      const testResponse = await fetch('/api/test.cjs');
-      const testResult = await testResponse.json();
-      
-      console.log('Test API response:', testResult);
-      
-      toast({
-        title: "API test uğurlu!",
-        description: `Test endpoint işləyir: ${testResult.message}`,
-      });
-    } catch (error) {
-      console.error('API test failed:', error);
-      toast({
-        title: "API test uğursuz!",
-        description: "API endpoint-lər işləmir. Yenidən deploy edin.",
-        variant: "destructive",
-      });
-    }
-  };
 
   // Image upload with validation
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -388,12 +361,7 @@ export const SwissAdminContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Məqalələr</CardTitle>
-            <div className="flex space-x-2">
-              <Button variant="outline" onClick={testAPI}>
-                <TestTube className="w-4 h-4 mr-2" />
-                API Test
-              </Button>
-              <Dialog open={showArticleForm} onOpenChange={setShowArticleForm}>
+            <Dialog open={showArticleForm} onOpenChange={setShowArticleForm}>
                 <DialogTrigger asChild>
                   <Button onClick={() => {
                     setEditingArticle(null);
@@ -517,7 +485,6 @@ export const SwissAdminContent = () => {
                 </div>
               </DialogContent>
             </Dialog>
-            </div>
           </CardHeader>
           <CardContent>
             <Table>

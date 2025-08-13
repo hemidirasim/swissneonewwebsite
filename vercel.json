@@ -15,9 +15,6 @@
   "functions": {
     "api/upload-image.cjs": {
       "maxDuration": 30
-    },
-    "api/test.cjs": {
-      "maxDuration": 10
     }
   },
   "headers": [
