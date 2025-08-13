@@ -1,5 +1,3 @@
-import { PrismaClient } from '@prisma/client';
-
 // Types
 export interface Article {
   id: string;
@@ -19,34 +17,16 @@ export interface ContactSubmission {
   created_at: string;
 }
 
-// Create Prisma client instance
-let prisma: PrismaClient;
-
-// Initialize Prisma client
-function getPrismaClient() {
-  if (!prisma) {
-    prisma = new PrismaClient({
-      datasources: {
-        db: {
-          url: process.env.DATABASE_URL || "postgresql://swissp_1:ti6NdPyN2uHREREA@j2tw.your-database.de:5432/swissp_db1"
-        }
-      }
-    });
-  }
-  return prisma;
-}
-
 // Check if we're in browser environment
 const isBrowser = typeof window !== 'undefined';
 
 // Initialize database
 export async function initializeDatabase() {
   try {
-    console.log('Initializing database with Prisma...');
-    const client = getPrismaClient();
-    // Test connection
-    await client.$connect();
-    console.log('Prisma database connection successful');
+    console.log('Initializing database with API endpoints...');
+    // Test connection by loading articles
+    await loadArticles();
+    console.log('Database connection successful via API');
   } catch (error) {
     console.error('Database initialization error:', error);
     console.log('Falling back to localStorage for data storage');
@@ -56,24 +36,21 @@ export async function initializeDatabase() {
 // Load articles from database
 export async function loadArticles(): Promise<Article[]> {
   try {
-    console.log('Loading articles from database with Prisma...');
-    const client = getPrismaClient();
-    const articles = await client.article.findMany({
-      orderBy: { createdAt: 'desc' }
-    });
+    console.log('Loading articles from database via API...');
     
-    console.log(`Loaded ${articles.length} articles from database`);
+    const response = await fetch('/api/articles');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     
-    // Convert to our interface format
-    return articles.map(article => ({
-      id: article.id,
-      title: article.title,
-      content: article.content,
-      image: article.image,
-      category: article.category,
-      created_at: article.createdAt.toISOString(),
-      updated_at: article.updatedAt.toISOString()
-    }));
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to load articles');
+    }
+    
+    console.log(`Loaded ${result.data.length} articles from database`);
+    return result.data;
   } catch (error) {
     console.error('Error loading articles:', error);
     // Fallback to localStorage if database fails
@@ -89,29 +66,28 @@ export async function loadArticles(): Promise<Article[]> {
 // Save article to database
 export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | 'updated_at'>): Promise<Article> {
   try {
-    console.log('Saving article to database with Prisma:', article.title);
-    const client = getPrismaClient();
+    console.log('Saving article to database via API:', article.title);
     
-    const newArticle = await client.article.create({
-      data: {
-        title: article.title,
-        content: article.content,
-        image: article.image,
-        category: article.category
-      }
+    const response = await fetch('/api/articles', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(article)
     });
     
-    console.log('Article saved successfully to PostgreSQL:', newArticle.id);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     
-    return {
-      id: newArticle.id,
-      title: newArticle.title,
-      content: newArticle.content,
-      image: newArticle.image,
-      category: newArticle.category,
-      created_at: newArticle.createdAt.toISOString(),
-      updated_at: newArticle.updatedAt.toISOString()
-    };
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to save article');
+    }
+    
+    console.log('Article saved successfully to PostgreSQL:', result.data.id);
+    return result.data;
   } catch (error) {
     console.error('Error saving article to PostgreSQL:', error);
     // Fallback to localStorage
@@ -138,31 +114,28 @@ export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | '
 // Update article in database
 export async function updateArticle(id: string, updates: Partial<Article>): Promise<Article> {
   try {
-    console.log('Updating article in database with Prisma:', id);
-    const client = getPrismaClient();
+    console.log('Updating article in database via API:', id);
     
-    const updateData: any = {};
-    if (updates.title !== undefined) updateData.title = updates.title;
-    if (updates.content !== undefined) updateData.content = updates.content;
-    if (updates.image !== undefined) updateData.image = updates.image;
-    if (updates.category !== undefined) updateData.category = updates.category;
-    
-    const updatedArticle = await client.article.update({
-      where: { id },
-      data: updateData
+    const response = await fetch('/api/articles', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id, ...updates })
     });
     
-    console.log('Article updated successfully in PostgreSQL');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     
-    return {
-      id: updatedArticle.id,
-      title: updatedArticle.title,
-      content: updatedArticle.content,
-      image: updatedArticle.image,
-      category: updatedArticle.category,
-      created_at: updatedArticle.createdAt.toISOString(),
-      updated_at: updatedArticle.updatedAt.toISOString()
-    };
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to update article');
+    }
+    
+    console.log('Article updated successfully in PostgreSQL');
+    return result.data;
   } catch (error) {
     console.error('Error updating article in PostgreSQL:', error);
     // Fallback to localStorage
@@ -185,11 +158,22 @@ export async function updateArticle(id: string, updates: Partial<Article>): Prom
 // Delete article from database
 export async function deleteArticle(id: string): Promise<void> {
   try {
-    console.log('Deleting article from database with Prisma:', id);
-    const client = getPrismaClient();
-    await client.article.delete({
-      where: { id }
+    console.log('Deleting article from database via API:', id);
+    
+    const response = await fetch(`/api/articles?id=${id}`, {
+      method: 'DELETE'
     });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to delete article');
+    }
+    
     console.log('Article deleted successfully from PostgreSQL');
   } catch (error) {
     console.error('Error deleting article from PostgreSQL:', error);
@@ -208,22 +192,21 @@ export async function deleteArticle(id: string): Promise<void> {
 // Load contact submissions from database
 export async function loadContactSubmissions(): Promise<ContactSubmission[]> {
   try {
-    console.log('Loading contact submissions from database with Prisma...');
-    const client = getPrismaClient();
-    const submissions = await client.contactSubmission.findMany({
-      orderBy: { createdAt: 'desc' }
-    });
+    console.log('Loading contact submissions from database via API...');
     
-    console.log(`Loaded ${submissions.length} contact submissions from database`);
+    const response = await fetch('/api/contact-submissions');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     
-    // Convert to our interface format
-    return submissions.map(submission => ({
-      id: submission.id,
-      name: submission.name,
-      email: submission.email,
-      message: submission.message,
-      created_at: submission.createdAt.toISOString()
-    }));
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to load contact submissions');
+    }
+    
+    console.log(`Loaded ${result.data.length} contact submissions from database`);
+    return result.data;
   } catch (error) {
     console.error('Error loading contact submissions:', error);
     // Fallback to localStorage if database fails
@@ -239,26 +222,28 @@ export async function loadContactSubmissions(): Promise<ContactSubmission[]> {
 // Add contact submission to database
 export async function addContactSubmission(submission: Omit<ContactSubmission, 'id' | 'created_at'>): Promise<ContactSubmission> {
   try {
-    console.log('Adding contact submission to database with Prisma:', submission.email);
-    const client = getPrismaClient();
+    console.log('Adding contact submission to database via API:', submission.email);
     
-    const newSubmission = await client.contactSubmission.create({
-      data: {
-        name: submission.name,
-        email: submission.email,
-        message: submission.message
-      }
+    const response = await fetch('/api/contact-submissions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(submission)
     });
     
-    console.log('Contact submission added successfully to PostgreSQL:', newSubmission.id);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     
-    return {
-      id: newSubmission.id,
-      name: newSubmission.name,
-      email: newSubmission.email,
-      message: newSubmission.message,
-      created_at: newSubmission.createdAt.toISOString()
-    };
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to add contact submission');
+    }
+    
+    console.log('Contact submission added successfully to PostgreSQL:', result.data.id);
+    return result.data;
   } catch (error) {
     console.error('Error adding contact submission to PostgreSQL:', error);
     // Fallback to localStorage
@@ -284,11 +269,22 @@ export async function addContactSubmission(submission: Omit<ContactSubmission, '
 // Delete contact submission from database
 export async function deleteContactSubmission(id: string): Promise<void> {
   try {
-    console.log('Deleting contact submission from database with Prisma:', id);
-    const client = getPrismaClient();
-    await client.contactSubmission.delete({
-      where: { id }
+    console.log('Deleting contact submission from database via API:', id);
+    
+    const response = await fetch(`/api/contact-submissions?id=${id}`, {
+      method: 'DELETE'
     });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to delete contact submission');
+    }
+    
     console.log('Contact submission deleted successfully from PostgreSQL');
   } catch (error) {
     console.error('Error deleting contact submission from PostgreSQL:', error);
@@ -304,9 +300,7 @@ export async function deleteContactSubmission(id: string): Promise<void> {
   }
 }
 
-// Close Prisma connection
+// Close database connection (not needed for API approach)
 export async function closeDatabase() {
-  if (prisma) {
-    await prisma.$disconnect();
-  }
+  // No connection to close when using API endpoints
 }

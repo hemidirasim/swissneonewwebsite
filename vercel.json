@@ -24,6 +24,12 @@
     },
     "api/init-db.js": {
       "maxDuration": 30
+    },
+    "api/articles.js": {
+      "maxDuration": 30
+    },
+    "api/contact-submissions.js": {
+      "maxDuration": 30
     }
   },
   "headers": [
