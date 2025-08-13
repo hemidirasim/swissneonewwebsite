@@ -19,18 +19,7 @@ export interface ContactSubmission {
 
 
 
-// Initialize database
-export async function initializeDatabase() {
-  try {
-    console.log('Initializing database with API endpoints...');
-    // Test connection by loading articles
-    await loadArticles();
-    console.log('Database connection successful via API');
-  } catch (error) {
-    console.error('Database initialization error:', error);
-    console.log('Falling back to localStorage for data storage');
-  }
-}
+
 
 // Load articles from database
 export async function loadArticles(): Promise<Article[]> {

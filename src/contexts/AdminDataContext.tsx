@@ -8,8 +8,7 @@ import {
   deleteArticle, 
   loadContactSubmissions, 
   addContactSubmission,
-  deleteContactSubmission,
-  initializeDatabase 
+  deleteContactSubmission
 } from '@/services/prismaService';
 
 interface AdminDataContextType {
@@ -20,12 +19,18 @@ interface AdminDataContextType {
   addArticle: (article: Omit<Article, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   updateArticle: (id: string, updates: Partial<Article>) => Promise<void>;
   deleteArticle: (id: string) => Promise<void>;
-  addContactSubmission: (submission: Omit<ContactSubmission, 'id' | 'created_at'>) => Promise<void>;
+  addContactSubmission: (submission: Omit<ContactSubmission, 'id' | 'created_at'>) => Promise<ContactSubmission>;
   deleteContactSubmission: (id: string) => Promise<void>;
   loading: boolean;
+  refreshData: () => Promise<void>;
 }
 
 const AdminDataContext = createContext<AdminDataContextType | undefined>(undefined);
+
+// Cache for articles to avoid unnecessary reloads
+let articlesCache: Article[] | null = null;
+let lastLoadTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [adminData, setAdminData] = useState<any>({});
@@ -43,20 +48,26 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setLoading(true);
       console.log('🔄 Loading data from remote database...');
       
-      // Initialize database tables
-      await initializeDatabase();
+      // Check if we have cached articles and they're still fresh
+      const now = Date.now();
+      if (articlesCache && (now - lastLoadTime) < CACHE_DURATION) {
+        console.log('📦 Using cached articles');
+        setArticles(articlesCache);
+        setLoading(false);
+        return;
+      }
       
-      // Load articles and contact submissions
-      const [articlesData, contactData] = await Promise.all([
-        loadArticles(),
-        loadContactSubmissions()
-      ]);
+      // Load articles only (contact submissions are not needed for articles page)
+      const articlesData = await loadArticles();
       
       console.log('📝 Articles loaded:', articlesData.length);
-      console.log('📧 Contact submissions loaded:', contactData.length);
+      
+      // Update cache
+      articlesCache = articlesData;
+      lastLoadTime = now;
       
       setArticles(articlesData);
-      setContactSubmissions(contactData);
+      setContactSubmissions([]); // Don't load contact submissions unless needed
     } catch (error) {
       console.error('❌ Error loading data:', error);
       // No fallback - only remote database
@@ -67,6 +78,13 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
+  const refreshData = async () => {
+    // Clear cache and reload
+    articlesCache = null;
+    lastLoadTime = 0;
+    await loadData();
+  };
+
   const updateAdminData = (newData: any) => {
     setAdminData(prev => ({ ...prev, ...newData }));
   };
@@ -75,6 +93,8 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     try {
       const newArticle = await saveArticle(article);
       setArticles(prev => [newArticle, ...prev]);
+      // Update cache
+      articlesCache = [newArticle, ...(articlesCache || [])];
     } catch (error) {
       console.error('Error adding article:', error);
       throw error;
@@ -87,6 +107,12 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setArticles(prev => prev.map(article => 
         article.id === id ? updatedArticle : article
       ));
+      // Update cache
+      if (articlesCache) {
+        articlesCache = articlesCache.map(article => 
+          article.id === id ? updatedArticle : article
+        );
+      }
     } catch (error) {
       console.error('Error updating article:', error);
       throw error;
@@ -97,23 +123,28 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     try {
       await deleteArticle(id);
       setArticles(prev => prev.filter(article => article.id !== id));
+      // Update cache
+      if (articlesCache) {
+        articlesCache = articlesCache.filter(article => article.id !== id);
+      }
     } catch (error) {
       console.error('Error deleting article:', error);
       throw error;
     }
   };
 
-  const addContactSubmissionHandler = async (submission: Omit<ContactSubmission, 'id' | 'created_at'>) => {
+  const addContactSubmissionHandler = async (submission: Omit<ContactSubmission, 'id' | 'created_at'>): Promise<ContactSubmission> => {
     try {
       const newSubmission = await addContactSubmission(submission);
       setContactSubmissions(prev => [newSubmission, ...prev]);
+      return newSubmission;
     } catch (error) {
       console.error('Error adding contact submission:', error);
       throw error;
     }
   };
 
-  const deleteContactSubmissionHandler = async (id: string) => {
+  const deleteContactSubmissionById = async (id: string) => {
     try {
       await deleteContactSubmission(id);
       setContactSubmissions(prev => prev.filter(submission => submission.id !== id));
@@ -123,19 +154,22 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
+  const value: AdminDataContextType = {
+    adminData,
+    articles,
+    contactSubmissions,
+    updateAdminData,
+    addArticle,
+    updateArticle: updateArticleById,
+    deleteArticle: deleteArticleById,
+    addContactSubmission,
+    deleteContactSubmission: deleteContactSubmissionById,
+    loading,
+    refreshData
+  };
+
   return (
-    <AdminDataContext.Provider value={{
-      adminData,
-      articles,
-      contactSubmissions,
-      updateAdminData,
-      addArticle,
-      updateArticle: updateArticleById,
-      deleteArticle: deleteArticleById,
-      addContactSubmission: addContactSubmissionHandler,
-      deleteContactSubmission: deleteContactSubmissionHandler,
-      loading
-    }}>
+    <AdminDataContext.Provider value={value}>
       {children}
     </AdminDataContext.Provider>
   );
