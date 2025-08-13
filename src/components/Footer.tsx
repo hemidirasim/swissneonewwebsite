@@ -129,7 +129,7 @@ export const Footer = () => {
 
           {/* Social Media */}
           <div>
-            <h4 className="font-semibold mb-4">Sosial Şəbəkələr</h4>
+            <h4 className="font-semibold mb-4">{t('social.title')}</h4>
             <div className="flex space-x-4">
               {socialLinks.map((social) => (
                 <a
@@ -145,7 +145,7 @@ export const Footer = () => {
               ))}
             </div>
             <p className="text-sm opacity-80 mt-3">
-              Bizi sosial şəbəkələrdə izləyin və yeniliklərdən xəbərdar olun!
+              {t('social.follow.footer')}
             </p>
           </div>
         </div>

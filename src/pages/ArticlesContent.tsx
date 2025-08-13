@@ -26,14 +26,14 @@ export const ArticlesContent = () => {
           <div className="flex items-center justify-center mb-4">
             <FileText className="w-8 h-8 text-primary mr-3" />
             <Badge variant="outline">
-              Məqalələr
+              {language === 'az' ? 'Məqalələr' : 'Articles'}
             </Badge>
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Məqalələr və Məsləhətlər
+            {language === 'az' ? 'Məqalələr və Məsləhətlər' : 'Articles and Advice'}
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Körpə qidalandırması haqqında faydalı məqalələr
+            {language === 'az' ? 'Körpə qidalandırması haqqında faydalı məqalələr' : 'Useful articles about baby nutrition'}
           </p>
         </div>
 
@@ -41,9 +41,11 @@ export const ArticlesContent = () => {
         {loading ? (
           <div className="text-center py-16">
             <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground animate-pulse" />
-            <h2 className="text-2xl font-bold mb-2">Məqalələr yüklənir...</h2>
+            <h2 className="text-2xl font-bold mb-2">
+              {language === 'az' ? 'Məqalələr yüklənir...' : 'Loading articles...'}
+            </h2>
             <p className="text-muted-foreground">
-              Zəhmət olmasa gözləyin.
+              {language === 'az' ? 'Zəhmət olmasa gözləyin.' : 'Please wait.'}
             </p>
           </div>
         ) : articles && articles.length > 0 ? (
@@ -106,9 +108,11 @@ export const ArticlesContent = () => {
         ) : (
           <div className="text-center py-16">
             <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-2xl font-bold mb-2">Hələ məqalə yoxdur</h2>
+            <h2 className="text-2xl font-bold mb-2">
+              {language === 'az' ? 'Məqalə tapılmadı' : 'No articles found'}
+            </h2>
             <p className="text-muted-foreground">
-              Tezliklə faydalı məqalələr əlavə ediləcək.
+              {language === 'az' ? 'Hazırda heç bir məqalə mövcud deyil.' : 'No articles are currently available.'}
             </p>
           </div>
         )}

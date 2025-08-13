@@ -16,10 +16,10 @@ const translations = {
     'nav.about': 'Haqqımızda',
     'nav.contact': 'Əlaqə',
     'nav.instructions': 'Təlimat',
-            'nav.articles': 'Məqalələr',
-        'article.detail.backToArticles': 'Məqalələrə qayıt',
-        'article.detail.articleNotFound': 'Məqalə tapılmadı',
-        'article.detail.relatedArticles': 'Əlaqəli Məqalələr',
+    'nav.articles': 'Məqalələr',
+    'article.detail.backToArticles': 'Məqalələrə qayıt',
+    'article.detail.articleNotFound': 'Məqalə tapılmadı',
+    'article.detail.relatedArticles': 'Əlaqəli Məqalələr',
     
     // Hero section
     'hero.title': 'İsveçrə keyfiyyətində',
@@ -131,7 +131,24 @@ const translations = {
     'form.cancel': 'Ləğv et',
     'form.send': 'Göndər',
     'form.success.title': 'Sorğu göndərildi!',
-    'form.success.description': 'Tezliklə sizinlə əlaqə saxlayacağıq.'
+    'form.success.description': 'Tezliklə sizinlə əlaqə saxlayacağıq.',
+
+    // Articles
+    'articles.title': 'Məqalələr və Məsləhətlər',
+    'articles.subtitle': 'Körpə qidalandırması haqqında faydalı məqalələr',
+    'articles.loading.title': 'Məqalələr yüklənir...',
+    'articles.loading.description': 'Zəhmət olmasa gözləyin.',
+    'articles.notFound': 'Məqalələr yüklənir və ya mövcud deyil...',
+
+    // Social Media
+    'social.title': 'Sosial Şəbəkələr',
+    'social.follow.title': 'Sosial Şəbəkələrdə Bizi İzləyin',
+    'social.follow.description': 'Yeniliklərdən xəbərdar olmaq, məsləhətlər almaq və eksklüziv təklifləri görmək üçün sosial şəbəkələrimizə qoşulun!',
+    'social.follow.footer': 'Bizi sosial şəbəkələrdə izləyin və yeniliklərdən xəbərdar olun!',
+    'social.follow.button': 'İzlə',
+
+    // Instructions
+    'instructions.weight.monitoring': 'Çəki İzləmə'
   },
   en: {
     // Navigation
@@ -140,10 +157,10 @@ const translations = {
     'nav.about': 'About',
     'nav.contact': 'Contact',
     'nav.instructions': 'Instructions',
-            'nav.articles': 'Articles',
-        'article.detail.backToArticles': 'Back to Articles',
-        'article.detail.articleNotFound': 'Article not found',
-        'article.detail.relatedArticles': 'Related Articles',
+    'nav.articles': 'Articles',
+    'article.detail.backToArticles': 'Back to Articles',
+    'article.detail.articleNotFound': 'Article not found',
+    'article.detail.relatedArticles': 'Related Articles',
     
     // Hero section
     'hero.title': 'Swiss Quality',
@@ -157,6 +174,7 @@ const translations = {
     'hero.swiss': 'Made in Switzerland',
     'hero.premium.badge': 'Premium',
     'hero.imageTitle': 'For your child\'s healthy future',
+    
     // Products
     'products.title': 'Products',
     'products.subtitle': 'Perfect nutrition for every age',
@@ -254,7 +272,24 @@ const translations = {
     'form.cancel': 'Cancel',
     'form.send': 'Send',
     'form.success.title': 'Inquiry sent!',
-    'form.success.description': 'We will contact you soon.'
+    'form.success.description': 'We will contact you soon.',
+
+    // Articles
+    'articles.title': 'Articles and Advice',
+    'articles.subtitle': 'Useful articles about baby nutrition',
+    'articles.loading.title': 'Loading articles...',
+    'articles.loading.description': 'Please wait.',
+    'articles.notFound': 'Articles are loading or not available...',
+
+    // Social Media
+    'social.title': 'Social Media',
+    'social.follow.title': 'Follow Us on Social Media',
+    'social.follow.description': 'Join our social networks to stay updated with news, get advice, and see exclusive offers!',
+    'social.follow.footer': 'Follow us on social media and stay updated with news!',
+    'social.follow.button': 'Follow',
+
+    // Instructions
+    'instructions.weight.monitoring': 'Weight Monitoring'
   }
 };
 

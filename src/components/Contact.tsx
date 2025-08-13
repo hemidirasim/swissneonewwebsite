@@ -110,10 +110,10 @@ export const Contact = () => {
             <CardContent className="p-12 text-center">
               <div className="flex items-center justify-center mb-6">
                 <Share2 className="w-8 h-8 text-primary mr-3" />
-                <h3 className="text-2xl font-bold text-foreground">Sosial Şəbəkələrdə Bizi İzləyin</h3>
+                <h3 className="text-2xl font-bold text-foreground">{t('social.follow.title')}</h3>
               </div>
               <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Yeniliklərdən xəbərdar olmaq, məsləhətlər almaq və eksklüziv təklifləri görmək üçün sosial şəbəkələrimizə qoşulun!
+                {t('social.follow.description')}
               </p>
               <div className="flex flex-wrap justify-center gap-6">
                 {socialLinks.map((social) => (
@@ -129,7 +129,7 @@ export const Contact = () => {
                       <social.icon className="w-6 h-6" />
                     </div>
                     <span className="font-medium text-foreground">{social.name}</span>
-                    <span className="text-sm text-muted-foreground">İzlə</span>
+                    <span className="text-sm text-muted-foreground">{t('social.follow.button')}</span>
                   </a>
                 ))}
               </div>
