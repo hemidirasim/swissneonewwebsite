@@ -29,6 +29,9 @@ export interface ContactSubmission {
   created_at: string;
 }
 
+// Check if we're in browser environment
+const isBrowser = typeof window !== 'undefined';
+
 // Database connection function
 async function getConnection() {
   try {
@@ -83,7 +86,8 @@ export async function initializeDatabase() {
     console.log('Database tables initialized successfully');
   } catch (error) {
     console.error('Database initialization error:', error);
-    throw error;
+    // Don't throw error, just log it
+    console.log('Falling back to localStorage for data storage');
   }
 }
 
@@ -101,8 +105,11 @@ export async function loadArticles(): Promise<Article[]> {
     console.error('Error loading articles:', error);
     // Fallback to localStorage if database fails
     console.log('Falling back to localStorage for articles');
-    const stored = localStorage.getItem('articles');
-    return stored ? JSON.parse(stored) : [];
+    if (isBrowser) {
+      const stored = localStorage.getItem('articles');
+      return stored ? JSON.parse(stored) : [];
+    }
+    return [];
   }
 }
 
@@ -124,6 +131,23 @@ export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | '
     return result.rows[0] as Article;
   } catch (error) {
     console.error('Error saving article:', error);
+    // Fallback to localStorage
+    console.log('Falling back to localStorage for article save');
+    if (isBrowser) {
+      const newArticle: Article = {
+        ...article,
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      const stored = localStorage.getItem('articles');
+      const articles = stored ? JSON.parse(stored) : [];
+      articles.unshift(newArticle);
+      localStorage.setItem('articles', JSON.stringify(articles));
+      
+      return newArticle;
+    }
     throw error;
   }
 }
@@ -175,6 +199,19 @@ export async function updateArticle(id: string, updates: Partial<Article>): Prom
     return result.rows[0] as Article;
   } catch (error) {
     console.error('Error updating article:', error);
+    // Fallback to localStorage
+    console.log('Falling back to localStorage for article update');
+    if (isBrowser) {
+      const stored = localStorage.getItem('articles');
+      const articles = stored ? JSON.parse(stored) : [];
+      const index = articles.findIndex((a: Article) => a.id === id);
+      
+      if (index !== -1) {
+        articles[index] = { ...articles[index], ...updates, updated_at: new Date().toISOString() };
+        localStorage.setItem('articles', JSON.stringify(articles));
+        return articles[index];
+      }
+    }
     throw error;
   }
 }
@@ -189,6 +226,14 @@ export async function deleteArticle(id: string): Promise<void> {
     console.log('Article deleted successfully');
   } catch (error) {
     console.error('Error deleting article:', error);
+    // Fallback to localStorage
+    console.log('Falling back to localStorage for article delete');
+    if (isBrowser) {
+      const stored = localStorage.getItem('articles');
+      const articles = stored ? JSON.parse(stored) : [];
+      const filtered = articles.filter((a: Article) => a.id !== id);
+      localStorage.setItem('articles', JSON.stringify(filtered));
+    }
     throw error;
   }
 }
@@ -207,8 +252,11 @@ export async function loadContactSubmissions(): Promise<ContactSubmission[]> {
     console.error('Error loading contact submissions:', error);
     // Fallback to localStorage if database fails
     console.log('Falling back to localStorage for contact submissions');
-    const stored = localStorage.getItem('contactSubmissions');
-    return stored ? JSON.parse(stored) : [];
+    if (isBrowser) {
+      const stored = localStorage.getItem('contactSubmissions');
+      return stored ? JSON.parse(stored) : [];
+    }
+    return [];
   }
 }
 
@@ -230,6 +278,22 @@ export async function addContactSubmission(submission: Omit<ContactSubmission, '
     return result.rows[0] as ContactSubmission;
   } catch (error) {
     console.error('Error adding contact submission:', error);
+    // Fallback to localStorage
+    console.log('Falling back to localStorage for contact submission');
+    if (isBrowser) {
+      const newSubmission: ContactSubmission = {
+        ...submission,
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString()
+      };
+      
+      const stored = localStorage.getItem('contactSubmissions');
+      const submissions = stored ? JSON.parse(stored) : [];
+      submissions.unshift(newSubmission);
+      localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
+      
+      return newSubmission;
+    }
     throw error;
   }
 }
@@ -244,6 +308,14 @@ export async function deleteContactSubmission(id: string): Promise<void> {
     console.log('Contact submission deleted successfully');
   } catch (error) {
     console.error('Error deleting contact submission:', error);
+    // Fallback to localStorage
+    console.log('Falling back to localStorage for contact submission delete');
+    if (isBrowser) {
+      const stored = localStorage.getItem('contactSubmissions');
+      const submissions = stored ? JSON.parse(stored) : [];
+      const filtered = submissions.filter((s: ContactSubmission) => s.id !== id);
+      localStorage.setItem('contactSubmissions', JSON.stringify(filtered));
+    }
     throw error;
   }
 }
