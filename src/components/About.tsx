@@ -44,9 +44,6 @@ export const About = () => {
           <Badge variant="outline" className="mb-4">
             {t('nav.about')}
           </Badge>
-          <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 max-w-4xl mx-auto">
-            {t('about.title')}
-          </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             {adminData?.companyDescription?.[language] || 'Swissneo — süd məhsulları sahəsində 100 ildən artıq təcrübəyə malik İsveçrənin super premium uşaq qidası markasıdır.'}
           </p>

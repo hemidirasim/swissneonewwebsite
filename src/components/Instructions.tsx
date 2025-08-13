@@ -106,12 +106,6 @@ export const Instructions = () => {
           <Badge variant="outline" className="mb-4">
             {language === 'az' ? 'Qidalandırma Təlimatları' : 'Feeding Instructions'}
           </Badge>
-          <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            {language === 'az' 
-              ? 'Swissneo Qidalandırma Cədvəli'
-              : 'Swissneo Feeding Table'
-            }
-          </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             {language === 'az'
               ? 'Körpənizin yaşına və çəkisinə uyğun olaraq qidalandırma təlimatları. Bu cədvələ ciddi əməl edin.'
