@@ -18,7 +18,8 @@ import {
   Upload,
   X,
   FileText,
-  Image as ImageIcon
+  Image as ImageIcon,
+  TestTube
 } from 'lucide-react';
 
 export const SwissAdminContent = () => {
@@ -100,6 +101,34 @@ export const SwissAdminContent = () => {
       title: "Çıxış edildi",
       description: "Təhlükəsiz şəkildə çıxış etdiniz.",
     });
+  };
+
+  // Test API endpoints
+  const testAPI = async () => {
+    try {
+      toast({
+        title: "API test edilir...",
+        description: "Vercel API endpoint-ləri yoxlanılır.",
+      });
+
+      // Test the test endpoint first
+      const testResponse = await fetch('/api/test.cjs');
+      const testResult = await testResponse.json();
+      
+      console.log('Test API response:', testResult);
+      
+      toast({
+        title: "API test uğurlu!",
+        description: `Test endpoint işləyir: ${testResult.message}`,
+      });
+    } catch (error) {
+      console.error('API test failed:', error);
+      toast({
+        title: "API test uğursuz!",
+        description: "API endpoint-lər işləmir. Yenidən deploy edin.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Image upload with validation
@@ -359,29 +388,34 @@ export const SwissAdminContent = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Məqalələr</CardTitle>
-            <Dialog open={showArticleForm} onOpenChange={setShowArticleForm}>
-              <DialogTrigger asChild>
-                <Button onClick={() => {
-                  setEditingArticle(null);
-                  setNewArticle({
-                    title: { az: '', en: '' },
-                    content: { az: '', en: '' },
-                    image: ''
-                  });
-                  setSelectedImage(null);
-                  setImagePreview('');
-                }}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Yeni Məqalə
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingArticle ? 'Məqaləni Redaktə Et' : 'Yeni Məqalə Əlavə Et'}
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
+            <div className="flex space-x-2">
+              <Button variant="outline" onClick={testAPI}>
+                <TestTube className="w-4 h-4 mr-2" />
+                API Test
+              </Button>
+              <Dialog open={showArticleForm} onOpenChange={setShowArticleForm}>
+                <DialogTrigger asChild>
+                  <Button onClick={() => {
+                    setEditingArticle(null);
+                    setNewArticle({
+                      title: { az: '', en: '' },
+                      content: { az: '', en: '' },
+                      image: ''
+                    });
+                    setSelectedImage(null);
+                    setImagePreview('');
+                  }}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Yeni Məqalə
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingArticle ? 'Məqaləni Redaktə Et' : 'Yeni Məqalə Əlavə Et'}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
                   {/* Image Upload */}
                   <div>
                     <Label>Şəkil</Label>
@@ -483,6 +517,7 @@ export const SwissAdminContent = () => {
                 </div>
               </DialogContent>
             </Dialog>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
