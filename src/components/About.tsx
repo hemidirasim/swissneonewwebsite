@@ -37,7 +37,7 @@ export const About = () => {
   ];
 
   return (
-    <section id="about" className="py-20 bg-background">
+    <section id="about" className="py-32 bg-background">
       <div className="container mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">

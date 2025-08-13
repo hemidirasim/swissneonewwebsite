@@ -55,7 +55,7 @@ export const ArticleDetailContent = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <div className="container mx-auto px-6 py-20">
+      <div className="container mx-auto px-6 py-32">
         {/* Back Button */}
         <div className="mb-8 max-w-4xl mx-auto">
           <Button

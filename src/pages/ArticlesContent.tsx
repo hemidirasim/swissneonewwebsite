@@ -20,7 +20,7 @@ export const ArticlesContent = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <div className="container mx-auto px-6 py-20">
+      <div className="container mx-auto px-6 py-32">
         {/* Header */}
         <div className="text-center mb-16">
           <div className="flex items-center justify-center mb-4">

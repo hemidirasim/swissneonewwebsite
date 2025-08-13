@@ -37,7 +37,7 @@ export const Contact = () => {
   ];
 
   return (
-    <section id="contact" className="py-20 bg-gradient-subtle">
+    <section id="contact" className="py-32 bg-gradient-subtle">
       <div className="container mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
