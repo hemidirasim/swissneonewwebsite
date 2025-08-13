@@ -20,7 +20,21 @@ export interface ContactSubmission {
 }
 
 // Create Prisma client instance
-const prisma = new PrismaClient();
+let prisma: PrismaClient;
+
+// Initialize Prisma client
+function getPrismaClient() {
+  if (!prisma) {
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL || "postgresql://swissp_1:ti6NdPyN2uHREREA@j2tw.your-database.de:5432/swissp_db1"
+        }
+      }
+    });
+  }
+  return prisma;
+}
 
 // Check if we're in browser environment
 const isBrowser = typeof window !== 'undefined';
@@ -29,8 +43,9 @@ const isBrowser = typeof window !== 'undefined';
 export async function initializeDatabase() {
   try {
     console.log('Initializing database with Prisma...');
+    const client = getPrismaClient();
     // Test connection
-    await prisma.$connect();
+    await client.$connect();
     console.log('Prisma database connection successful');
   } catch (error) {
     console.error('Database initialization error:', error);
@@ -42,7 +57,8 @@ export async function initializeDatabase() {
 export async function loadArticles(): Promise<Article[]> {
   try {
     console.log('Loading articles from database with Prisma...');
-    const articles = await prisma.article.findMany({
+    const client = getPrismaClient();
+    const articles = await client.article.findMany({
       orderBy: { createdAt: 'desc' }
     });
     
@@ -74,8 +90,9 @@ export async function loadArticles(): Promise<Article[]> {
 export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | 'updated_at'>): Promise<Article> {
   try {
     console.log('Saving article to database with Prisma:', article.title);
+    const client = getPrismaClient();
     
-    const newArticle = await prisma.article.create({
+    const newArticle = await client.article.create({
       data: {
         title: article.title,
         content: article.content,
@@ -84,7 +101,7 @@ export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | '
       }
     });
     
-    console.log('Article saved successfully:', newArticle.id);
+    console.log('Article saved successfully to PostgreSQL:', newArticle.id);
     
     return {
       id: newArticle.id,
@@ -96,7 +113,7 @@ export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | '
       updated_at: newArticle.updatedAt.toISOString()
     };
   } catch (error) {
-    console.error('Error saving article:', error);
+    console.error('Error saving article to PostgreSQL:', error);
     // Fallback to localStorage
     console.log('Falling back to localStorage for article save');
     if (isBrowser) {
@@ -122,6 +139,7 @@ export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | '
 export async function updateArticle(id: string, updates: Partial<Article>): Promise<Article> {
   try {
     console.log('Updating article in database with Prisma:', id);
+    const client = getPrismaClient();
     
     const updateData: any = {};
     if (updates.title !== undefined) updateData.title = updates.title;
@@ -129,12 +147,12 @@ export async function updateArticle(id: string, updates: Partial<Article>): Prom
     if (updates.image !== undefined) updateData.image = updates.image;
     if (updates.category !== undefined) updateData.category = updates.category;
     
-    const updatedArticle = await prisma.article.update({
+    const updatedArticle = await client.article.update({
       where: { id },
       data: updateData
     });
     
-    console.log('Article updated successfully');
+    console.log('Article updated successfully in PostgreSQL');
     
     return {
       id: updatedArticle.id,
@@ -146,7 +164,7 @@ export async function updateArticle(id: string, updates: Partial<Article>): Prom
       updated_at: updatedArticle.updatedAt.toISOString()
     };
   } catch (error) {
-    console.error('Error updating article:', error);
+    console.error('Error updating article in PostgreSQL:', error);
     // Fallback to localStorage
     console.log('Falling back to localStorage for article update');
     if (isBrowser) {
@@ -168,12 +186,13 @@ export async function updateArticle(id: string, updates: Partial<Article>): Prom
 export async function deleteArticle(id: string): Promise<void> {
   try {
     console.log('Deleting article from database with Prisma:', id);
-    await prisma.article.delete({
+    const client = getPrismaClient();
+    await client.article.delete({
       where: { id }
     });
-    console.log('Article deleted successfully');
+    console.log('Article deleted successfully from PostgreSQL');
   } catch (error) {
-    console.error('Error deleting article:', error);
+    console.error('Error deleting article from PostgreSQL:', error);
     // Fallback to localStorage
     console.log('Falling back to localStorage for article delete');
     if (isBrowser) {
@@ -190,7 +209,8 @@ export async function deleteArticle(id: string): Promise<void> {
 export async function loadContactSubmissions(): Promise<ContactSubmission[]> {
   try {
     console.log('Loading contact submissions from database with Prisma...');
-    const submissions = await prisma.contactSubmission.findMany({
+    const client = getPrismaClient();
+    const submissions = await client.contactSubmission.findMany({
       orderBy: { createdAt: 'desc' }
     });
     
@@ -220,8 +240,9 @@ export async function loadContactSubmissions(): Promise<ContactSubmission[]> {
 export async function addContactSubmission(submission: Omit<ContactSubmission, 'id' | 'created_at'>): Promise<ContactSubmission> {
   try {
     console.log('Adding contact submission to database with Prisma:', submission.email);
+    const client = getPrismaClient();
     
-    const newSubmission = await prisma.contactSubmission.create({
+    const newSubmission = await client.contactSubmission.create({
       data: {
         name: submission.name,
         email: submission.email,
@@ -229,7 +250,7 @@ export async function addContactSubmission(submission: Omit<ContactSubmission, '
       }
     });
     
-    console.log('Contact submission added successfully:', newSubmission.id);
+    console.log('Contact submission added successfully to PostgreSQL:', newSubmission.id);
     
     return {
       id: newSubmission.id,
@@ -239,7 +260,7 @@ export async function addContactSubmission(submission: Omit<ContactSubmission, '
       created_at: newSubmission.createdAt.toISOString()
     };
   } catch (error) {
-    console.error('Error adding contact submission:', error);
+    console.error('Error adding contact submission to PostgreSQL:', error);
     // Fallback to localStorage
     console.log('Falling back to localStorage for contact submission');
     if (isBrowser) {
@@ -264,12 +285,13 @@ export async function addContactSubmission(submission: Omit<ContactSubmission, '
 export async function deleteContactSubmission(id: string): Promise<void> {
   try {
     console.log('Deleting contact submission from database with Prisma:', id);
-    await prisma.contactSubmission.delete({
+    const client = getPrismaClient();
+    await client.contactSubmission.delete({
       where: { id }
     });
-    console.log('Contact submission deleted successfully');
+    console.log('Contact submission deleted successfully from PostgreSQL');
   } catch (error) {
-    console.error('Error deleting contact submission:', error);
+    console.error('Error deleting contact submission from PostgreSQL:', error);
     // Fallback to localStorage
     console.log('Falling back to localStorage for contact submission delete');
     if (isBrowser) {
@@ -284,5 +306,7 @@ export async function deleteContactSubmission(id: string): Promise<void> {
 
 // Close Prisma connection
 export async function closeDatabase() {
-  await prisma.$disconnect();
+  if (prisma) {
+    await prisma.$disconnect();
+  }
 }
