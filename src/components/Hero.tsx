@@ -55,19 +55,19 @@ export const Hero = () => {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
               <Award className="w-4 h-4" />
-              Super Premium Formula
+              {t('hero.superPremium')}
             </div>
 
             {/* Main heading */}
             <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
-              <span className="text-primary">{adminData?.heroTitle?.[language] || 'İsveçrə keyfiyyətində'}</span>
+              <span className="text-primary">{adminData?.heroTitle?.[language] || t('hero.title')}</span>
               <br />
-              {adminData?.heroSubtitle?.[language] || 'Premium uşaq qidası'}
+              {adminData?.heroSubtitle?.[language] || t('hero.subtitle')}
             </h1>
 
             {/* Description */}
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl">
-              {adminData?.heroDescription?.[language] || 'Swissneo — 100 ildən artıq İsveçrə təcrübəsi ilə hazırlanmış super premium uşaq qarışığı. Uşağınızın sağlam inkişafı və güclü immunitet üçün.'}
+              {adminData?.heroDescription?.[language] || t('hero.description')}
             </p>
 
             {/* Trust indicators */}
@@ -121,7 +121,7 @@ export const Hero = () => {
                 
                 {/* Overlay content */}
                 <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-4">
-                  <h3 className="font-semibold text-foreground mb-1">Swissneo Formula</h3>
+                  <h3 className="font-semibold text-foreground mb-1">{t('hero.swissneoFormula')}</h3>
                   <p className="text-sm text-muted-foreground">{t('hero.imageTitle')}</p>
                 </div>
               </div>

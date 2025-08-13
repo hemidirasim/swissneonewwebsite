@@ -33,6 +33,8 @@ const translations = {
     'hero.swiss': 'İsveçrə istehsalı',
     'hero.premium.badge': 'Premium',
     'hero.imageTitle': 'Uşağınızın sağlam gələcəyi üçün',
+    'hero.superPremium': 'Super Premium Formula',
+    'hero.swissneoFormula': 'Swissneo Formula',
     
     // Products
     'products.title': 'Məhsullar',
@@ -46,6 +48,8 @@ const translations = {
     'product.weight': '400q',
     'product.origin': 'İsveçrə istehsalı',
     'product.features': 'Xüsusiyyətlər',
+    'product.features.title': 'Məhsullarımızın Əsas Xüsusiyyətləri',
+    'product.features.description': 'Her məhsulda olan keyfiyyət xüsusiyyətləri',
     'product.feature1': 'Yüksək keyfiyyətli İsveçrə südü',
     'product.feature2': 'Vitaminlər və minerallarla zənginləşdirilmiş',
     'product.feature3': 'Prebiotiklər daxil',
@@ -139,6 +143,8 @@ const translations = {
     'articles.loading.title': 'Məqalələr yüklənir...',
     'articles.loading.description': 'Zəhmət olmasa gözləyin.',
     'articles.notFound': 'Məqalələr yüklənir və ya mövcud deyil...',
+    'articles.noArticles': 'Hələ heç bir məqalə yoxdur.',
+    'articles.useful': 'Faydalı məqalələr',
 
     // Social Media
     'social.title': 'Sosial Şəbəkələr',
@@ -174,6 +180,8 @@ const translations = {
     'hero.swiss': 'Made in Switzerland',
     'hero.premium.badge': 'Premium',
     'hero.imageTitle': 'For your child\'s healthy future',
+    'hero.superPremium': 'Super Premium Formula',
+    'hero.swissneoFormula': 'Swissneo Formula',
     
     // Products
     'products.title': 'Products',
@@ -187,6 +195,8 @@ const translations = {
     'product.weight': '400g',
     'product.origin': 'Made in Switzerland',
     'product.features': 'Features',
+    'product.features.title': 'Key Features of Our Products',
+    'product.features.description': 'Quality features present in every product',
     'product.feature1': 'High-quality Swiss milk',
     'product.feature2': 'Enriched with vitamins and minerals',
     'product.feature3': 'Contains prebiotics',
@@ -280,6 +290,8 @@ const translations = {
     'articles.loading.title': 'Loading articles...',
     'articles.loading.description': 'Please wait.',
     'articles.notFound': 'Articles are loading or not available...',
+    'articles.noArticles': 'No articles available yet.',
+    'articles.useful': 'Useful articles',
 
     // Social Media
     'social.title': 'Social Media',

@@ -23,7 +23,7 @@ export const Articles = () => {
       <section id="articles" className="py-20 bg-gradient-subtle">
         <div className="container mx-auto px-6 py-20">
           <div className="text-center">
-            <p className="text-lg text-muted-foreground">Məqalələr yüklənir...</p>
+            <p className="text-lg text-muted-foreground">{t('articles.loading.title')}</p>
           </div>
         </div>
       </section>
@@ -36,17 +36,17 @@ export const Articles = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <Badge variant="outline" className="mb-4">
-            Məqalələr
+            {t('nav.articles')}
           </Badge>
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Məqalələr
+            {t('nav.articles')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Faydalı məqalələr
+            {t('articles.useful')}
           </p>
         </div>
 
-                {/* Articles Grid */}
+        {/* Articles Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {articles && articles.length > 0 ? (
             articles.map((article) => (
@@ -105,7 +105,7 @@ export const Articles = () => {
             ))
           ) : (
             <div className="col-span-full text-center py-10">
-              <p className="text-muted-foreground">Məqalələr yüklənir və ya mövcud deyil...</p>
+              <p className="text-muted-foreground">{t('articles.notFound')}</p>
             </div>
           )}
         </div>
@@ -114,7 +114,7 @@ export const Articles = () => {
         {articles.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
-              Hələ heç bir məqalə yoxdur.
+              {t('articles.noArticles')}
             </p>
           </div>
         )}
