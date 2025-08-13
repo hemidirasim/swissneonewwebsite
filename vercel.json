@@ -18,6 +18,9 @@
     },
     "api/test-db.js": {
       "maxDuration": 30
+    },
+    "api/init-db.js": {
+      "maxDuration": 30
     }
   },
   "headers": [
