@@ -1,8 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
-
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
@@ -13,13 +11,50 @@ module.exports = async function handler(req, res) {
     return;
   }
 
+  // Check environment variables
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    console.error('DATABASE_URL is missing');
+    return res.status(500).json({
+      success: false,
+      error: 'DATABASE_URL environment variable is missing'
+    });
+  }
+
+  let prisma;
   try {
+    console.log('Creating Prisma client for contact submissions...');
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: databaseUrl
+        }
+      }
+    });
+    console.log('Prisma client created successfully for contact submissions');
+  } catch (error) {
+    console.error('Prisma client creation error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Prisma client creation failed',
+      details: error.message
+    });
+  }
+
+  try {
+    console.log('Connecting to database for contact submissions...');
+    await prisma.$connect();
+    console.log('Database connected successfully for contact submissions');
+
     switch (req.method) {
       case 'GET':
+        console.log('Fetching contact submissions...');
         // Get all contact submissions
         const submissions = await prisma.contactSubmission.findMany({
           orderBy: { createdAt: 'desc' }
         });
+        
+        console.log(`Found ${submissions.length} contact submissions`);
         
         res.status(200).json({
           success: true,
@@ -34,6 +69,7 @@ module.exports = async function handler(req, res) {
         break;
 
       case 'POST':
+        console.log('Creating new contact submission...');
         // Create new contact submission
         const { name, email, message } = req.body;
         
@@ -53,6 +89,8 @@ module.exports = async function handler(req, res) {
           }
         });
 
+        console.log('Contact submission created successfully:', newSubmission.id);
+
         res.status(201).json({
           success: true,
           data: {
@@ -66,6 +104,7 @@ module.exports = async function handler(req, res) {
         break;
 
       case 'DELETE':
+        console.log('Deleting contact submission...');
         // Delete contact submission
         const { id: deleteId } = req.query;
         
@@ -80,6 +119,8 @@ module.exports = async function handler(req, res) {
         await prisma.contactSubmission.delete({
           where: { id: deleteId }
         });
+
+        console.log('Contact submission deleted successfully:', deleteId);
 
         res.status(200).json({
           success: true,
@@ -100,5 +141,14 @@ module.exports = async function handler(req, res) {
       error: 'Database operation failed',
       message: error.message
     });
+  } finally {
+    if (prisma) {
+      try {
+        await prisma.$disconnect();
+        console.log('Database connection closed for contact submissions');
+      } catch (error) {
+        console.error('Error closing database connection:', error);
+      }
+    }
   }
-};
+}
