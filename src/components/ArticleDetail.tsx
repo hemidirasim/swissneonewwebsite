@@ -65,17 +65,19 @@ export const ArticleDetail = () => {
     <div className="min-h-screen bg-gradient-subtle">
       <div className="container mx-auto px-6 py-20">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/articles')}
-          className="mb-8 hover:bg-white/10"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Məqalələrə qayıt
-        </Button>
+        <div className="mb-8 max-w-4xl mx-auto">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/articles')}
+            className="mb-4 hover:bg-white/10"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Məqalələrə qayıt
+          </Button>
+        </div>
 
         {/* Article Header */}
-        <Card className="mb-8 overflow-hidden">
+        <Card className="mb-8 overflow-hidden max-w-4xl mx-auto">
           <CardContent className="p-0">
             {/* Article Image */}
             {article.image && (
@@ -124,7 +126,7 @@ export const ArticleDetail = () => {
         </Card>
 
         {/* Article Content */}
-        <Card>
+        <Card className="max-w-4xl mx-auto">
           <CardContent className="p-6 md:p-8">
             <div 
               className="prose prose-lg max-w-none"
@@ -134,7 +136,7 @@ export const ArticleDetail = () => {
         </Card>
 
         {/* Related Articles */}
-        <div className="mt-12">
+        <div className="mt-12 max-w-4xl mx-auto">
           <h2 className="text-2xl font-bold mb-6">Əlaqəli məqalələr</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {articles

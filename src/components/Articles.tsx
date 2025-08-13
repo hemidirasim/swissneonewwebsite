@@ -21,9 +21,9 @@ export const Articles = () => {
   if (loading) {
     return (
       <section id="articles" className="py-20 bg-gradient-subtle">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-6 py-20">
           <div className="text-center">
-            <p>Məqalələr yüklənir...</p>
+            <p className="text-lg text-muted-foreground">Məqalələr yüklənir...</p>
           </div>
         </div>
       </section>
@@ -32,7 +32,7 @@ export const Articles = () => {
 
   return (
     <section id="articles" className="py-20 bg-gradient-subtle">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-6 py-20">
         {/* Header */}
         <div className="text-center mb-16">
           <Badge variant="outline" className="mb-4">

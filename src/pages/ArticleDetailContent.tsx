@@ -55,13 +55,13 @@ export const ArticleDetailContent = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto px-6 py-20">
         {/* Back Button */}
-        <div className="mb-8">
+        <div className="mb-8 max-w-4xl mx-auto">
           <Button
             variant="ghost"
             onClick={() => navigate('/articles')}
-            className="mb-4"
+            className="mb-4 hover:bg-white/10"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Məqalələrə qayıt
