@@ -35,14 +35,15 @@ const translations = {
     'hero.imageTitle': 'Uşağınızın sağlam gələcəyi üçün',
     'hero.superPremium': 'Super Premium Formula',
     'hero.swissneoFormula': 'Swissneo Formula',
+    'hero.motherChildAlt': 'Ana və övlad - Swissneo premium uşaq qidası',
     
     // Products
     'products.title': 'Məhsullar',
     'products.subtitle': 'Hər yaş qrupu üçün mükəmməl qidalanma',
-    'product1.name': 'Swissneo 1',
+    'product1.name': 'Swissneo Super Premium Formula 0-6 ay',
     'product1.stage': '0-6 ay',
     'product1.description': 'Doğulduğu gündən etibarən 6 ayadək olan körpələr üçün başlanğıc süd qarışığı',
-    'product2.name': 'Swissneo 2', 
+    'product2.name': 'Swissneo Super Premium Formula 6-12 ay', 
     'product2.stage': '6-12 ay',
     'product2.description': '6-12 aylıq körpələr üçün növbəti mərhələ süd qarışığı',
     'product.weight': '400q',
@@ -122,6 +123,7 @@ const translations = {
     'footer.products.info': 'Məhsul məlumatları',
     'footer.copyright': 'Bütün hüquqlar qorunur.',
     'footer.made': 'İsveçrə keyfiyyəti ilə hazırlanıb',
+    'footer.ageGroup': 'ay yaş qrupu',
     
     // Contact Form
     'form.send.inquiry': 'Sorğu göndərin',
@@ -182,14 +184,15 @@ const translations = {
     'hero.imageTitle': 'For your child\'s healthy future',
     'hero.superPremium': 'Super Premium Formula',
     'hero.swissneoFormula': 'Swissneo Formula',
+    'hero.motherChildAlt': 'Mother and child - Swissneo premium baby food',
     
     // Products
     'products.title': 'Products',
     'products.subtitle': 'Perfect nutrition for every age',
-    'product1.name': 'Swissneo 1',
+    'product1.name': 'Swissneo Super Premium Formula 0-6 months',
     'product1.stage': '0-6 months',
     'product1.description': 'Starting infant milk formula for babies from birth to 6 months',
-    'product2.name': 'Swissneo 2',
+    'product2.name': 'Swissneo Super Premium Formula 6-12 months',
     'product2.stage': '6-12 months',
     'product2.description': 'Follow-on milk formula for babies from 6 to 12 months',
     'product.weight': '400g',
@@ -269,6 +272,7 @@ const translations = {
     'footer.products.info': 'Product Information',
     'footer.copyright': 'All rights reserved.',
     'footer.made': 'Made with Swiss quality',
+    'footer.ageGroup': 'months age group',
     
     // Contact Form
     'form.send.inquiry': 'Send Inquiry',

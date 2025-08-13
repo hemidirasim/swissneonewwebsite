@@ -123,7 +123,7 @@ export const Footer = () => {
               <li>🇨🇭 {t('hero.swiss')}</li>
               <li>🌱 100% {t('hero.natural')}</li>
               <li>✨ Super {t('hero.premium')}</li>
-              <li>👶 0-12 {language === 'az' ? 'ay yaş qrupu' : 'months age group'}</li>
+              <li>👶 0-12 {t('footer.ageGroup')}</li>
             </ul>
           </div>
 

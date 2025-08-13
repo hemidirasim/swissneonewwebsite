@@ -115,7 +115,7 @@ export const Hero = () => {
                 <div className="absolute inset-0 bg-gradient-hero opacity-10 rounded-3xl"></div>
                 <img 
                   src={motherChildImage} 
-                  alt="Ana və övlad - Swissneo premium uşaq qidası"
+                  alt={t('hero.motherChildAlt')}
                   className="w-full h-auto rounded-3xl"
                 />
                 

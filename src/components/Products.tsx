@@ -23,18 +23,18 @@ export const Products = () => {
     {
       id: 1,
       image: '/lovable-uploads/b0d62079-dc9d-4d61-a539-2cde4f82d6c3.png',
-      name: adminData?.product1Name?.[language] || 'Swissneo Super Premium Formula 0-6 ay',
+      name: adminData?.product1Name?.[language] || t('product1.name'),
       stage: t('product1.stage'),
-      description: adminData?.product1Description?.[language] || 'Doğulduğu gündən etibarən 6 ayadək olan körpələr üçün başlanğıc süd qarışığı',
+      description: adminData?.product1Description?.[language] || t('product1.description'),
       color: 'from-blue-400 to-blue-600',
       bgColor: 'bg-blue-50'
     },
     {
       id: 2,
       image: '/lovable-uploads/1b436833-1495-456b-bdfb-0184d54c29b7.png',
-      name: adminData?.product2Name?.[language] || 'Swissneo Super Premium Formula 6-12 ay',
+      name: adminData?.product2Name?.[language] || t('product2.name'),
       stage: t('product2.stage'),
-      description: adminData?.product2Description?.[language] || '6-12 aylıq körpələr üçün növbəti mərhələ süd qarışığı',
+      description: adminData?.product2Description?.[language] || t('product2.description'),
       color: 'from-green-400 to-green-600',
       bgColor: 'bg-green-50'
     }
