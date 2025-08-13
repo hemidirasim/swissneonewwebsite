@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "npx prisma generate && npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
   "installCommand": "npm install",
@@ -17,6 +17,9 @@
     }
   ],
   "functions": {
+    "api/simple-test.js": {
+      "maxDuration": 30
+    },
     "api/upload-image-blob.js": {
       "maxDuration": 30
     },
