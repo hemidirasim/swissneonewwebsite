@@ -8,7 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
-import databaseService, { Article } from '@/services/databaseService';
+import { useAdminData } from '@/contexts/AdminDataContext';
+import { Article } from '@/services/databaseService';
 import { uploadImageWithFallback, validateImage } from '@/services/imageService';
 import { 
   Plus, 
@@ -24,16 +25,17 @@ import {
 export const SwissAdminContent = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
+  const { articles, addArticle, updateArticle, deleteArticle, loading } = useAdminData();
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [articles, setArticles] = useState<Article[]>([]);
   const [showArticleForm, setShowArticleForm] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [newArticle, setNewArticle] = useState<Partial<Article>>({
-    title: { az: '', en: '' },
-    content: { az: '', en: '' },
-    image: ''
+    title: '',
+    content: '',
+    image: '',
+    category: ''
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
@@ -42,22 +44,26 @@ export const SwissAdminContent = () => {
   // Check session on mount
   useEffect(() => {
     checkSession();
-    loadArticles();
   }, []);
 
   const checkSession = () => {
-    const loggedIn = databaseService.isLoggedIn();
-    const user = databaseService.getCurrentUser();
-    setIsLoggedIn(loggedIn);
-    setCurrentUser(user);
-  };
-
-  const loadArticles = () => {
-    try {
-      const articlesData = databaseService.getArticles();
-      setArticles(articlesData);
-    } catch (error) {
-      console.error('Error loading articles:', error);
+    // Simple admin authentication
+    const session = localStorage.getItem('swissneo-admin-session');
+    if (session) {
+      try {
+        const sessionData = JSON.parse(session);
+        const now = new Date();
+        const expiresAt = new Date(sessionData.expiresAt);
+        
+        if (now < expiresAt) {
+          setIsLoggedIn(true);
+          setCurrentUser(sessionData.user);
+        } else {
+          localStorage.removeItem('swissneo-admin-session');
+        }
+      } catch (error) {
+        localStorage.removeItem('swissneo-admin-session');
+      }
     }
   };
 
@@ -68,8 +74,21 @@ export const SwissAdminContent = () => {
     const password = formData.get('password') as string;
 
     try {
-      const user = await databaseService.authenticateUser(username, password);
-      if (user) {
+      // Simple admin authentication
+      if (username === 'admin' && password === 'swissneo2024') {
+        const user = {
+          id: 1,
+          username: 'admin',
+          role: 'admin'
+        };
+        
+        const session = {
+          user,
+          loginTime: new Date().toISOString(),
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
+        };
+        
+        localStorage.setItem('swissneo-admin-session', JSON.stringify(session));
         setIsLoggedIn(true);
         setCurrentUser(user);
         toast({
@@ -93,7 +112,7 @@ export const SwissAdminContent = () => {
   };
 
   const handleLogout = () => {
-    databaseService.logout();
+    localStorage.removeItem('swissneo-admin-session');
     setIsLoggedIn(false);
     setCurrentUser(null);
     toast({
@@ -139,10 +158,10 @@ export const SwissAdminContent = () => {
 
 
   const handleAddArticle = async () => {
-    if (!newArticle.title?.az || !newArticle.content?.az) {
+    if (!newArticle.title || !newArticle.content || !newArticle.category) {
       toast({
         title: "Xəta!",
-        description: "Başlıq və məzmun məcburidir.",
+        description: "Başlıq, məzmun və kateqoriya məcburidir.",
         variant: "destructive",
       });
       return;
@@ -167,22 +186,21 @@ export const SwissAdminContent = () => {
       const articleData = {
         title: newArticle.title,
         content: newArticle.content,
-        image: imageUrl,
-        date: new Date().toISOString()
-      } as Omit<Article, 'id'>;
+        image: imageUrl || 'https://via.placeholder.com/400x300?text=No+Image',
+        category: newArticle.category
+      };
 
-      databaseService.addArticle(articleData);
+      await addArticle(articleData);
       
       setNewArticle({
-        title: { az: '', en: '' },
-        content: { az: '', en: '' },
-        image: ''
+        title: '',
+        content: '',
+        image: '',
+        category: ''
       });
       setSelectedImage(null);
       setImagePreview('');
       setShowArticleForm(false);
-      loadArticles();
-
       toast({
         title: "Məqalə əlavə edildi!",
         description: "Yeni məqalə uğurla əlavə edildi.",
@@ -202,7 +220,7 @@ export const SwissAdminContent = () => {
   const handleUpdateArticle = async () => {
     if (!editingArticle) return;
 
-    if (!newArticle.title?.az || !newArticle.content?.az) {
+    if (!newArticle.title || !newArticle.content) {
       toast({
         title: "Xəta!",
         description: "Başlıq və məzmun məcburidir.",
@@ -233,19 +251,18 @@ export const SwissAdminContent = () => {
         image: imageUrl
       };
 
-      databaseService.updateArticle(editingArticle.id, updates);
+      updateArticle(editingArticle.id, updates);
       
       setEditingArticle(null);
       setNewArticle({
-        title: { az: '', en: '' },
-        content: { az: '', en: '' },
-        image: ''
+        title: '',
+        content: '',
+        image: '',
+        category: ''
       });
       setSelectedImage(null);
       setImagePreview('');
       setShowArticleForm(false);
-      loadArticles();
-
       toast({
         title: "Məqalə yeniləndi!",
         description: "Məqalə uğurla yeniləndi.",
@@ -273,10 +290,9 @@ export const SwissAdminContent = () => {
     setShowArticleForm(true);
   };
 
-  const handleDeleteArticle = (id: number) => {
+  const handleDeleteArticle = (id: string) => {
     if (confirm('Bu məqaləni silmək istədiyinizə əminsiniz?')) {
-      databaseService.deleteArticle(id);
-      loadArticles();
+      deleteArticle(id);
       toast({
         title: "Məqalə silindi!",
         description: "Məqalə uğurla silindi.",
@@ -366,9 +382,10 @@ export const SwissAdminContent = () => {
                   <Button onClick={() => {
                     setEditingArticle(null);
                     setNewArticle({
-                      title: { az: '', en: '' },
-                      content: { az: '', en: '' },
-                      image: ''
+                      title: '',
+                      content: '',
+                      image: '',
+                      category: ''
                     });
                     setSelectedImage(null);
                     setImagePreview('');
@@ -426,49 +443,37 @@ export const SwissAdminContent = () => {
                   </div>
 
                   {/* Title */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Başlıq (AZ)</Label>
-                      <Input
-                        value={newArticle.title?.az || ''}
-                        onChange={(e) => updateArticleField('title', { ...newArticle.title, az: e.target.value })}
-                        className="mt-1"
-                        placeholder="Məqalə başlığı..."
-                      />
-                    </div>
-                    <div>
-                      <Label>Başlıq (EN)</Label>
-                      <Input
-                        value={newArticle.title?.en || ''}
-                        onChange={(e) => updateArticleField('title', { ...newArticle.title, en: e.target.value })}
-                        className="mt-1"
-                        placeholder="Article title..."
-                      />
-                    </div>
+                  <div>
+                    <Label>Başlıq</Label>
+                    <Input
+                      value={newArticle.title || ''}
+                      onChange={(e) => updateArticleField('title', e.target.value)}
+                      className="mt-1"
+                      placeholder="Məqalə başlığı..."
+                    />
+                  </div>
+
+                  {/* Category */}
+                  <div>
+                    <Label>Kateqoriya</Label>
+                    <Input
+                      value={newArticle.category || ''}
+                      onChange={(e) => updateArticleField('category', e.target.value)}
+                      className="mt-1"
+                      placeholder="Məqalə kateqoriyası..."
+                    />
                   </div>
 
                   {/* Content */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Məzmun (AZ)</Label>
-                      <Textarea
-                        value={newArticle.content?.az || ''}
-                        onChange={(e) => updateArticleField('content', { ...newArticle.content, az: e.target.value })}
-                        className="mt-1"
-                        rows={10}
-                        placeholder="Məqalə məzmunu..."
-                      />
-                    </div>
-                    <div>
-                      <Label>Məzmun (EN)</Label>
-                      <Textarea
-                        value={newArticle.content?.en || ''}
-                        onChange={(e) => updateArticleField('content', { ...newArticle.content, en: e.target.value })}
-                        className="mt-1"
-                        rows={10}
-                        placeholder="Article content..."
-                      />
-                    </div>
+                  <div>
+                    <Label>Məzmun</Label>
+                    <Textarea
+                      value={newArticle.content || ''}
+                      onChange={(e) => updateArticleField('content', e.target.value)}
+                      className="mt-1"
+                      rows={10}
+                      placeholder="Məqalə məzmunu..."
+                    />
                   </div>
 
                   <div className="flex justify-end space-x-2">
@@ -521,7 +526,7 @@ export const SwissAdminContent = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {new Date(article.date).toLocaleDateString()}
+                                              {new Date(article.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
