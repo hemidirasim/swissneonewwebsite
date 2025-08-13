@@ -16,6 +16,9 @@
     "api/upload-image.ts": {
       "maxDuration": 30
     },
+    "api/upload-image.js": {
+      "maxDuration": 30
+    },
     "api/test.ts": {
       "maxDuration": 10
     },
