@@ -46,62 +46,68 @@ export const Articles = () => {
           </p>
         </div>
 
-        {/* Articles Grid */}
+                {/* Articles Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {articles.map((article) => (
-            <Card key={article.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
-              <CardContent className="p-0">
-                {/* Article Image */}
-                <div className="relative h-48 overflow-hidden">
-                  {article.image && article.image !== '📄' ? (
-                    <img
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-4xl">
-                      📄
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-
-                {/* Article Content */}
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
-                    {article.title}
-                  </h3>
-
-                  <p className="text-muted-foreground mb-4 line-clamp-3">
-                    {article.content?.substring(0, 150)}...
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {new Date(article.created_at).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric'
-                        })}
+          {articles && articles.length > 0 ? (
+            articles.map((article) => (
+              <Card key={article.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
+                <CardContent className="p-0">
+                  {/* Article Image */}
+                  <div className="relative h-48 overflow-hidden">
+                    {article.image && article.image !== '📄' ? (
+                      <img
+                        src={article.image}
+                        alt={article.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-4xl">
+                        📄
                       </div>
-                    </div>
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleArticleClick(article.id)}
-                      className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+
+                  {/* Article Content */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
+                      {article.title}
+                    </h3>
+
+                    <p className="text-muted-foreground mb-4 line-clamp-3">
+                      {article.content?.substring(0, 150)}...
+                    </p>
+
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(article.created_at).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </div>
+                      </div>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleArticleClick(article.id)}
+                        className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-10">
+              <p className="text-muted-foreground">Məqalələr yüklənir və ya mövcud deyil...</p>
+            </div>
+          )}
         </div>
 
         {/* No Articles Message */}
