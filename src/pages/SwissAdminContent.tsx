@@ -181,20 +181,15 @@ export const SwissAdminContent = () => {
       let imageUrl = '';
       
       if (selectedImage) {
-        const isDevelopment = import.meta.env.DEV;
-        if (isDevelopment) {
-          toast({
-            title: "Development Mode",
-            description: "Şəkil sıxışdırılır və base64 formatında saxlanılır.",
-          });
-          
-          // Compress image in development mode to reduce size
-          const { compressImage } = await import('@/services/imageService');
-          const compressedImage = await compressImage(selectedImage, 800); // Max 800px
-          imageUrl = await uploadImageWithFallback(compressedImage);
-        } else {
-          imageUrl = await uploadImageWithFallback(selectedImage);
-        }
+        toast({
+          title: "Şəkil yüklənir",
+          description: "Şəkil Vercel Blob Storage-a yüklənir...",
+        });
+        
+        // Compress image to reduce upload size
+        const { compressImage } = await import('@/services/imageService');
+        const compressedImage = await compressImage(selectedImage, 1200); // Max 1200px
+        imageUrl = await uploadImageWithFallback(compressedImage);
         
         console.log('🖼️ Şəkil yükləndi:', imageUrl);
       }
@@ -255,20 +250,15 @@ export const SwissAdminContent = () => {
       let imageUrl = editingArticle.image || '';
       
       if (selectedImage) {
-        const isDevelopment = import.meta.env.DEV;
-        if (isDevelopment) {
-          toast({
-            title: "Development Mode",
-            description: "Şəkil sıxışdırılır və base64 formatında saxlanılır.",
-          });
-          
-          // Compress image in development mode to reduce size
-          const { compressImage } = await import('@/services/imageService');
-          const compressedImage = await compressImage(selectedImage, 800); // Max 800px
-          imageUrl = await uploadImageWithFallback(compressedImage);
-        } else {
-          imageUrl = await uploadImageWithFallback(selectedImage);
-        }
+        toast({
+          title: "Şəkil yüklənir",
+          description: "Şəkil Vercel Blob Storage-a yüklənir...",
+        });
+        
+        // Compress image to reduce upload size
+        const { compressImage } = await import('@/services/imageService');
+        const compressedImage = await compressImage(selectedImage, 1200); // Max 1200px
+        imageUrl = await uploadImageWithFallback(compressedImage);
         
         console.log('🖼️ Yeni şəkil yükləndi:', imageUrl);
       }

@@ -3,22 +3,13 @@ export const uploadImageToVercel = async (file: File): Promise<string> => {
   try {
     console.log('Starting Vercel Blob upload for file:', file.name, 'Size:', file.size);
     
-    // Check if we're in development mode
-    const isDevelopment = import.meta.env.DEV;
-    
-    if (isDevelopment) {
-      console.log('Development mode detected - using base64 fallback');
-      // In development, use base64 since API routes don't work with Vite dev server
-      return await convertToBase64(file);
-    }
-    
     // Convert file to base64
     const base64 = await convertToBase64(file);
     console.log('File converted to base64, length:', base64.length);
     
-    // Send to Vercel API (using .cjs endpoint)
-    console.log('Sending request to /api/upload-image.cjs...');
-    const response = await fetch('/api/upload-image.cjs', {
+    // Send to Vercel API
+    console.log('Sending request to /api/upload-image...');
+    const response = await fetch('/api/upload-image', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -31,7 +22,6 @@ export const uploadImageToVercel = async (file: File): Promise<string> => {
     });
 
     console.log('Response status:', response.status);
-    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -66,16 +56,8 @@ export const convertToBase64 = (file: File): Promise<string> => {
 
 export const uploadImageWithFallback = async (file: File): Promise<string> => {
   try {
-    // Check if we're in development mode
-    const isDevelopment = import.meta.env.DEV;
-    
-    if (isDevelopment) {
-      console.log('Development mode - using base64 for local testing');
-      return await convertToBase64(file);
-    }
-    
-    // Always try Vercel Blob first in production
-    console.log('Production mode - attempting to upload to Vercel Blob...');
+    // Always try Vercel Blob first
+    console.log('Attempting to upload to Vercel Blob...');
     const url = await uploadImageToVercel(file);
     console.log('Successfully uploaded to Vercel Blob:', url);
     return url;
