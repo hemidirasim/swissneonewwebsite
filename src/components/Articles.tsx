@@ -33,13 +33,13 @@ export const Articles = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <Badge variant="outline" className="mb-4">
-            {adminData.articlesTitle?.[language] || 'Məqalələr'}
+            Məqalələr
           </Badge>
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            {adminData.articlesTitle?.[language] || 'Məqalələr'}
+            Məqalələr
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            {adminData.articlesDescription?.[language] || 'Faydalı məqalələr'}
+            Faydalı məqalələr
           </p>
         </div>
 
