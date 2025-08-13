@@ -185,11 +185,17 @@ export const SwissAdminContent = () => {
         if (isDevelopment) {
           toast({
             title: "Development Mode",
-            description: "Şəkil base64 formatında saxlanılır. Production-da Vercel Blob-a yüklənəcək.",
+            description: "Şəkil sıxışdırılır və base64 formatında saxlanılır.",
           });
+          
+          // Compress image in development mode to reduce size
+          const { compressImage } = await import('@/services/imageService');
+          const compressedImage = await compressImage(selectedImage, 800); // Max 800px
+          imageUrl = await uploadImageWithFallback(compressedImage);
+        } else {
+          imageUrl = await uploadImageWithFallback(selectedImage);
         }
         
-        imageUrl = await uploadImageWithFallback(selectedImage);
         console.log('🖼️ Şəkil yükləndi:', imageUrl);
       }
 
@@ -253,11 +259,17 @@ export const SwissAdminContent = () => {
         if (isDevelopment) {
           toast({
             title: "Development Mode",
-            description: "Şəkil base64 formatında saxlanılır. Production-da Vercel Blob-a yüklənəcək.",
+            description: "Şəkil sıxışdırılır və base64 formatında saxlanılır.",
           });
+          
+          // Compress image in development mode to reduce size
+          const { compressImage } = await import('@/services/imageService');
+          const compressedImage = await compressImage(selectedImage, 800); // Max 800px
+          imageUrl = await uploadImageWithFallback(compressedImage);
+        } else {
+          imageUrl = await uploadImageWithFallback(selectedImage);
         }
         
-        imageUrl = await uploadImageWithFallback(selectedImage);
         console.log('🖼️ Yeni şəkil yükləndi:', imageUrl);
       }
 
