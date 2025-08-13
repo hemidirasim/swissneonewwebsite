@@ -35,20 +35,23 @@ export async function initializeDatabase() {
 // Load articles from database
 export async function loadArticles(): Promise<Article[]> {
   try {
-    console.log('Loading articles from database via API...');
+    console.log('🔄 Loading articles from database via API...');
     
     const response = await fetch('/api/articles');
+    console.log('📡 API Response status:', response.status);
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
     const result = await response.json();
+    console.log('📡 API Response data:', result);
     
     if (!result.success) {
       throw new Error(result.error || 'Failed to load articles');
     }
     
-    console.log(`Loaded ${result.data.length} articles from database`);
+    console.log(`✅ Loaded ${result.data.length} articles from database`);
     return result.data;
   } catch (error) {
     console.error('Error loading articles:', error);
