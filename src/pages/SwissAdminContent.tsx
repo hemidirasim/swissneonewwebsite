@@ -130,8 +130,7 @@ export const SwissAdminContent = () => {
   const handleImageSelect = (file: File, preview: string) => {
     setSelectedImage(file);
     setImagePreview(preview);
-    // Şəkli newArticle state-inə əlavə et
-    setNewArticle(prev => ({ ...prev, image: preview }));
+    // Preview üçün base64 istifadə et, amma yükləmə zamanı Vercel Blob-a göndər
   };
 
   const handleImageRemove = () => {
@@ -142,11 +141,16 @@ export const SwissAdminContent = () => {
 
   const handleAddArticle = async () => {
     try {
-      // Şəkil artıq newArticle.image-də var
+      let imageUrl = '';
+      if (selectedImage) {
+        // Vercel Blob Storage-a yüklə
+        imageUrl = await databaseService.uploadImage(selectedImage);
+      }
+
       const articleData = {
         title: newArticle.title,
         content: newArticle.content,
-        image: newArticle.image || '', // Base64 şəkil
+        image: imageUrl, // Vercel Blob URL
         date: new Date().toISOString()
       } as Omit<Article, 'id'>;
 
@@ -190,11 +194,16 @@ export const SwissAdminContent = () => {
     if (!editingArticle) return;
 
     try {
-      // Şəkil artıq newArticle.image-də var
+      let imageUrl = editingArticle.image || '';
+      if (selectedImage) {
+        // Vercel Blob Storage-a yüklə
+        imageUrl = await databaseService.uploadImage(selectedImage);
+      }
+
       const updates = {
         title: newArticle.title,
         content: newArticle.content,
-        image: newArticle.image || editingArticle.image || ''
+        image: imageUrl // Vercel Blob URL
       };
 
       updateArticle(editingArticle.id, updates);

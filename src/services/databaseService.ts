@@ -131,7 +131,7 @@ class DatabaseService {
     }
   }
 
-  // Upload image to Vercel Blob Storage
+  // Upload image to Vercel Blob Storage via API
   async uploadImage(file: File): Promise<string> {
     try {
       // Check if we're in a browser environment
@@ -140,27 +140,34 @@ class DatabaseService {
         return 'https://via.placeholder.com/400x300?text=No+Image';
       }
 
-      // Check if Vercel Blob token is available
-      if (!process.env.BLOB_READ_WRITE_TOKEN) {
-        console.warn('BLOB_READ_WRITE_TOKEN not found, using fallback');
-        return 'https://via.placeholder.com/400x300?text=No+Blob+Token';
+      // Create FormData
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Upload to API endpoint
+      const response = await fetch('/api/upload-image', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Upload failed: ${response.statusText}`);
       }
 
-      // Create unique filename
-      const timestamp = Date.now();
-      const fileName = `article_${timestamp}_${file.name}`;
+      const result = await response.json();
       
-      // Upload to Vercel Blob
-      const { url } = await put(fileName, file, {
-        access: 'public',
-        addRandomSuffix: false
-      });
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      console.log('Image uploaded successfully to Vercel Blob:', result.url);
+      return result.url;
       
-      return url;
     } catch (error) {
       console.error('Error uploading image:', error);
       
-      // Fallback: return a placeholder image URL if Vercel Blob fails
+      // Fallback: return a placeholder image URL
       return 'https://via.placeholder.com/400x300?text=Image+Upload+Failed';
     }
   }

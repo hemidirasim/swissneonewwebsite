@@ -85,6 +85,7 @@ npm run preview
 - ✅ **Preview** funksiyası
 - ✅ **Remove** və **Replace** düymələri
 - ✅ **Responsive design**
+- ✅ **Vercel Blob Storage** inteqrasiyası
 
 ### Xüsusiyyətlər:
 - 🎯 **Drag & Drop** - Şəkli sürükləyib buraxın
@@ -94,6 +95,7 @@ npm run preview
 - 🔄 **Replace Image** - Mövcud şəkli dəyişdirin
 - 🗑️ **Remove Image** - Şəkli silin
 - 📱 **Mobile Friendly** - Mobil cihazlarda işləyir
+- ☁️ **Cloud Storage** - Vercel Blob Storage-a yüklənir
 
 ### Dəstəklənən Formatlar:
 - ✅ **PNG** - Rəqəmsal şəkillər
@@ -104,7 +106,22 @@ npm run preview
 ### Ölçü Limiti:
 - 📏 **Maksimum 5MB** fayl ölçüsü
 - ⚡ **Sürətli yükləmə**
-- 💾 **Base64 encoding** ilə saxlanılır
+- ☁️ **Vercel Blob Storage** ilə saxlanılır
+
+### API Endpoint:
+- 🔗 **`/api/upload-image`** - Şəkil yükləmə endpoint-i
+- 📤 **FormData** ilə şəkil göndərilir
+- ☁️ **Vercel Blob Storage**-a yüklənir
+- 🔗 **Public URL** qaytarılır
+
+### Şəkil Yükləmə Prosesi:
+1. **Şəkil seçilir** visual uploader ilə
+2. **Preview** göstərilir (base64)
+3. **FormData** yaradılır
+4. **`/api/upload-image`** endpoint-inə göndərilir
+5. **Vercel Blob Storage**-a yüklənir
+6. **Public URL** qaytarılır
+7. **Məqalə ilə birlikdə** saxlanılır
 
 ## 🏗️ Project Structure
 
