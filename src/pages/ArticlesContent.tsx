@@ -29,6 +29,9 @@ export const ArticlesContent = () => {
               Məqalələr
             </Badge>
           </div>
+          <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
+            Məqalələr və Məsləhətlər
+          </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             Körpə qidalandırması haqqında faydalı məqalələr
           </p>

@@ -55,6 +55,9 @@ export const Products = () => {
           <Badge variant="outline" className="mb-4">
             {t('products.title')}
           </Badge>
+          <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
+            {t('products.subtitle')}
+          </h2>
         </div>
 
         {/* Products Grid */}

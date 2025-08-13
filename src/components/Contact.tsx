@@ -44,6 +44,9 @@ export const Contact = () => {
           <Badge variant="outline" className="mb-4">
             {t('contact.title')}
           </Badge>
+          <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
+            {t('contact.question')}
+          </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             {t('contact.description')}
           </p>
