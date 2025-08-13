@@ -2,6 +2,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "installCommand": "npm install",
   "env": {
     "DATABASE_URL": "postgresql://swissp_1:ti6NdPyN2uHREREA@j2tw.your-database.de:5432/swissp_db1"
   },
