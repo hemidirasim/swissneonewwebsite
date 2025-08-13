@@ -32,18 +32,27 @@ export interface ContactSubmission {
 // Database connection function
 async function getConnection() {
   try {
+    console.log('Attempting to connect to PostgreSQL database...');
     const { Pool } = await import('pg');
     const pool = new Pool(DB_CONFIG);
+    
+    // Test the connection
+    const client = await pool.connect();
+    await client.query('SELECT NOW()');
+    client.release();
+    
+    console.log('PostgreSQL connection successful');
     return pool;
   } catch (error) {
     console.error('Database connection error:', error);
-    throw new Error('Database connection failed');
+    throw new Error(`Database connection failed: ${error.message}`);
   }
 }
 
 // Initialize database tables
 export async function initializeDatabase() {
   try {
+    console.log('Initializing database tables...');
     const pool = await getConnection();
     
     // Create articles table
@@ -81,14 +90,17 @@ export async function initializeDatabase() {
 // Load articles from database
 export async function loadArticles(): Promise<Article[]> {
   try {
+    console.log('Loading articles from database...');
     const pool = await getConnection();
     const result = await pool.query('SELECT * FROM articles ORDER BY created_at DESC');
     await pool.end();
     
+    console.log(`Loaded ${result.rows.length} articles from database`);
     return result.rows as Article[];
   } catch (error) {
     console.error('Error loading articles:', error);
     // Fallback to localStorage if database fails
+    console.log('Falling back to localStorage for articles');
     const stored = localStorage.getItem('articles');
     return stored ? JSON.parse(stored) : [];
   }
@@ -97,6 +109,7 @@ export async function loadArticles(): Promise<Article[]> {
 // Save article to database
 export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | 'updated_at'>): Promise<Article> {
   try {
+    console.log('Saving article to database:', article.title);
     const pool = await getConnection();
     const now = new Date().toISOString();
     
@@ -107,6 +120,7 @@ export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | '
     
     await pool.end();
     
+    console.log('Article saved successfully:', result.rows[0].id);
     return result.rows[0] as Article;
   } catch (error) {
     console.error('Error saving article:', error);
@@ -117,6 +131,7 @@ export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | '
 // Update article in database
 export async function updateArticle(id: string, updates: Partial<Article>): Promise<Article> {
   try {
+    console.log('Updating article in database:', id);
     const pool = await getConnection();
     const now = new Date().toISOString();
     
@@ -156,6 +171,7 @@ export async function updateArticle(id: string, updates: Partial<Article>): Prom
       throw new Error('Article not found');
     }
     
+    console.log('Article updated successfully');
     return result.rows[0] as Article;
   } catch (error) {
     console.error('Error updating article:', error);
@@ -166,9 +182,11 @@ export async function updateArticle(id: string, updates: Partial<Article>): Prom
 // Delete article from database
 export async function deleteArticle(id: string): Promise<void> {
   try {
+    console.log('Deleting article from database:', id);
     const pool = await getConnection();
     await pool.query('DELETE FROM articles WHERE id = $1', [id]);
     await pool.end();
+    console.log('Article deleted successfully');
   } catch (error) {
     console.error('Error deleting article:', error);
     throw error;
@@ -178,14 +196,17 @@ export async function deleteArticle(id: string): Promise<void> {
 // Load contact submissions from database
 export async function loadContactSubmissions(): Promise<ContactSubmission[]> {
   try {
+    console.log('Loading contact submissions from database...');
     const pool = await getConnection();
     const result = await pool.query('SELECT * FROM contact_submissions ORDER BY created_at DESC');
     await pool.end();
     
+    console.log(`Loaded ${result.rows.length} contact submissions from database`);
     return result.rows as ContactSubmission[];
   } catch (error) {
     console.error('Error loading contact submissions:', error);
     // Fallback to localStorage if database fails
+    console.log('Falling back to localStorage for contact submissions');
     const stored = localStorage.getItem('contactSubmissions');
     return stored ? JSON.parse(stored) : [];
   }
@@ -194,6 +215,7 @@ export async function loadContactSubmissions(): Promise<ContactSubmission[]> {
 // Add contact submission to database
 export async function addContactSubmission(submission: Omit<ContactSubmission, 'id' | 'created_at'>): Promise<ContactSubmission> {
   try {
+    console.log('Adding contact submission to database:', submission.email);
     const pool = await getConnection();
     const now = new Date().toISOString();
     
@@ -204,6 +226,7 @@ export async function addContactSubmission(submission: Omit<ContactSubmission, '
     
     await pool.end();
     
+    console.log('Contact submission added successfully:', result.rows[0].id);
     return result.rows[0] as ContactSubmission;
   } catch (error) {
     console.error('Error adding contact submission:', error);
@@ -214,9 +237,11 @@ export async function addContactSubmission(submission: Omit<ContactSubmission, '
 // Delete contact submission from database
 export async function deleteContactSubmission(id: string): Promise<void> {
   try {
+    console.log('Deleting contact submission from database:', id);
     const pool = await getConnection();
     await pool.query('DELETE FROM contact_submissions WHERE id = $1', [id]);
     await pool.end();
+    console.log('Contact submission deleted successfully');
   } catch (error) {
     console.error('Error deleting contact submission:', error);
     throw error;
