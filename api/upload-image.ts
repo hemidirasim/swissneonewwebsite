@@ -25,28 +25,33 @@ export default async function handler(req: any, res: any) {
       return res.status(500).json({ error: 'Blob storage not configured' });
     }
 
-    // Get the file from the request body
-    const { file, fileName, fileType } = req.body;
-    
-    if (!file || !fileName || !fileType) {
-      return res.status(400).json({ error: 'File data is required' });
+    // Safely parse the request body
+    let body;
+    try {
+      body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid JSON in request body' });
     }
 
-    // Validate file type
+    const { file, fileName, fileType } = body || {};
+    
+    if (!file || !fileName || !fileType) {
+      return res.status(400).json({ error: 'Missing required fields: file, fileName, fileType' });
+    }
+
     if (!fileType.startsWith('image/')) {
       return res.status(400).json({ error: 'File must be an image' });
     }
 
-    // Convert base64 to buffer
+    // Process base64 data
     const base64Data = file.replace(/^data:image\/[a-z]+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
 
-    // Validate file size (max 10MB)
     if (buffer.length > 10 * 1024 * 1024) {
       return res.status(400).json({ error: 'File size must be less than 10MB' });
     }
 
-    // Create unique filename
+    // Create filename
     const timestamp = Date.now();
     const randomSuffix = Math.random().toString(36).substring(2, 15);
     const finalFileName = `swissneo_article_${timestamp}_${randomSuffix}_${fileName}`;
@@ -57,11 +62,14 @@ export default async function handler(req: any, res: any) {
       addRandomSuffix: false
     });
 
-    console.log('Image uploaded successfully to Vercel Blob:', url);
+    console.log('Successfully uploaded to Vercel Blob:', url);
     return res.status(200).json({ url });
     
   } catch (error) {
-    console.error('Error uploading image:', error);
-    return res.status(500).json({ error: 'Failed to upload image' });
+    console.error('Serverless function error:', error);
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      message: error.message 
+    });
   }
 }
