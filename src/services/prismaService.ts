@@ -37,6 +37,40 @@ export async function loadArticles(): Promise<Article[]> {
   try {
     console.log('🔄 Loading articles from database via API...');
     
+    // Check if we're in development mode
+    if (import.meta.env.DEV) {
+      console.log('🔧 Development mode detected, using mock data...');
+      return [
+        {
+          id: '1',
+          title: 'Uşaqlar üçün sağlam qidalanma',
+          content: 'Uşaqların sağlam inkişafı üçün düzgün qidalanma çox vacibdir...',
+          image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
+          category: 'Qidalanma',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        {
+          id: '2',
+          title: 'Uşaq inkişafının əsas mərhələləri',
+          content: 'Uşaqların inkişafı müxtəlif mərhələlərdə baş verir...',
+          image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=300&fit=crop',
+          category: 'İnkişaf',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        {
+          id: '3',
+          title: 'Uşaqlar üçün fiziki fəaliyyət',
+          content: 'Fiziki fəaliyyət uşaqların sağlamlığı üçün vacibdir...',
+          image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
+          category: 'Fiziki fəaliyyət',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+      ];
+    }
+    
     const response = await fetch('/api/articles');
     console.log('📡 API Response status:', response.status);
     
@@ -150,7 +184,28 @@ export async function deleteArticle(id: string): Promise<void> {
 // Load contact submissions from database
 export async function loadContactSubmissions(): Promise<ContactSubmission[]> {
   try {
-    console.log('Loading contact submissions from database via API...');
+    console.log('🔄 Loading contact submissions from database via API...');
+    
+    // Check if we're in development mode
+    if (import.meta.env.DEV) {
+      console.log('🔧 Development mode detected, using mock contact data...');
+      return [
+        {
+          id: '1',
+          name: 'Aynur Məmmədova',
+          email: 'aynur.mammadova@email.com',
+          message: 'Uşağım 2 yaşındadır və yemək yeməkdə problem yaşayır. Nə tövsiyə edərsiniz?',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '2',
+          name: 'Elşən Əliyev',
+          email: 'elshen.aliyev@email.com',
+          message: 'Uşağım üçün düzgün yuxu rejimi necə qurmaq olar? 3 yaşındadır.',
+          created_at: new Date().toISOString()
+        }
+      ];
+    }
     
     const response = await fetch('/api/contact-submissions');
     if (!response.ok) {
@@ -163,7 +218,7 @@ export async function loadContactSubmissions(): Promise<ContactSubmission[]> {
       throw new Error(result.error || 'Failed to load contact submissions');
     }
     
-    console.log(`Loaded ${result.data.length} contact submissions from database`);
+    console.log(`✅ Loaded ${result.data.length} contact submissions from database`);
     return result.data;
   } catch (error) {
     console.error('Error loading contact submissions:', error);
