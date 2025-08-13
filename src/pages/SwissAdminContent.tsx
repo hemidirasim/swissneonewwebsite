@@ -11,6 +11,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdminData } from '@/contexts/AdminDataContext';
 import { Article } from '@/services/prismaService';
 import { uploadImageWithFallback, validateImage } from '@/services/imageService';
+import { AdminLogin } from '@/components/AdminLogin';
+import { isAdminLoggedIn, getStoredAdminData, logoutAdmin } from '@/services/authService';
+import type { Admin } from '@/services/authService';
 import { 
   Plus, 
   Edit, 
@@ -34,7 +37,7 @@ export const SwissAdminContent = () => {
   }, [articles, loading]);
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<Admin | null>(null);
   const [showArticleForm, setShowArticleForm] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [newArticle, setNewArticle] = useState<Partial<Article>>({
@@ -47,78 +50,32 @@ export const SwissAdminContent = () => {
   const [imagePreview, setImagePreview] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
 
-  // Check session on mount
+  // Check authentication on mount
   useEffect(() => {
-    checkSession();
+    checkAuthentication();
   }, []);
 
-  const checkSession = () => {
-    // Simple admin authentication
-    const session = localStorage.getItem('swissneo-admin-session');
-    if (session) {
-      try {
-        const sessionData = JSON.parse(session);
-        const now = new Date();
-        const expiresAt = new Date(sessionData.expiresAt);
-        
-        if (now < expiresAt) {
-          setIsLoggedIn(true);
-          setCurrentUser(sessionData.user);
-        } else {
-          localStorage.removeItem('swissneo-admin-session');
-        }
-      } catch (error) {
-        localStorage.removeItem('swissneo-admin-session');
+  const checkAuthentication = () => {
+    if (isAdminLoggedIn()) {
+      const adminData = getStoredAdminData();
+      if (adminData) {
+        setIsLoggedIn(true);
+        setCurrentUser(adminData);
       }
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const username = formData.get('username') as string;
-    const password = formData.get('password') as string;
-
-    try {
-      // Simple admin authentication
-      if (username === 'admin' && password === 'swissneo2024') {
-        const user = {
-          id: 1,
-          username: 'admin',
-          role: 'admin'
-        };
-        
-        const session = {
-          user,
-          loginTime: new Date().toISOString(),
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
-        };
-        
-        localStorage.setItem('swissneo-admin-session', JSON.stringify(session));
-        setIsLoggedIn(true);
-        setCurrentUser(user);
-        toast({
-          title: "Giriş uğurlu!",
-          description: "Admin panelinə xoş gəlmisiniz.",
-        });
-      } else {
-        toast({
-          title: "Giriş uğursuz!",
-          description: "İstifadəçi adı və ya şifrə yanlışdır.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Xəta!",
-        description: "Giriş zamanı xəta baş verdi.",
-        variant: "destructive",
-      });
-    }
+  const handleLoginSuccess = (admin: Admin) => {
+    setIsLoggedIn(true);
+    setCurrentUser(admin);
+    toast({
+      title: "Giriş uğurlu!",
+      description: `Xoş gəlmisiniz, ${admin.username}!`,
+    });
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('swissneo-admin-session');
+    logoutAdmin();
     setIsLoggedIn(false);
     setCurrentUser(null);
     toast({
@@ -126,6 +83,8 @@ export const SwissAdminContent = () => {
       description: "Təhlükəsiz şəkildə çıxış etdiniz.",
     });
   };
+
+
 
 
 
@@ -368,45 +327,7 @@ export const SwissAdminContent = () => {
   };
 
   if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              Swissneo Admin Panel
-            </CardTitle>
-            <p className="text-gray-600">Zəhmət olmasa giriş edin</p>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <Label htmlFor="username">İstifadəçi adı</Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="password">Şifrə</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  className="mt-1"
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Giriş et
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <AdminLogin onLoginSuccess={handleLoginSuccess} />;
   }
 
   return (

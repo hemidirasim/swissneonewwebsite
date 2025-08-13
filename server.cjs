@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 const { put } = require('@vercel/blob');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -225,6 +226,73 @@ app.post('/api/contact-submissions', async (req, res) => {
   }
 });
 
+// Admin authentication endpoint
+app.post('/api/auth', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      res.status(400).json({
+        success: false,
+        error: 'Username and password are required'
+      });
+      return;
+    }
+
+    // Find admin by username
+    const admin = await prisma.admin.findUnique({
+      where: { username }
+    });
+
+    if (!admin) {
+      res.status(401).json({
+        success: false,
+        error: 'Invalid credentials'
+      });
+      return;
+    }
+
+    // Check if admin is active
+    if (!admin.isActive) {
+      res.status(401).json({
+        success: false,
+        error: 'Account is deactivated'
+      });
+      return;
+    }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, admin.password);
+
+    if (!isValidPassword) {
+      res.status(401).json({
+        success: false,
+        error: 'Invalid credentials'
+      });
+      return;
+    }
+
+    // Return admin info (without password)
+    res.json({
+      success: true,
+      data: {
+        id: admin.id,
+        username: admin.username,
+        email: admin.email,
+        role: admin.role,
+        isActive: admin.isActive
+      }
+    });
+
+  } catch (error) {
+    console.error('Authentication error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Authentication failed'
+    });
+  }
+});
+
 // Upload image to Vercel Blob Storage
 app.post('/api/upload-image', async (req, res) => {
   try {
@@ -273,6 +341,7 @@ app.listen(PORT, () => {
   console.log(`   POST /api/articles`);
   console.log(`   PUT  /api/articles`);
   console.log(`   DELETE /api/articles`);
+  console.log(`   POST /api/auth`);
   console.log(`   POST /api/upload-image`);
   console.log(`   GET  /api/contact-submissions`);
   console.log(`   POST /api/contact-submissions`);
