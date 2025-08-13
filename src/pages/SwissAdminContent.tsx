@@ -27,6 +27,12 @@ export const SwissAdminContent = () => {
   const { toast } = useToast();
   const { articles, addArticle, updateArticle, deleteArticle, loading } = useAdminData();
   
+  // Debug log for articles
+  useEffect(() => {
+    console.log('📋 Admin panel: Məqalələr yükləndi:', articles);
+    console.log('📋 Admin panel: Loading status:', loading);
+  }, [articles, loading]);
+  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [showArticleForm, setShowArticleForm] = useState(false);
@@ -169,6 +175,9 @@ export const SwissAdminContent = () => {
 
     setIsUploading(true);
     try {
+      console.log('🔄 Admin panel: Məqalə əlavə edilir...');
+      console.log('📝 Məqalə məlumatları:', newArticle);
+      
       let imageUrl = '';
       
       if (selectedImage) {
@@ -181,6 +190,7 @@ export const SwissAdminContent = () => {
         }
         
         imageUrl = await uploadImageWithFallback(selectedImage);
+        console.log('🖼️ Şəkil yükləndi:', imageUrl);
       }
 
       const articleData = {
@@ -190,6 +200,7 @@ export const SwissAdminContent = () => {
         category: newArticle.category
       };
 
+      console.log('📤 Remote databazaya göndərilən məlumat:', articleData);
       await addArticle(articleData);
       
       setNewArticle({
@@ -231,6 +242,10 @@ export const SwissAdminContent = () => {
 
     setIsUploading(true);
     try {
+      console.log('🔄 Admin panel: Məqalə yenilənir...');
+      console.log('📝 Yenilənəcək məqalə ID:', editingArticle.id);
+      console.log('📝 Yeni məlumatlar:', newArticle);
+      
       let imageUrl = editingArticle.image || '';
       
       if (selectedImage) {
@@ -243,6 +258,7 @@ export const SwissAdminContent = () => {
         }
         
         imageUrl = await uploadImageWithFallback(selectedImage);
+        console.log('🖼️ Yeni şəkil yükləndi:', imageUrl);
       }
 
       const updates = {
@@ -251,6 +267,7 @@ export const SwissAdminContent = () => {
         image: imageUrl
       };
 
+      console.log('📤 Remote databazaya göndərilən yeniləmələr:', updates);
       updateArticle(editingArticle.id, updates);
       
       setEditingArticle(null);
@@ -292,6 +309,7 @@ export const SwissAdminContent = () => {
 
   const handleDeleteArticle = (id: string) => {
     if (confirm('Bu məqaləni silmək istədiyinizə əminsiniz?')) {
+      console.log('🗑️ Admin panel: Məqalə silinir:', id);
       deleteArticle(id);
       toast({
         title: "Məqalə silindi!",
@@ -548,7 +566,7 @@ export const SwissAdminContent = () => {
                       {article.image ? (
                         <img
                           src={article.image}
-                          alt={article.title[language]}
+                          alt={article.title}
                           className="w-12 h-12 object-cover rounded"
                         />
                       ) : (
@@ -559,9 +577,9 @@ export const SwissAdminContent = () => {
                     </TableCell>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{article.title[language]}</div>
+                        <div className="font-medium">{article.title}</div>
                         <div className="text-sm text-gray-500 line-clamp-2">
-                          {article.content[language]?.substring(0, 100)}...
+                          {article.content?.substring(0, 100)}...
                         </div>
                       </div>
                     </TableCell>
