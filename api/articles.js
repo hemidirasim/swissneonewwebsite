@@ -1,24 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
 
-let prisma;
-
-try {
-  prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL
-      }
-    }
-  });
-} catch (error) {
-  console.error('Prisma client initialization error:', error);
-  return res.status(500).json({
-    success: false,
-    error: 'Database connection failed',
-    details: error.message
-  });
-}
-
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -30,26 +11,51 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  try {
-    // Test database connection
-    await prisma.$connect();
-    console.log('Database connected successfully');
-  } catch (error) {
-    console.error('Database connection error:', error);
+  console.log('Articles API called with method:', req.method);
+
+  // Check environment variables
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    console.error('DATABASE_URL is missing');
     return res.status(500).json({
       success: false,
-      error: 'Database connection failed',
+      error: 'DATABASE_URL environment variable is missing'
+    });
+  }
+
+  let prisma;
+  try {
+    console.log('Creating Prisma client...');
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: databaseUrl
+        }
+      }
+    });
+    console.log('Prisma client created successfully');
+  } catch (error) {
+    console.error('Prisma client creation error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Prisma client creation failed',
       details: error.message
     });
   }
 
   try {
+    console.log('Connecting to database...');
+    await prisma.$connect();
+    console.log('Database connected successfully');
+
     switch (req.method) {
       case 'GET':
-        // Get all articles
+        console.log('Fetching articles...');
         const articles = await prisma.article.findMany({
           orderBy: { createdAt: 'desc' }
         });
+        
+        console.log(`Found ${articles.length} articles`);
         
         res.status(200).json({
           success: true,
@@ -66,7 +72,7 @@ module.exports = async function handler(req, res) {
         break;
 
       case 'POST':
-        // Create new article
+        console.log('Creating new article...');
         const { title, content, image, category } = req.body;
         
         if (!title || !content || !category) {
@@ -86,6 +92,8 @@ module.exports = async function handler(req, res) {
           }
         });
 
+        console.log('Article created successfully:', newArticle.id);
+
         res.status(201).json({
           success: true,
           data: {
@@ -101,7 +109,7 @@ module.exports = async function handler(req, res) {
         break;
 
       case 'PUT':
-        // Update article
+        console.log('Updating article...');
         const { id, ...updates } = req.body;
         
         if (!id) {
@@ -116,6 +124,8 @@ module.exports = async function handler(req, res) {
           where: { id },
           data: updates
         });
+
+        console.log('Article updated successfully:', id);
 
         res.status(200).json({
           success: true,
@@ -132,7 +142,7 @@ module.exports = async function handler(req, res) {
         break;
 
       case 'DELETE':
-        // Delete article
+        console.log('Deleting article...');
         const { id: deleteId } = req.query;
         
         if (!deleteId) {
@@ -147,6 +157,8 @@ module.exports = async function handler(req, res) {
           where: { id: deleteId }
         });
 
+        console.log('Article deleted successfully:', deleteId);
+
         res.status(200).json({
           success: true,
           message: 'Article deleted successfully'
@@ -160,11 +172,20 @@ module.exports = async function handler(req, res) {
         });
     }
   } catch (error) {
-    console.error('Database error:', error);
+    console.error('Database operation error:', error);
     res.status(500).json({
       success: false,
       error: 'Database operation failed',
-      message: error.message
+      details: error.message
     });
+  } finally {
+    if (prisma) {
+      try {
+        await prisma.$disconnect();
+        console.log('Database connection closed');
+      } catch (error) {
+        console.error('Error closing database connection:', error);
+      }
+    }
   }
 };

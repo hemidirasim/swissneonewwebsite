@@ -12,7 +12,7 @@ const DB_CONFIG = {
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
@@ -20,43 +20,106 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  if (req.method !== 'GET') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
-
   try {
-    console.log('Testing database connection...');
-    
-    const pool = new Pool(DB_CONFIG);
-    
-    // Test connection
-    const client = await pool.connect();
-    const result = await client.query('SELECT NOW() as current_time, version() as version');
-    client.release();
-    
-    // Test articles table
-    const articlesResult = await pool.query('SELECT COUNT(*) as count FROM articles');
-    
-    await pool.end();
-    
-    res.status(200).json({
+    // Check environment variables
+    const databaseUrl = process.env.DATABASE_URL;
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+
+    console.log('Environment check:');
+    console.log('DATABASE_URL exists:', !!databaseUrl);
+    console.log('BLOB_READ_WRITE_TOKEN exists:', !!blobToken);
+
+    if (!databaseUrl) {
+      return res.status(500).json({
+        success: false,
+        error: 'DATABASE_URL environment variable is missing',
+        env: {
+          databaseUrl: !!databaseUrl,
+          blobToken: !!blobToken
+        }
+      });
+    }
+
+    // Try to import Prisma
+    let PrismaClient;
+    try {
+      PrismaClient = require('@prisma/client').PrismaClient;
+      console.log('Prisma client imported successfully');
+    } catch (error) {
+      console.error('Prisma import error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Prisma client import failed',
+        details: error.message
+      });
+    }
+
+    // Try to create Prisma client
+    let prisma;
+    try {
+      prisma = new PrismaClient({
+        datasources: {
+          db: {
+            url: databaseUrl
+          }
+        }
+      });
+      console.log('Prisma client created successfully');
+    } catch (error) {
+      console.error('Prisma client creation error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Prisma client creation failed',
+        details: error.message
+      });
+    }
+
+    // Try to connect to database
+    try {
+      await prisma.$connect();
+      console.log('Database connected successfully');
+    } catch (error) {
+      console.error('Database connection error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Database connection failed',
+        details: error.message
+      });
+    }
+
+    // Try to query database
+    try {
+      const articles = await prisma.article.findMany({
+        take: 1
+      });
+      console.log('Database query successful, found articles:', articles.length);
+    } catch (error) {
+      console.error('Database query error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Database query failed',
+        details: error.message
+      });
+    }
+
+    // Close connection
+    await prisma.$disconnect();
+
+    return res.status(200).json({
       success: true,
-      message: 'Database connection successful',
-      data: {
-        currentTime: result.rows[0].current_time,
-        version: result.rows[0].version,
-        articlesCount: articlesResult.rows[0].count
+      message: 'Database connection and query successful',
+      env: {
+        databaseUrl: !!databaseUrl,
+        blobToken: !!blobToken
       }
     });
-    
+
   } catch (error) {
-    console.error('Database test error:', error);
-    res.status(500).json({
+    console.error('General error:', error);
+    return res.status(500).json({
       success: false,
-      error: 'Database connection failed',
-      message: error.message,
-      stack: error.stack
+      error: 'General error occurred',
+      details: error.message
     });
   }
 };
