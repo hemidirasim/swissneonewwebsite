@@ -16,7 +16,10 @@
     }
   ],
   "functions": {
-    "api/upload-image.cjs": {
+    "api/upload-image-blob.js": {
+      "maxDuration": 30
+    },
+    "api/auth.js": {
       "maxDuration": 30
     },
     "api/test-db.js": {
