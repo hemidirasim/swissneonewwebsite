@@ -69,17 +69,50 @@ npm run preview
 
 - ✅ Multilingual support (AZ/EN)
 - ✅ Admin panel with session management
-- ✅ Article management with image upload
+- ✅ Article management with beautiful image uploader
 - ✅ Contact form submissions
 - ✅ Responsive design
-- ✅ Vercel Blob Storage for images
 - ✅ LocalStorage for data persistence
+
+## 🎨 Qəşəng Visual Uploader
+
+### Modern Şəkil Yükləmə Sistemi
+- ✅ **Drag & Drop** funksiyası
+- ✅ **Visual feedback** və animasiyalar
+- ✅ **Hover effects** və transitions
+- ✅ **Loading states** və progress
+- ✅ **File validation** (format və ölçü)
+- ✅ **Preview** funksiyası
+- ✅ **Remove** və **Replace** düymələri
+- ✅ **Responsive design**
+
+### Xüsusiyyətlər:
+- 🎯 **Drag & Drop** - Şəkli sürükləyib buraxın
+- 🖱️ **Click to Upload** - Klikləyərək şəkil seçin
+- 👁️ **Live Preview** - Dərhal preview görün
+- ✨ **Smooth Animations** - Gözəl animasiyalar
+- 🔄 **Replace Image** - Mövcud şəkli dəyişdirin
+- 🗑️ **Remove Image** - Şəkli silin
+- 📱 **Mobile Friendly** - Mobil cihazlarda işləyir
+
+### Dəstəklənən Formatlar:
+- ✅ **PNG** - Rəqəmsal şəkillər
+- ✅ **JPG/JPEG** - Fotoşəkillər
+- ✅ **GIF** - Animasiyalı şəkillər
+- ✅ **WebP** - Modern format
+
+### Ölçü Limiti:
+- 📏 **Maksimum 5MB** fayl ölçüsü
+- ⚡ **Sürətli yükləmə**
+- 💾 **Base64 encoding** ilə saxlanılır
 
 ## 🏗️ Project Structure
 
 ```
 src/
 ├── components/          # UI components
+│   ├── ui/             # Shadcn/ui components
+│   └── ImageUploader.tsx # Beautiful image uploader
 ├── contexts/           # React contexts
 ├── data/              # Static data
 ├── hooks/             # Custom hooks
@@ -98,60 +131,17 @@ src/
 ### Vercel Config
 - SPA fallback routing
 - Static asset caching
-- Security headers
 
-## 📱 Pages
-
-- **Home**: `/` - Main landing page
-- **About**: `/about` - Company information
-- **Products**: `/products` - Product catalog
-- **Articles**: `/articles` - Blog articles
-- **Contact**: `/contact` - Contact information
-- **Instructions**: `/instructions` - Feeding instructions
-- **Admin**: `/swissadmin` - Admin panel
-
-## 🚀 Deployment Status
-
-- ✅ Local development working
-- ✅ Vercel deployment configured
-- ✅ Environment variables documented
-- ✅ Error handling implemented
-- ✅ Fallback mechanisms in place
-
-## 🔍 Troubleshooting
+## 🚨 Troubleshooting
 
 ### Vercel Deployment Issues
-
-1. **Environment Variable Missing**
-   - Vercel dashboard-da `BLOB_READ_WRITE_TOKEN` əlavə edin
-   - Bütün environment-ləri seçin (Production, Preview, Development)
-
-2. **Build Errors**
-   - `npm run build` local-da test edin
-   - Console xətalarını yoxlayın
-
-3. **Image Upload Issues**
-   - Vercel Blob token düzgün əlavə edilib-edilmədiyini yoxlayın
-   - Fallback placeholder images istifadə olunur
-
-### Local Development Issues
-
-1. **Port Already in Use**
-   ```bash
-   pkill -f "npm run dev"
-   npm run dev
-   ```
-
-2. **Dependencies Issues**
-   ```bash
-   rm -rf node_modules package-lock.json
-   npm install
-   ```
-
-## 📞 Support
-
-Əgər problem varsa:
-1. Console xətalarını yoxlayın
-2. Environment variables-ı yoxlayın
+1. Environment variables düzgün qurulub
+2. Build logs-ı yoxlayın
 3. Vercel logs-ı yoxlayın
 4. Local build test edin
+
+### Local Development Issues
+1. Node.js versiyası 18+ olmalıdır
+2. npm install tamamlanmalıdır
+3. Port 8080 boş olmalıdır
+4. Browser console xətalarını yoxlayın

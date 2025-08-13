@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdminData } from '@/contexts/AdminDataContext';
 import databaseService, { Article, ContactSubmission } from '@/services/databaseService';
+import { ImageUploader } from '@/components/ImageUploader';
 import { 
   Settings, 
   FileText, 
@@ -126,29 +127,26 @@ export const SwissAdminContent = () => {
   };
 
   // Article functions
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageSelect = (file: File, preview: string) => {
+    setSelectedImage(file);
+    setImagePreview(preview);
+    // Şəkli newArticle state-inə əlavə et
+    setNewArticle(prev => ({ ...prev, image: preview }));
+  };
+
+  const handleImageRemove = () => {
+    setSelectedImage(null);
+    setImagePreview('');
+    setNewArticle(prev => ({ ...prev, image: '' }));
   };
 
   const handleAddArticle = async () => {
     try {
-      let imageUrl = '';
-      if (selectedImage) {
-        imageUrl = await databaseService.uploadImage(selectedImage);
-      }
-
+      // Şəkil artıq newArticle.image-də var
       const articleData = {
         title: newArticle.title,
         content: newArticle.content,
-        image: imageUrl,
+        image: newArticle.image || '', // Base64 şəkil
         date: new Date().toISOString()
       } as Omit<Article, 'id'>;
 
@@ -168,6 +166,7 @@ export const SwissAdminContent = () => {
         description: "Yeni məqalə uğurla əlavə edildi.",
       });
     } catch (error) {
+      console.error('Error adding article:', error);
       toast({
         title: "Xəta!",
         description: "Məqalə əlavə edilərkən xəta baş verdi.",
@@ -191,15 +190,11 @@ export const SwissAdminContent = () => {
     if (!editingArticle) return;
 
     try {
-      let imageUrl = editingArticle.image || '';
-      if (selectedImage) {
-        imageUrl = await databaseService.uploadImage(selectedImage);
-      }
-
+      // Şəkil artıq newArticle.image-də var
       const updates = {
         title: newArticle.title,
         content: newArticle.content,
-        image: imageUrl
+        image: newArticle.image || editingArticle.image || ''
       };
 
       updateArticle(editingArticle.id, updates);
@@ -219,6 +214,7 @@ export const SwissAdminContent = () => {
         description: "Məqalə uğurla yeniləndi.",
       });
     } catch (error) {
+      console.error('Error updating article:', error);
       toast({
         title: "Xəta!",
         description: "Məqalə yenilənərkən xəta baş verdi.",
@@ -485,37 +481,11 @@ export const SwissAdminContent = () => {
                     </DialogHeader>
                     <div className="space-y-4">
                       {/* Image Upload */}
-                      <div>
-                        <Label>Şəkil</Label>
-                        <div className="mt-2 flex items-center space-x-4">
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageSelect}
-                            className="flex-1"
-                          />
-                          {imagePreview && (
-                            <div className="relative">
-                              <img
-                                src={imagePreview}
-                                alt="Preview"
-                                className="w-20 h-20 object-cover rounded"
-                              />
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                className="absolute -top-2 -right-2 w-6 h-6 p-0"
-                                onClick={() => {
-                                  setSelectedImage(null);
-                                  setImagePreview('');
-                                }}
-                              >
-                                <X className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      <ImageUploader
+                        onImageSelect={handleImageSelect}
+                        currentPreview={imagePreview}
+                        onRemove={handleImageRemove}
+                      />
 
                       {/* Title */}
                       <div className="grid grid-cols-2 gap-4">
