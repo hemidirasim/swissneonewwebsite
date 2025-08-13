@@ -1,6 +1,23 @@
 const { PrismaClient } = require('@prisma/client');
 
-const prisma = new PrismaClient();
+let prisma;
+
+try {
+  prisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL
+      }
+    }
+  });
+} catch (error) {
+  console.error('Prisma client initialization error:', error);
+  return res.status(500).json({
+    success: false,
+    error: 'Database connection failed',
+    details: error.message
+  });
+}
 
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
@@ -11,6 +28,19 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.status(200).json({ message: 'OK' });
     return;
+  }
+
+  try {
+    // Test database connection
+    await prisma.$connect();
+    console.log('Database connected successfully');
+  } catch (error) {
+    console.error('Database connection error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Database connection failed',
+      details: error.message
+    });
   }
 
   try {

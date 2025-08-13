@@ -1,18 +1,59 @@
-import { PrismaClient } from '@prisma/client';
-import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
+const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 
-const prisma = new PrismaClient();
+let prisma;
 
-export async function POST(request) {
+try {
+  prisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL
+      }
+    }
+  });
+} catch (error) {
+  console.error('Prisma client initialization error:', error);
+}
+
+module.exports = async function handler(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).json({ message: 'OK' });
+    return;
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({
+      success: false,
+      error: 'Method not allowed'
+    });
+  }
+
   try {
-    const { username, password } = await request.json();
+    // Test database connection
+    await prisma.$connect();
+    console.log('Database connected successfully for auth');
+  } catch (error) {
+    console.error('Database connection error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Database connection failed',
+      details: error.message
+    });
+  }
+
+  try {
+    const { username, password } = req.body;
 
     if (!username || !password) {
-      return NextResponse.json(
-        { success: false, error: 'Username and password are required' },
-        { status: 400 }
-      );
+      return res.status(400).json({
+        success: false,
+        error: 'Username and password are required'
+      });
     }
 
     // Find admin by username
@@ -21,32 +62,32 @@ export async function POST(request) {
     });
 
     if (!admin) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid credentials' },
-        { status: 401 }
-      );
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials'
+      });
     }
 
     // Check if admin is active
     if (!admin.isActive) {
-      return NextResponse.json(
-        { success: false, error: 'Account is deactivated' },
-        { status: 401 }
-      );
+      return res.status(401).json({
+        success: false,
+        error: 'Account is deactivated'
+      });
     }
 
     // Verify password
     const isValidPassword = await bcrypt.compare(password, admin.password);
 
     if (!isValidPassword) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid credentials' },
-        { status: 401 }
-      );
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials'
+      });
     }
 
     // Return admin info (without password)
-    return NextResponse.json({
+    return res.status(200).json({
       success: true,
       data: {
         id: admin.id,
@@ -59,9 +100,10 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Authentication error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Authentication failed' },
-      { status: 500 }
-    );
+    return res.status(500).json({
+      success: false,
+      error: 'Authentication failed',
+      details: error.message
+    });
   }
-}
+};
