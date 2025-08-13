@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
+const { put } = require('@vercel/blob');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -224,6 +225,47 @@ app.post('/api/contact-submissions', async (req, res) => {
   }
 });
 
+// Upload image to Vercel Blob Storage
+app.post('/api/upload-image', async (req, res) => {
+  try {
+    const { file, fileName, fileType } = req.body;
+
+    if (!file || !fileName || !fileType) {
+      res.status(400).json({
+        success: false,
+        error: 'File, fileName, and fileType are required'
+      });
+      return;
+    }
+
+    // Convert base64 to buffer
+    const base64Data = file.replace(/^data:image\/[a-z]+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    console.log('Uploading to Vercel Blob:', fileName, 'Size:', buffer.length);
+
+    // Upload to Vercel Blob
+    const blob = await put(fileName, buffer, {
+      access: 'public',
+      contentType: fileType,
+    });
+
+    console.log('Image uploaded to Vercel Blob:', blob.url);
+
+    res.json({
+      success: true,
+      url: blob.url,
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Upload failed',
+      details: error.message
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Development API server running on http://localhost:${PORT}`);
   console.log(`📝 API endpoints available:`);
@@ -231,6 +273,7 @@ app.listen(PORT, () => {
   console.log(`   POST /api/articles`);
   console.log(`   PUT  /api/articles`);
   console.log(`   DELETE /api/articles`);
+  console.log(`   POST /api/upload-image`);
   console.log(`   GET  /api/contact-submissions`);
   console.log(`   POST /api/contact-submissions`);
 });
