@@ -8,18 +8,13 @@ import { useNavigate } from 'react-router-dom';
 
 export const ArticlesContent = () => {
   const { language } = useLanguage();
-  const { adminData } = useAdminData();
+  const { articles, loading } = useAdminData();
   const navigate = useNavigate();
 
-  const articles = (adminData.articles || []).map(article => ({
-    id: article.id,
-    title: article.title[language],
-    content: article.content[language],
-    date: article.date,
-    image: article.image || '📄',
-  }));
+  console.log('📋 ArticlesContent - articles:', articles);
+  console.log('📋 ArticlesContent - loading:', loading);
 
-  const handleArticleClick = (articleId: number) => {
+  const handleArticleClick = (articleId: string) => {
     navigate(`/articles/${articleId}`);
   };
 
@@ -43,15 +38,15 @@ export const ArticlesContent = () => {
         </div>
 
         {/* Articles Grid */}
-        {articles.length === 0 ? (
+        {loading ? (
           <div className="text-center py-16">
-            <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-2xl font-bold mb-2">Hələ məqalə yoxdur</h2>
+            <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground animate-pulse" />
+            <h2 className="text-2xl font-bold mb-2">Məqalələr yüklənir...</h2>
             <p className="text-muted-foreground">
-              Tezliklə faydalı məqalələr əlavə ediləcək.
+              Zəhmət olmasa gözləyin.
             </p>
           </div>
-        ) : (
+        ) : articles && articles.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {articles.map((article) => (
               <Card key={article.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -84,7 +79,7 @@ export const ArticlesContent = () => {
 
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-muted-foreground">
-                        {new Date(article.date).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
+                        {new Date(article.created_at).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric'
@@ -104,6 +99,14 @@ export const ArticlesContent = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+            <h2 className="text-2xl font-bold mb-2">Hələ məqalə yoxdur</h2>
+            <p className="text-muted-foreground">
+              Tezliklə faydalı məqalələr əlavə ediləcək.
+            </p>
           </div>
         )}
       </div>
