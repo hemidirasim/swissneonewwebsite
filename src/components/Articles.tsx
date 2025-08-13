@@ -3,7 +3,7 @@ import { useAdminData } from '@/contexts/AdminDataContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
+import { ArrowRight, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const Articles = () => {
@@ -14,10 +14,7 @@ export const Articles = () => {
   const articles = (adminData.articles || []).map(article => ({
     id: article.id,
     title: article.title[language],
-    excerpt: article.excerpt[language],
-    category: article.category[language],
-    readTime: article.readTime[language],
-    author: article.author[language],
+    content: article.content[language],
     date: article.date,
     image: article.image || '📄',
     color: 'from-blue-400 to-blue-600',
@@ -66,30 +63,16 @@ export const Articles = () => {
 
                 {/* Article Content */}
                 <div className="p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Badge variant="secondary" className="text-xs">
-                      {article.category}
-                    </Badge>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="w-3 h-3" />
-                      {article.readTime}
-                    </div>
-                  </div>
-
                   <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
                     {article.title}
                   </h3>
 
                   <p className="text-muted-foreground mb-4 line-clamp-3">
-                    {article.excerpt}
+                    {article.content?.substring(0, 150)}...
                   </p>
 
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        {article.author}
-                      </div>
+                    <div className="text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         {new Date(article.date).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
@@ -116,17 +99,15 @@ export const Articles = () => {
         </div>
 
         {/* View All Button */}
-        {articles.length > 0 && (
-          <div className="text-center">
-            <Button
-              onClick={() => navigate('/articles')}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              {t('articles.viewAll')}
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </div>
-        )}
+        <div className="text-center">
+          <Button
+            onClick={() => navigate('/articles')}
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105"
+          >
+            Bütün məqalələri gör
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </div>
       </div>
     </section>
   );
