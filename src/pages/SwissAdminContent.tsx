@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import databaseService, { Article } from '@/services/databaseService';
+import { uploadImageWithFallback, validateImage } from '@/services/imageService';
 import { 
   Plus, 
   Edit, 
@@ -101,26 +102,17 @@ export const SwissAdminContent = () => {
     });
   };
 
-  // Simple image upload with base64 fallback
+  // Image upload with validation
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
+    // Validate file
+    const validation = validateImage(file);
+    if (!validation.isValid) {
       toast({
         title: "Xəta!",
-        description: "Yalnız şəkil faylları yükləyə bilərsiniz.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "Xəta!",
-        description: "Şəkil ölçüsü 5MB-dan çox ola bilməz.",
+        description: validation.error || "Şəkil yüklənərkən xəta baş verdi.",
         variant: "destructive",
       });
       return;
@@ -142,42 +134,7 @@ export const SwissAdminContent = () => {
     setNewArticle(prev => ({ ...prev, image: '' }));
   };
 
-  const uploadImageToVercel = async (file: File): Promise<string> => {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
 
-      const response = await fetch('/api/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
-      console.log('Image uploaded to Vercel Blob:', result.url);
-      return result.url;
-    } catch (error) {
-      console.error('Vercel Blob upload failed:', error);
-      throw error;
-    }
-  };
-
-  const convertToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        resolve(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
 
   const handleAddArticle = async () => {
     if (!newArticle.title?.az || !newArticle.content?.az) {
@@ -194,14 +151,15 @@ export const SwissAdminContent = () => {
       let imageUrl = '';
       
       if (selectedImage) {
-        try {
-          // Try Vercel Blob first
-          imageUrl = await uploadImageToVercel(selectedImage);
-        } catch (error) {
-          console.log('Vercel Blob failed, using base64 fallback');
-          // Fallback to base64
-          imageUrl = await convertToBase64(selectedImage);
+        const isDevelopment = import.meta.env.DEV;
+        if (isDevelopment) {
+          toast({
+            title: "Development Mode",
+            description: "Şəkil base64 formatında saxlanılır. Production-da Vercel Blob-a yüklənəcək.",
+          });
         }
+        
+        imageUrl = await uploadImageWithFallback(selectedImage);
       }
 
       const articleData = {
@@ -256,14 +214,15 @@ export const SwissAdminContent = () => {
       let imageUrl = editingArticle.image || '';
       
       if (selectedImage) {
-        try {
-          // Try Vercel Blob first
-          imageUrl = await uploadImageToVercel(selectedImage);
-        } catch (error) {
-          console.log('Vercel Blob failed, using base64 fallback');
-          // Fallback to base64
-          imageUrl = await convertToBase64(selectedImage);
+        const isDevelopment = import.meta.env.DEV;
+        if (isDevelopment) {
+          toast({
+            title: "Development Mode",
+            description: "Şəkil base64 formatında saxlanılır. Production-da Vercel Blob-a yüklənəcək.",
+          });
         }
+        
+        imageUrl = await uploadImageWithFallback(selectedImage);
       }
 
       const updates = {

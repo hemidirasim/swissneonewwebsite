@@ -1,5 +1,5 @@
 import databaseData from '@/data/database.json';
-import { ImageService } from './imageService';
+import { validateImage, compressImage, uploadImageWithFallback } from './imageService';
 
 export interface Article {
   id: number;
@@ -136,11 +136,11 @@ class DatabaseService {
     }
   }
 
-  // Upload image using ImageService (Vercel Blob Storage)
+  // Upload image using image service (Vercel Blob Storage)
   async uploadImage(file: File): Promise<string> {
     try {
       // Validate image first
-      const validation = ImageService.validateImage(file);
+      const validation = validateImage(file);
       if (!validation.isValid) {
         throw new Error(validation.error);
       }
@@ -148,11 +148,11 @@ class DatabaseService {
       // Compress image if needed
       let processedFile = file;
       if (file.size > 5 * 1024 * 1024) { // Compress if > 5MB
-        processedFile = await ImageService.compressImage(file, 1024);
+        processedFile = await compressImage(file, 1024);
       }
 
-      // Upload using ImageService (Vercel Blob Storage)
-      const imageUrl = await ImageService.uploadImage(processedFile);
+      // Upload using image service (Vercel Blob Storage)
+      const imageUrl = await uploadImageWithFallback(processedFile);
       
       console.log('Image uploaded successfully:', imageUrl);
       return imageUrl;
