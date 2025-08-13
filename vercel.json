@@ -13,16 +13,10 @@
     }
   ],
   "functions": {
-    "api/upload-image.ts": {
+    "api/upload-image.cjs": {
       "maxDuration": 30
     },
-    "api/upload-image.js": {
-      "maxDuration": 30
-    },
-    "api/test.ts": {
-      "maxDuration": 10
-    },
-    "api/test.js": {
+    "api/test.cjs": {
       "maxDuration": 10
     }
   },
