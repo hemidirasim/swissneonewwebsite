@@ -300,6 +300,46 @@ export const SwissAdminContent = () => {
     }
   };
 
+  const handleSeedDemoData = async () => {
+    if (!confirm('Demo məlumat əlavə etmək istədiyinizə əminsiniz? Mövcud məlumatlar silinəcək.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/seed-demo-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast({
+          title: "Demo məlumat əlavə edildi!",
+          description: `${result.data.articles} məqalə və ${result.data.contactSubmissions} əlaqə əlavə edildi.`,
+        });
+        
+        // Refresh data
+        window.location.reload();
+      } else {
+        throw new Error(result.error || 'Demo məlumat əlavə edilə bilmədi');
+      }
+    } catch (error) {
+      console.error('Error seeding demo data:', error);
+      toast({
+        title: "Xəta!",
+        description: "Demo məlumat əlavə edilərkən xəta baş verdi.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const updateArticleField = (field: keyof Article, value: any) => {
     setNewArticle(prev => ({
       ...prev,

@@ -30,6 +30,9 @@
     },
     "api/contact-submissions.js": {
       "maxDuration": 30
+    },
+    "api/seed-demo-data.js": {
+      "maxDuration": 30
     }
   },
   "headers": [
