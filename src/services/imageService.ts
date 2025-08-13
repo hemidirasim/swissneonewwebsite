@@ -8,8 +8,8 @@ export const uploadImageToVercel = async (file: File): Promise<string> => {
     console.log('File converted to base64, length:', base64.length);
     
     // Send to Vercel API
-    console.log('Sending request to /api/upload-image...');
-    const response = await fetch('/api/upload-image', {
+    console.log('Sending request to /api/upload-image-blob...');
+    const response = await fetch('/api/upload-image-blob', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

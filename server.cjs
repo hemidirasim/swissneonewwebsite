@@ -294,7 +294,7 @@ app.post('/api/auth', async (req, res) => {
 });
 
 // Upload image to Vercel Blob Storage
-app.post('/api/upload-image', async (req, res) => {
+app.post('/api/upload-image-blob', async (req, res) => {
   try {
     const { file, fileName, fileType } = req.body;
 
@@ -342,7 +342,7 @@ app.listen(PORT, () => {
   console.log(`   PUT  /api/articles`);
   console.log(`   DELETE /api/articles`);
   console.log(`   POST /api/auth`);
-  console.log(`   POST /api/upload-image`);
+  console.log(`   POST /api/upload-image-blob`);
   console.log(`   GET  /api/contact-submissions`);
   console.log(`   POST /api/contact-submissions`);
 });
