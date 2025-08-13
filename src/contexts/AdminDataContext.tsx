@@ -10,6 +10,7 @@ import {
   addContactSubmission,
   deleteContactSubmission
 } from '@/services/prismaService';
+import adminDataJson from '@/data/database.json';
 
 interface AdminDataContextType {
   adminData: any;
@@ -33,7 +34,7 @@ let lastLoadTime = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [adminData, setAdminData] = useState<any>({});
+  const [adminData, setAdminData] = useState<any>(adminDataJson);
   const [articles, setArticles] = useState<Article[]>([]);
   const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,7 +163,7 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     addArticle,
     updateArticle: updateArticleById,
     deleteArticle: deleteArticleById,
-    addContactSubmission,
+    addContactSubmission: addContactSubmissionHandler,
     deleteContactSubmission: deleteContactSubmissionById,
     loading,
     refreshData
