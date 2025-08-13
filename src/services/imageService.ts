@@ -1,9 +1,6 @@
-// Image upload service using Cloudinary
+// Image upload service using Vercel Blob Storage
 export class ImageService {
-  private static readonly CLOUDINARY_CLOUD_NAME = 'swissneo';
-  private static readonly CLOUDINARY_UPLOAD_PRESET = 'ml_default';
-
-  // Upload image to Cloudinary
+  // Upload image to Vercel Blob Storage
   static async uploadImage(file: File): Promise<string> {
     try {
       // Validate file
@@ -15,36 +12,32 @@ export class ImageService {
         throw new Error('File size too large. Maximum 10MB allowed.');
       }
 
-      // Create FormData for Cloudinary
+      // Create FormData for Vercel API
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('upload_preset', this.CLOUDINARY_UPLOAD_PRESET);
-      formData.append('cloud_name', this.CLOUDINARY_CLOUD_NAME);
 
-      // Upload to Cloudinary
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${this.CLOUDINARY_CLOUD_NAME}/image/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
+      // Upload to Vercel API endpoint
+      const response = await fetch('/api/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
 
       if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Upload failed: ${response.statusText}`);
       }
 
       const result = await response.json();
       
       if (result.error) {
-        throw new Error(result.error.message || 'Upload failed');
+        throw new Error(result.error);
       }
 
-      console.log('Image uploaded successfully to Cloudinary:', result.secure_url);
-      return result.secure_url;
+      console.log('Image uploaded successfully to Vercel Blob:', result.url);
+      return result.url;
 
     } catch (error) {
-      console.error('Cloudinary upload failed:', error);
+      console.error('Vercel Blob upload failed:', error);
       
       // Fallback to base64
       return this.convertToBase64(file);

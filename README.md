@@ -85,7 +85,7 @@ npm run preview
 - ✅ **Preview** funksiyası
 - ✅ **Remove** və **Replace** düymələri
 - ✅ **Responsive design**
-- ✅ **Cloudinary** inteqrasiyası
+- ✅ **Vercel Blob Storage** inteqrasiyası
 - ✅ **Image compression** və optimization
 - ✅ **Multi-level fallback** sistemi
 
@@ -97,8 +97,8 @@ npm run preview
 - 🔄 **Replace Image** - Mövcud şəkli dəyişdirin
 - 🗑️ **Remove Image** - Şəkli silin
 - 📱 **Mobile Friendly** - Mobil cihazlarda işləyir
-- ☁️ **Cloud Storage** - Cloudinary-a yüklənir
-- 🔄 **Fallback System** - Cloudinary uğursuz olsa base64 istifadə edir
+- ☁️ **Cloud Storage** - Vercel Blob Storage-a yüklənir
+- 🔄 **Fallback System** - Vercel uğursuz olsa base64 istifadə edir
 - 📏 **Auto Compression** - Böyük şəkillər avtomatik sıxılır
 
 ### Dəstəklənən Formatlar:
@@ -110,15 +110,22 @@ npm run preview
 ### Ölçü Limiti:
 - 📏 **Maksimum 10MB** fayl ölçüsü
 - ⚡ **Avtomatik sıxılma** 5MB-dan çox fayllar üçün
-- ☁️ **Cloudinary** ilə saxlanılır
+- ☁️ **Vercel Blob Storage** ilə saxlanılır
 - 💾 **Base64 fallback** sistem
+
+### API Endpoint:
+- 🔗 **`/api/upload-image`** - Şəkil yükləmə endpoint-i
+- 📤 **FormData** ilə şəkil göndərilir
+- ☁️ **Vercel Blob Storage**-a yüklənir
+- 🔗 **Public URL** qaytarılır
+- 🔄 **Fallback** base64 encoding
 
 ### Şəkil Yükləmə Prosesi:
 1. **Şəkil seçilir** visual uploader ilə
 2. **Validation** keçir (format və ölçü)
-3. **Compression** (lazım olsa)
-4. **Cloudinary**-a yükləmə cəhdi
-5. **Uğurlu olsa** - Cloudinary URL qaytarılır
+3. **Compression** (5MB-dan çox fayllar üçün)
+4. **Vercel Blob Storage**-a yükləmə cəhdi
+5. **Uğurlu olsa** - Vercel Blob URL qaytarılır
 6. **Uğursuz olsa** - Base64 encoding istifadə edilir
 7. **Məqalə ilə birlikdə** saxlanılır
 
@@ -132,9 +139,14 @@ npm run preview
 - 🔍 **File validation** - Format və ölçü yoxlaması
 - 📐 **Dimension detection** - Şəkil ölçülərini tapır
 - 🗜️ **Auto compression** - Böyük şəkilləri sıxır
-- ☁️ **Cloudinary upload** - Etibarlı cloud storage
+- ☁️ **Vercel Blob upload** - Etibarlı cloud storage
 - 💾 **Base64 fallback** - Offline dəstəyi
 - 🛡️ **Error handling** - Bütün xətalar tutulur
+
+### Environment Variables:
+```
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_lpXh5J5CALn3pKRK_Vx0SPIGeZbAkiuiyC9UyRvbW0EwIGk
+```
 
 ## 🏗️ Project Structure
 

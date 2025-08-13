@@ -136,7 +136,7 @@ class DatabaseService {
     }
   }
 
-  // Upload image using ImageService
+  // Upload image using ImageService (Vercel Blob Storage)
   async uploadImage(file: File): Promise<string> {
     try {
       // Validate image first
@@ -151,7 +151,7 @@ class DatabaseService {
         processedFile = await ImageService.compressImage(file, 1024);
       }
 
-      // Upload using ImageService
+      // Upload using ImageService (Vercel Blob Storage)
       const imageUrl = await ImageService.uploadImage(processedFile);
       
       console.log('Image uploaded successfully:', imageUrl);
