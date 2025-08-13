@@ -3,7 +3,7 @@ import { useAdminData } from '@/contexts/AdminDataContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, FileText } from 'lucide-react';
+import { ArrowRight, FileText, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const ArticlesContent = () => {
@@ -26,14 +26,14 @@ export const ArticlesContent = () => {
           <div className="flex items-center justify-center mb-4">
             <FileText className="w-8 h-8 text-primary mr-3" />
             <Badge variant="outline">
-              {adminData.articlesTitle?.[language] || 'Məqalələr'}
+              Məqalələr
             </Badge>
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            {adminData.articlesTitle?.[language] || 'Məqalələr və Məsləhətlər'}
+            Məqalələr və Məsləhətlər
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            {adminData.articlesDescription?.[language] || 'Körpə qidalandırması haqqında faydalı məqalələr'}
+            Körpə qidalandırması haqqında faydalı məqalələr
           </p>
         </div>
 
@@ -79,11 +79,14 @@ export const ArticlesContent = () => {
 
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-muted-foreground">
-                        {new Date(article.created_at).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric'
-                        })}
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(article.created_at).toLocaleDateString(language === 'az' ? 'az-AZ' : 'en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </div>
                       </div>
 
                       <Button
