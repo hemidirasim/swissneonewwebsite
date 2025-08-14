@@ -1,6 +1,6 @@
 // Types
 export interface Article {
-  id: string;
+  id: number;
   title: string;
   content: string;
   image: string;
@@ -80,7 +80,7 @@ export async function saveArticle(article: Omit<Article, 'id' | 'created_at' | '
 }
 
 // Update article in database
-export async function updateArticle(id: string, updates: Partial<Article>): Promise<Article> {
+export async function updateArticle(id: number, updates: Partial<Article>): Promise<Article> {
   try {
     console.log('Updating article in database via API:', id);
     
@@ -111,7 +111,7 @@ export async function updateArticle(id: string, updates: Partial<Article>): Prom
 }
 
 // Delete article from database
-export async function deleteArticle(id: string): Promise<void> {
+export async function deleteArticle(id: number): Promise<void> {
   try {
     console.log('Deleting article from database via API:', id);
     

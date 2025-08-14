@@ -15,10 +15,22 @@ export const ArticleDetailContent = () => {
   console.log('📋 ArticleDetailContent - articles:', articles);
   console.log('📋 ArticleDetailContent - id:', id);
   console.log('📋 ArticleDetailContent - loading:', loading);
+  console.log('📋 ArticleDetailContent - articles type:', typeof articles);
+  console.log('📋 ArticleDetailContent - articles length:', articles?.length);
 
   // Convert string ID to number for comparison
   const articleId = id ? parseInt(id, 10) : null;
-  const article = articles?.find(a => a.id === articleId);
+  console.log('📋 ArticleDetailContent - articleId (parsed):', articleId);
+  console.log('📋 ArticleDetailContent - articleId type:', typeof articleId);
+
+  const article = articles?.find(a => {
+    console.log('📋 ArticleDetailContent - checking article:', a);
+    console.log('📋 ArticleDetailContent - article.id:', a.id, 'type:', typeof a.id);
+    console.log('📋 ArticleDetailContent - comparison:', a.id === articleId);
+    return a.id === articleId;
+  });
+
+  console.log('📋 ArticleDetailContent - found article:', article);
 
   const handleBackClick = () => {
     const currentLang = lang || language;
@@ -51,6 +63,11 @@ export const ArticleDetailContent = () => {
             <p className="text-muted-foreground mb-6">
               Axtardığınız məqalə mövcud deyil və ya silinib.
             </p>
+            <div className="text-sm text-muted-foreground mb-4">
+              <p>ID: {id}</p>
+              <p>Parsed ID: {articleId}</p>
+              <p>Articles count: {articles?.length || 0}</p>
+            </div>
             <Button onClick={handleBackClick}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Məqalələrə qayıt

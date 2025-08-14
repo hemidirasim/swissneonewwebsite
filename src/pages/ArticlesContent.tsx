@@ -17,8 +17,12 @@ export const ArticlesContent = () => {
   console.log('📋 ArticlesContent - loading:', loading);
 
   const handleArticleClick = (articleId: string) => {
+    console.log('📋 ArticlesContent - handleArticleClick - articleId:', articleId);
+    console.log('📋 ArticlesContent - handleArticleClick - articleId type:', typeof articleId);
     const currentLang = lang || language;
-    navigate(`/${currentLang}/articles/${articleId}`);
+    const targetUrl = `/${currentLang}/articles/${articleId}`;
+    console.log('📋 ArticlesContent - handleArticleClick - navigating to:', targetUrl);
+    navigate(targetUrl);
   };
 
   return (
@@ -97,7 +101,7 @@ export const ArticlesContent = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleArticleClick(article.id)}
+                        onClick={() => handleArticleClick(article.id.toString())}
                         className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                       >
                         <ArrowRight className="w-4 h-4" />
