@@ -101,7 +101,7 @@ export const ArticlesContent = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleArticleClick(article.id.toString())}
+                        onClick={() => handleArticleClick(article.id)}
                         className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                       >
                         <ArrowRight className="w-4 h-4" />

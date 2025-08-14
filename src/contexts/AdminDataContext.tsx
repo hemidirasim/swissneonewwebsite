@@ -18,8 +18,8 @@ interface AdminDataContextType {
   contactSubmissions: ContactSubmission[];
   updateAdminData: (newData: any) => void;
   addArticle: (article: Omit<Article, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
-  updateArticle: (id: number, updates: Partial<Article>) => Promise<void>;
-  deleteArticle: (id: number) => Promise<void>;
+  updateArticle: (id: string, updates: Partial<Article>) => Promise<void>;
+  deleteArticle: (id: string) => Promise<void>;
   addContactSubmission: (submission: Omit<ContactSubmission, 'id' | 'created_at'>) => Promise<ContactSubmission>;
   deleteContactSubmission: (id: string) => Promise<void>;
   loading: boolean;
@@ -102,7 +102,7 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  const updateArticleById = async (id: number, updates: Partial<Article>) => {
+  const updateArticleById = async (id: string, updates: Partial<Article>) => {
     try {
       const updatedArticle = await updateArticle(id, updates);
       setArticles(prev => prev.map(article => 
@@ -120,7 +120,7 @@ export const AdminDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  const deleteArticleById = async (id: number) => {
+  const deleteArticleById = async (id: string) => {
     try {
       await deleteArticle(id);
       setArticles(prev => prev.filter(article => article.id !== id));

@@ -18,9 +18,9 @@ export const ArticleDetailContent = () => {
   console.log('📋 ArticleDetailContent - articles type:', typeof articles);
   console.log('📋 ArticleDetailContent - articles length:', articles?.length);
 
-  // Convert string ID to number for comparison
-  const articleId = id ? parseInt(id, 10) : null;
-  console.log('📋 ArticleDetailContent - articleId (parsed):', articleId);
+  // Use string ID directly (no need to parse)
+  const articleId = id;
+  console.log('📋 ArticleDetailContent - articleId:', articleId);
   console.log('📋 ArticleDetailContent - articleId type:', typeof articleId);
 
   const article = articles?.find(a => {
