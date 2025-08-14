@@ -1,15 +1,20 @@
-import { LanguageProvider } from '@/contexts/LanguageContext';
-import { AdminDataProvider } from '@/contexts/AdminDataContext';
 import { SwissAdminContent } from './SwissAdminContent';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const SwissAdmin = () => {
-  return (
-    <LanguageProvider>
-      <AdminDataProvider>
-        <SwissAdminContent />
-      </AdminDataProvider>
-    </LanguageProvider>
-  );
+  const { lang } = useParams<{ lang: string }>();
+  const { setLanguage } = useLanguage();
+
+  useEffect(() => {
+    // Set language from URL parameter
+    if (lang && (lang === 'az' || lang === 'en')) {
+      setLanguage(lang as 'az' | 'en');
+    }
+  }, [lang, setLanguage]);
+
+  return <SwissAdminContent />;
 };
 
 export default SwissAdmin;

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
@@ -18,32 +18,37 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Vercel deployment cache busting - latest version v2.1
+// Vercel deployment cache busting - latest version v2.2
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
-      <AdminDataProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+    <BrowserRouter>
+      <LanguageProvider>
+        <AdminDataProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/admin" element={<SwissAdmin />} />
-              <Route path="/product/:productId" element={<ProductDetailPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/products" element={<ProductsPage />} />
-              <Route path="/instructions" element={<InstructionsPage />} />
-              <Route path="/articles" element={<ArticlesPage />} />
-              <Route path="/articles/:id" element={<ArticleDetailPage />} />
+              {/* Redirect root to default language */}
+              <Route path="/" element={<Navigate to="/az" replace />} />
+              
+              {/* Language-specific routes */}
+              <Route path="/:lang" element={<Index />} />
+              <Route path="/:lang/admin" element={<SwissAdmin />} />
+              <Route path="/:lang/product/:productId" element={<ProductDetailPage />} />
+              <Route path="/:lang/about" element={<AboutPage />} />
+              <Route path="/:lang/contact" element={<ContactPage />} />
+              <Route path="/:lang/products" element={<ProductsPage />} />
+              <Route path="/:lang/instructions" element={<InstructionsPage />} />
+              <Route path="/:lang/articles" element={<ArticlesPage />} />
+              <Route path="/:lang/articles/:id" element={<ArticleDetailPage />} />
+              
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AdminDataProvider>
-    </LanguageProvider>
+          </TooltipProvider>
+        </AdminDataProvider>
+      </LanguageProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 
