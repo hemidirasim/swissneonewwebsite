@@ -623,10 +623,10 @@ export const ProductDetail = () => {
               }
             </p>
                          <div className="flex gap-4 justify-center">
-               <Button variant="outline" size="lg" onClick={() => navigate('/contact')}>
+               <Button variant="outline" size="lg" onClick={() => navigate(`/${language}/contact`)}>
                  {t('product.detail.contactUs')}
                </Button>
-               <Button variant="outline" size="lg" onClick={() => navigate('/instructions')}>
+               <Button variant="outline" size="lg" onClick={() => navigate(`/${language}/instructions`)}>
                  {language === 'az' ? 'Təlimat' : 'Instructions'}
                </Button>
              </div>
