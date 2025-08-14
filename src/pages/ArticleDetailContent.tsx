@@ -4,6 +4,7 @@ import { useAdminData } from '@/contexts/AdminDataContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileText } from 'lucide-react';
+import { renderHtmlContent } from '@/lib/utils';
 
 export const ArticleDetailContent = () => {
   const { id } = useParams<{ id: string }>();
@@ -102,9 +103,12 @@ export const ArticleDetailContent = () => {
 
             {/* Article Content */}
             <div className="prose prose-lg max-w-none">
-              <div className="text-foreground leading-relaxed whitespace-pre-wrap">
-                {article.content}
-              </div>
+              <div 
+                className="text-foreground leading-relaxed"
+                dangerouslySetInnerHTML={{ 
+                  __html: renderHtmlContent(article.content || '') 
+                }}
+              />
             </div>
 
             {/* Article Footer */}
