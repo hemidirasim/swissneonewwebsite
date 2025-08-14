@@ -67,7 +67,7 @@ export const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <button 
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate(`/${language}`)}
                   className="text-sm opacity-80 hover:opacity-100 transition-opacity"
                 >
                   {t('nav.home')}
@@ -75,7 +75,7 @@ export const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => navigate('/products')}
+                  onClick={() => navigate(`/${language}/products`)}
                   className="text-sm opacity-80 hover:opacity-100 transition-opacity"
                 >
                   {t('nav.products')}
@@ -83,7 +83,7 @@ export const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => navigate('/about')}
+                  onClick={() => navigate(`/${language}/about`)}
                   className="text-sm opacity-80 hover:opacity-100 transition-opacity"
                 >
                   {t('nav.about')}
@@ -91,7 +91,7 @@ export const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => navigate('/instructions')}
+                  onClick={() => navigate(`/${language}/instructions`)}
                   className="text-sm opacity-80 hover:opacity-100 transition-opacity"
                 >
                   {t('nav.instructions')}
@@ -99,7 +99,7 @@ export const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => navigate('/articles')}
+                  onClick={() => navigate(`/${language}/articles`)}
                   className="text-sm opacity-80 hover:opacity-100 transition-opacity"
                 >
                   {t('nav.articles')}
@@ -107,7 +107,7 @@ export const Footer = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => navigate('/contact')}
+                  onClick={() => navigate(`/${language}/contact`)}
                   className="text-sm opacity-80 hover:opacity-100 transition-opacity"
                 >
                   {t('nav.contact')}

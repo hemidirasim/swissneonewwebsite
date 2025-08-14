@@ -48,7 +48,7 @@ export const ArticleDetail = () => {
       <div className="container mx-auto px-6 py-20">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Məqalə tapılmadı</h1>
-          <Button onClick={() => navigate('/articles')}>
+          <Button onClick={() => navigate(`/${language}/articles`)}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Məqalələrə qayıt
           </Button>
@@ -68,7 +68,7 @@ export const ArticleDetail = () => {
         <div className="mb-8 max-w-4xl mx-auto">
           <Button
             variant="ghost"
-            onClick={() => navigate('/articles')}
+            onClick={() => navigate(`/${language}/articles`)}
             className="mb-4 hover:bg-white/10"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -143,7 +143,7 @@ export const ArticleDetail = () => {
               .filter(a => a.id !== articleId && a.category === article.category)
               .slice(0, 3)
               .map((relatedArticle) => (
-                <Card key={relatedArticle.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/articles/${relatedArticle.id}`)}>
+                <Card key={relatedArticle.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/${language}/articles/${relatedArticle.id}`)}>
                   <CardContent className="p-4">
                     {relatedArticle.image && (
                       <div className="h-32 mb-4 overflow-hidden rounded">

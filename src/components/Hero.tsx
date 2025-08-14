@@ -91,7 +91,7 @@ export const Hero = () => {
               <Button 
                 variant="premium" 
                 size="lg"
-                onClick={() => navigate('/products')}
+                onClick={() => navigate(`/${language}/products`)}
                 className="group"
               >
                 {t('hero.cta')}
@@ -100,7 +100,7 @@ export const Hero = () => {
               <Button 
                 variant="outline" 
                 size="lg"
-                onClick={() => navigate('/about')}
+                onClick={() => navigate(`/${language}/about`)}
               >
                 {t('hero.learn')}
               </Button>

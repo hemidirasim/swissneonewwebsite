@@ -143,7 +143,7 @@ export const ProductDetail = () => {
         <h2 className="text-2xl font-bold mb-4">
           {t('product.detail.productNotFound')}
         </h2>
-        <Button onClick={() => navigate('/')}>
+        <Button onClick={() => navigate(`/${language}`)}>
           {t('product.detail.backToHome')}
         </Button>
       </div>
@@ -156,7 +156,7 @@ export const ProductDetail = () => {
         {/* Back Button */}
         <Button 
           variant="ghost" 
-          onClick={() => navigate('/')}
+          onClick={() => navigate(`/${language}`)}
           className="mb-6 flex items-center gap-2 relative z-10 mt-20"
         >
           <ArrowLeft className="w-4 h-4" />

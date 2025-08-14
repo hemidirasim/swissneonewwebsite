@@ -281,7 +281,7 @@ export const Instructions = () => {
               <Button 
                 variant="outline" 
                 size="lg"
-                onClick={() => navigate('/contact')}
+                onClick={() => navigate(`/${language}/contact`)}
                 className="px-6 py-2"
               >
                 {language === 'az' ? 'Əlaqə' : 'Contact'}
