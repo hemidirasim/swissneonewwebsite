@@ -4,19 +4,21 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, FileText, Calendar } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { stripHtmlTags } from '@/lib/utils';
 
 export const ArticlesContent = () => {
   const { language } = useLanguage();
   const { articles, loading } = useAdminData();
   const navigate = useNavigate();
+  const { lang } = useParams<{ lang: string }>();
 
   console.log('📋 ArticlesContent - articles:', articles);
   console.log('📋 ArticlesContent - loading:', loading);
 
   const handleArticleClick = (articleId: string) => {
-    navigate(`/articles/${articleId}`);
+    const currentLang = lang || language;
+    navigate(`/${currentLang}/articles/${articleId}`);
   };
 
   return (
@@ -113,7 +115,7 @@ export const ArticlesContent = () => {
               {language === 'az' ? 'Məqalə tapılmadı' : 'No articles found'}
             </h2>
             <p className="text-muted-foreground">
-              {language === 'az' ? 'Hazırda heç bir məqalə mövcud deyil.' : 'No articles are currently available.'}
+              {language === 'az' ? 'Hələ heç bir məqalə yoxdur.' : 'No articles available yet.'}
             </p>
           </div>
         )}

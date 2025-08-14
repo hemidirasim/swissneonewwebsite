@@ -7,7 +7,7 @@ import { ArrowLeft, FileText } from 'lucide-react';
 import { renderHtmlContent } from '@/lib/utils';
 
 export const ArticleDetailContent = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, lang } = useParams<{ id: string; lang: string }>();
   const { language } = useLanguage();
   const { articles, loading } = useAdminData();
   const navigate = useNavigate();
@@ -19,6 +19,11 @@ export const ArticleDetailContent = () => {
   // Convert string ID to number for comparison
   const articleId = id ? parseInt(id, 10) : null;
   const article = articles?.find(a => a.id === articleId);
+
+  const handleBackClick = () => {
+    const currentLang = lang || language;
+    navigate(`/${currentLang}/articles`);
+  };
 
   if (loading) {
     return (
@@ -46,7 +51,7 @@ export const ArticleDetailContent = () => {
             <p className="text-muted-foreground mb-6">
               Axtardığınız məqalə mövcud deyil və ya silinib.
             </p>
-            <Button onClick={() => navigate('/articles')}>
+            <Button onClick={handleBackClick}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Məqalələrə qayıt
             </Button>
@@ -63,7 +68,7 @@ export const ArticleDetailContent = () => {
         <div className="mb-8 max-w-4xl mx-auto">
           <Button
             variant="ghost"
-            onClick={() => navigate('/articles')}
+            onClick={handleBackClick}
             className="mb-4 hover:bg-white/10"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
