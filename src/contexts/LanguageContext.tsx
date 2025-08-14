@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export type Language = 'az' | 'en';
 
@@ -312,12 +312,20 @@ const translations = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>('az');
+  // Initialize language from localStorage or default to 'az'
+  const [language, setLanguageState] = useState<Language>(() => {
+    const savedLanguage = localStorage.getItem('swissneo-language');
+    return (savedLanguage === 'az' || savedLanguage === 'en') ? savedLanguage : 'az';
+  });
 
-  // Set language and update URL
+  // Save language to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('swissneo-language', language);
+  }, [language]);
+
+  // Set language function
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    // URL will be updated by the page components using useNavigate
   };
 
   const t = (key: string): string => {
