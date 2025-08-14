@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { stripHtmlTags } from '@/lib/utils';
 
 export const Articles = () => {
   const { t, language } = useLanguage();
@@ -75,7 +76,7 @@ export const Articles = () => {
                     </h3>
 
                     <p className="text-muted-foreground mb-4 line-clamp-3">
-                      {article.content?.substring(0, 150)}...
+                      {stripHtmlTags(article.content || '').substring(0, 150)}...
                     </p>
 
                     <div className="flex items-center justify-between">
