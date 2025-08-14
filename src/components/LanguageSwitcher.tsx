@@ -28,7 +28,8 @@ export const LanguageSwitcher = () => {
     const hash = location.hash;
     const fullPath = newPath + searchParams + hash;
     
-    navigate(fullPath, { replace: true });
+    // Use push instead of replace to allow back/forward navigation
+    navigate(fullPath);
   };
 
   return (
