@@ -18,7 +18,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Vercel deployment cache busting - latest version
+// Vercel deployment cache busting - latest version v2.1
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
