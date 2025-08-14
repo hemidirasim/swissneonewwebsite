@@ -4,19 +4,21 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { stripHtmlTags } from '@/lib/utils';
 
 export const Articles = () => {
   const { t, language } = useLanguage();
   const { adminData, articles, loading } = useAdminData();
   const navigate = useNavigate();
+  const { lang } = useParams<{ lang: string }>();
 
   console.log('📋 Articles component - articles:', articles);
   console.log('📋 Articles component - loading:', loading);
 
   const handleArticleClick = (articleId: string) => {
-    navigate(`/articles/${articleId}`);
+    const currentLang = lang || language;
+    navigate(`/${currentLang}/articles/${articleId}`);
   };
 
   if (loading) {
@@ -105,20 +107,25 @@ export const Articles = () => {
               </Card>
             ))
           ) : (
-            <div className="col-span-full text-center py-10">
-              <p className="text-muted-foreground">{t('articles.notFound')}</p>
+            <div className="col-span-full text-center py-12">
+              <p className="text-lg text-muted-foreground">{t('articles.noArticles')}</p>
             </div>
           )}
         </div>
 
-        {/* No Articles Message */}
-        {articles.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">
-              {t('articles.noArticles')}
-            </p>
-          </div>
-        )}
+        {/* View All Button */}
+        <div className="text-center">
+          <Button
+            onClick={() => {
+              const currentLang = lang || language;
+              navigate(`/${currentLang}/articles`);
+            }}
+            className="group"
+          >
+            {t('nav.articles')}
+            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </div>
       </div>
     </section>
   );

@@ -16,7 +16,9 @@ export const ArticleDetailContent = () => {
   console.log('📋 ArticleDetailContent - id:', id);
   console.log('📋 ArticleDetailContent - loading:', loading);
 
-  const article = articles?.find(a => a.id === id);
+  // Convert string ID to number for comparison
+  const articleId = id ? parseInt(id, 10) : null;
+  const article = articles?.find(a => a.id === articleId);
 
   if (loading) {
     return (
@@ -102,25 +104,10 @@ export const ArticleDetailContent = () => {
             </div>
 
             {/* Article Content */}
-            <div className="prose prose-lg max-w-none">
-              <div 
-                className="text-foreground leading-relaxed"
-                dangerouslySetInnerHTML={{ 
-                  __html: renderHtmlContent(article.content || '') 
-                }}
-              />
-            </div>
-
-            {/* Article Footer */}
-            <div className="mt-12 pt-8 border-t">
-              <Button
-                variant="outline"
-                onClick={() => navigate('/articles')}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Bütün məqalələr
-              </Button>
-            </div>
+            <div 
+              className="prose prose-lg max-w-none text-foreground"
+              dangerouslySetInnerHTML={{ __html: renderHtmlContent(article.content) }}
+            />
           </CardContent>
         </Card>
       </div>

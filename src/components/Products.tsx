@@ -3,7 +3,7 @@ import { useAdminData } from '@/contexts/AdminDataContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { 
   ArrowRight, 
   Weight, 
@@ -18,6 +18,7 @@ export const Products = () => {
   const { t, language } = useLanguage();
   const { adminData } = useAdminData();
   const navigate = useNavigate();
+  const { lang } = useParams<{ lang: string }>();
 
   const products = [
     {
@@ -100,7 +101,10 @@ export const Products = () => {
 
                     {/* View Details Button */}
                     <Button 
-                      onClick={() => navigate(`/product/${product.id}`)}
+                      onClick={() => {
+                        const currentLang = lang || language;
+                        navigate(`/${currentLang}/product/${product.id}`);
+                      }}
                       className="w-full flex items-center gap-2 group"
                     >
                       {t('product.detail.viewDetails')}

@@ -34,6 +34,9 @@ export const ProductDetail = () => {
     window.scrollTo(0, 0);
   }, [productId]);
 
+  // Convert string productId to number for comparison
+  const productIdNum = productId ? parseInt(productId, 10) : null;
+
   const products = [
     {
       id: 1,
@@ -117,21 +120,22 @@ export const ProductDetail = () => {
         energy: '70 kcal/100ml',
         protein: '1.5g/100ml',
         fat: '3.8g/100ml',
-        carbohydrates: '7.2g/100ml',
+        carbohydrates: '7.6g/100ml',
         vitamins: ['A', 'D', 'E', 'K', 'C', 'B1', 'B2', 'B6', 'B12'],
-        minerals: ['Dəmir', 'Sink', 'Kalsium', 'Fosfor', 'Maqnezium']
+        minerals: ['Kalsium', 'Fosfor', 'Maqnezium', 'Kalium', 'Natrium', 'Xlorid', 'Sink', 'Dəmir']
       } : {
         energy: '70 kcal/100ml',
         protein: '1.5g/100ml',
         fat: '3.8g/100ml',
-        carbohydrates: '7.2g/100ml',
+        carbohydrates: '7.6g/100ml',
         vitamins: ['A', 'D', 'E', 'K', 'C', 'B1', 'B2', 'B6', 'B12'],
-        minerals: ['Iron', 'Zinc', 'Calcium', 'Phosphorus', 'Magnesium']
+        minerals: ['Calcium', 'Phosphorus', 'Magnesium', 'Potassium', 'Sodium', 'Chloride', 'Zinc', 'Iron']
       }
     }
   ];
 
-  const product = products.find(p => p.id === parseInt(productId || '1'));
+  // Find the product by ID
+  const product = products.find(p => p.id === productIdNum);
 
   if (!product) {
     return (
