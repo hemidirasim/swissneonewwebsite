@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { createContext, useContext, useState } from 'react';
 
 export type Language = 'az' | 'en';
 
@@ -313,53 +312,13 @@ const translations = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
   const [language, setLanguageState] = useState<Language>('az');
-
-  // Extract language from URL path
-  const getLanguageFromPath = (pathname: string): Language => {
-    const pathSegments = pathname.split('/').filter(Boolean);
-    if (pathSegments.length > 0 && (pathSegments[0] === 'az' || pathSegments[0] === 'en')) {
-      return pathSegments[0] as Language;
-    }
-    return 'az'; // default language
-  };
-
-  // Update URL when language changes
-  const updateURL = (newLanguage: Language) => {
-    const currentPath = location.pathname;
-    const pathSegments = currentPath.split('/').filter(Boolean);
-    
-    // Remove existing language prefix if present
-    if (pathSegments.length > 0 && (pathSegments[0] === 'az' || pathSegments[0] === 'en')) {
-      pathSegments.shift();
-    }
-    
-    // Add new language prefix
-    const newPath = `/${newLanguage}${pathSegments.length > 0 ? '/' + pathSegments.join('/') : ''}`;
-    
-    // Preserve search params and hash
-    const searchParams = location.search;
-    const hash = location.hash;
-    const fullPath = newPath + searchParams + hash;
-    
-    navigate(fullPath, { replace: true });
-  };
 
   // Set language and update URL
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    updateURL(lang);
+    // URL will be updated by the page components using useNavigate
   };
-
-  // Initialize language from URL on mount and when location changes
-  useEffect(() => {
-    const urlLanguage = getLanguageFromPath(location.pathname);
-    if (urlLanguage !== language) {
-      setLanguageState(urlLanguage);
-    }
-  }, [location.pathname]);
 
   const t = (key: string): string => {
     return translations[language][key as keyof typeof translations['az']] || key;
